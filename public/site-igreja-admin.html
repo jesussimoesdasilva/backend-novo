@@ -105,6 +105,35 @@ th{color:var(--gold);font-size:12px;text-transform:uppercase}
   .print-date { text-align: right; font-size: 12px; color: #64748b; margin-top: 10px; }
 }
 .print-header { display: none; }
+
+/* =========================================
+   AJUSTES PARA TELEMÓVEL (PAINEL ADMIN)
+   ========================================= */
+@media (max-width: 900px) {
+  .painel { flex-direction: column; }
+  .sidebar { 
+    width: 100%; 
+    height: auto; 
+    position: relative; 
+    border-right: none; 
+    border-bottom: 1px solid var(--border); 
+    padding: 15px 0;
+  }
+  .brand { padding: 0 15px 15px; text-align: center; }
+  .brand-icon { margin: 0 auto 10px; }
+  .nav-section { padding: 0 10px; }
+  
+  .main { padding: 20px 15px; }
+  
+  .grid-2 { grid-template-columns: 1fr; gap: 10px; }
+  .grid-4 { grid-template-columns: 1fr 1fr; gap: 10px; }
+  
+  .card { padding: 15px; overflow-x: auto; }
+  table { min-width: 600px; }
+  
+  .btn { width: 100%; margin-bottom: 10px; }
+  input, select, textarea { font-size: 16px; }
+}
 </style>
 </head>
 <body>
@@ -134,7 +163,6 @@ th{color:var(--gold);font-size:12px;text-transform:uppercase}
       <div class="nav-title">Gestão</div>
       <button class="nav-item active" onclick="section('sobre',this)"><span class="icon">📋</span> Sobre</button>
       
-      <!-- NOVO BOTÃO: PAINEL DO PASTOR -->
       <button class="nav-item" onclick="window.open('/igreja/' + slug + '/pastor', '_blank')">
         <span class="icon">📖</span> Painel do Pastor
       </button>
@@ -968,7 +996,6 @@ async function gerarRelatorioDepartamentos() {
           </thead>
           <tbody>
             ${lista.map(d => {
-              // Calcula os membros únicos somando os membros de todos os sectores do departamento
               const membrosUnicos = new Set();
               if (d.sectores) {
                 d.sectores.forEach(s => {
@@ -997,7 +1024,6 @@ async function gerarRelatorioDepartamentos() {
   } catch (e) { content.innerHTML = '<div class="empty" style="color:var(--red)">Erro ao gerar relatório.</div>'; }
 }
 
-// NOVO RELATÓRIO: SECTORES DETALHADOS
 async function gerarRelatorioSectores() {
   const div = document.getElementById('areaRelatorio');
   const content = document.getElementById('conteudoRelatorio');

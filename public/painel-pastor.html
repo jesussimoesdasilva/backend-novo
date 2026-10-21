@@ -76,7 +76,6 @@ th{color:var(--gold);font-size:12px;text-transform:uppercase}
   .section { display: none !important; }
   .section.active { display: block !important; }
   
-  /* Remove sombras e fundos escuros no print */
   .card, #conteudoRelatorio > div { 
     background: #ffffff !important; 
     border: none !important; 
@@ -86,13 +85,30 @@ th{color:var(--gold);font-size:12px;text-transform:uppercase}
     border-radius: 0 !important;
   }
 
-  /* Cabeçalho do Relatório */
   .print-header { display: block !important; text-align: center; margin-bottom: 30px; border-bottom: 3px solid #020617; padding-bottom: 15px; }
   .print-header h1 { font-size: 24px; color: #020617; margin: 0 0 5px 0; text-transform: uppercase; letter-spacing: 2px; }
   .print-header p { font-size: 14px; color: #64748b; margin: 0; font-weight: bold; }
   .print-date { text-align: right; font-size: 12px; color: #64748b; margin-top: 10px; }
 }
 .print-header { display: none; }
+
+/* =========================================
+   AJUSTES PARA TELEMÓVEL
+   ========================================= */
+@media (max-width: 900px) {
+  .painel { flex-direction: column; }
+  .sidebar { width: 100%; height: auto; position: relative; border-right: none; border-bottom: 1px solid var(--border); padding: 15px 0; }
+  .brand { padding: 0 15px 15px; text-align: center; }
+  .brand-icon { margin: 0 auto 10px; }
+  .nav-section { padding: 0 10px; }
+  .main { padding: 20px 15px; }
+  .grid-2 { grid-template-columns: 1fr; gap: 10px; }
+  .grid-4 { grid-template-columns: 1fr 1fr; gap: 10px; }
+  .card { padding: 15px; overflow-x: auto; }
+  table { min-width: 600px; }
+  .btn { width: 100%; margin-bottom: 10px; }
+  input, select, textarea { font-size: 16px; }
+}
 </style>
 </head>
 <body>
@@ -284,6 +300,13 @@ async function fazerLogin(e) {
       method: 'POST', headers: {'Content-Type':'application/json'},
       body: JSON.stringify({ email, senha })
     });
+    
+    // Proteção contra resposta HTML (erro do servidor) em vez de JSON
+    const contentType = r.headers.get("content-type");
+    if (!contentType || !contentType.includes("application/json")) {
+      throw new Error("O servidor não respondeu corretamente. O pastor ainda não foi criado na base de dados.");
+    }
+
     const d = await r.json();
     if (!r.ok) throw new Error(d.message || 'Erro no login');
     
@@ -362,7 +385,6 @@ async function carregarRelatorios() {
   } catch (e) { console.error(e); }
 }
 
-// ===== GERAR RELATÓRIO PREMIUM COM DETALHES =====
 async function gerarRelatorioDetalhado() {
   const div = document.getElementById('areaRelatorio');
   const content = document.getElementById('conteudoRelatorio');
@@ -372,7 +394,6 @@ async function gerarRelatorioDetalhado() {
   try {
     const igrejaId = igrejaAtual.igrejaId || igrejaAtual.id;
     
-    // Vai buscar as estatísticas, as transações E o nome oficial da igreja
     const [resStats, resTransacoes, resIgreja] = await Promise.all([
       fetch(API + '/ofertas/estatisticas/' + igrejaId),
       fetch(API + '/ofertas/igreja/' + igrejaId),
@@ -526,7 +547,6 @@ async function adicionarDespesa() {
   }
 }
 
-// ORAÇÃO
 let abaOracaoAtual = 'PEDIDO';
 
 function mudarAbaAdmin(tipo) {
