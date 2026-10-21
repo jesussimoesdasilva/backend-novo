@@ -1,0 +1,1882 @@
+<!DOCTYPE html>
+<html lang="pt-AO">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Painel da Igreja</title>
+<style>
+:root{--navy:#020617;--navy2:#0f172a;--navy3:#1e293b;--gold:#facc15;--gold2:#eab308;--cyan:#22d3ee;--blue:#3b82f6;--green:#10b981;--red:#ef4444;--text:#f1f5f9;--muted:#94a3b8;--border:#334155}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--navy);color:var(--text)}
+.login-screen{min-height:100vh;display:grid;place-items:center;padding:20px;background:radial-gradient(ellipse at top,rgba(59,130,246,.15),transparent 50%),var(--navy)}
+.login-card{background:rgba(30,41,59,.9);border:1px solid var(--border);border-radius:20px;padding:40px;max-width:420px;width:100%}
+.login-logo{width:70px;height:70px;margin:0 auto 20px;border-radius:16px;background:linear-gradient(135deg,var(--gold),var(--gold2));display:grid;place-items:center;font-size:32px;overflow:hidden}
+.login-logo img{width:100%;height:100%;object-fit:cover}
+.login-card h2{text-align:center;color:var(--gold);font-size:24px;margin-bottom:8px}
+.login-card p{text-align:center;color:var(--muted);font-size:14px;margin-bottom:30px}
+.login-field{margin-bottom:16px}
+.login-field label{display:block;color:var(--text);font-size:13px;font-weight:600;margin-bottom:6px}
+.login-field input{width:100%;padding:13px 16px;border:1px solid var(--border);border-radius:10px;background:rgba(2,6,23,.6);color:var(--text);font-size:14px}
+.login-field input:focus{outline:none;border-color:var(--gold)}
+.btn-login{width:100%;padding:14px;border:none;border-radius:10px;background:linear-gradient(135deg,var(--gold),var(--gold2));color:var(--navy);font-weight:700;font-size:15px;cursor:pointer;margin-top:10px}
+.login-error{background:rgba(239,68,68,.15);color:#fca5a5;padding:12px;border-radius:8px;margin-top:15px;font-size:13px;display:none}
+.login-error.show{display:block}
+.painel{display:none;min-height:100vh}
+.painel.show{display:flex}
+.sidebar{width:260px;background:rgba(15,23,42,.8);border-right:1px solid var(--border);padding:25px 0;display:flex;flex-direction:column;position:sticky;top:0;height:100vh;overflow-y:auto}
+.brand{padding:0 25px 20px;border-bottom:1px solid var(--border);margin-bottom:15px}
+.brand-icon{width:48px;height:48px;background:linear-gradient(135deg,var(--gold),var(--gold2));border-radius:12px;display:grid;place-items:center;font-size:24px;margin-bottom:12px;overflow:hidden}
+.brand-icon img{width:100%;height:100%;object-fit:cover}
+.brand h1{color:var(--gold);font-size:16px;font-weight:800;line-height:1.3}
+.brand p{color:var(--muted);font-size:11px;margin-top:3px}
+.nav-section{padding:0 15px;margin-bottom:15px}
+.nav-title{color:var(--muted);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;padding:0 10px;margin-bottom:8px}
+.nav-item{display:flex;align-items:center;gap:12px;padding:11px 14px;border-radius:10px;color:var(--muted);font-size:14px;font-weight:500;margin-bottom:3px;cursor:pointer;border:none;background:none;width:100%;text-align:left}
+.nav-item:hover{background:rgba(255,255,255,.05);color:var(--text)}
+.nav-item.active{background:linear-gradient(90deg,rgba(250,204,21,.15),transparent);color:var(--gold);border-left:3px solid var(--gold);padding-left:11px}
+.nav-item .icon{font-size:17px;width:20px;text-align:center}
+.sidebar-footer{margin-top:auto;padding:15px 25px;border-top:1px solid var(--border)}
+.sidebar-footer button{width:100%;padding:10px;border-radius:8px;background:rgba(239,68,68,.15);color:var(--red);border:1px solid rgba(239,68,68,.3);font-weight:600;font-size:13px;cursor:pointer}
+.main{flex:1;padding:30px 40px;min-width:0}
+.topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:25px;flex-wrap:wrap;gap:15px}
+.topbar h2{font-size:26px;font-weight:800}
+.topbar p{color:var(--muted);font-size:14px;margin-top:4px}
+.card{background:rgba(30,41,59,.6);border:1px solid var(--border);border-radius:16px;padding:24px;margin-bottom:20px}
+.card h3{color:var(--gold);font-size:18px;margin-bottom:16px}
+.field{margin-bottom:14px}
+.field label{display:block;color:var(--text);font-size:13px;font-weight:600;margin-bottom:6px}
+input,textarea,select{width:100%;padding:12px 14px;border:1px solid var(--border);border-radius:10px;background:rgba(2,6,23,.6);color:var(--text);font-size:14px;font-family:inherit}
+input:focus,textarea:focus,select:focus{outline:none;border-color:var(--gold)}
+textarea{min-height:100px;resize:vertical}
+.btn{padding:11px 20px;border-radius:10px;font-weight:700;font-size:14px;border:none;cursor:pointer;font-family:inherit}
+.btn-primary{background:linear-gradient(135deg,var(--gold),var(--gold2));color:var(--navy)}
+.btn-success{background:var(--green);color:#fff}
+.btn-danger{background:rgba(239,68,68,.15);color:var(--red);border:1px solid rgba(239,68,68,.3);padding:7px 12px;font-size:12px;border-radius:8px}
+.btn-danger:hover{background:rgba(239,68,68,.25)}
+.btn-outline{background:transparent;border:1px solid var(--gold);color:var(--gold);padding:7px 12px;font-size:12px;border-radius:8px}
+.section{display:none}
+.section.active{display:block}
+.empty{padding:40px;text-align:center;color:var(--muted);font-style:italic}
+.toast-container{position:fixed;top:20px;right:20px;z-index:999}
+.toast{background:var(--navy3);border-left:4px solid var(--green);padding:14px 18px;border-radius:8px;margin-bottom:10px;box-shadow:0 8px 30px rgba(0,0,0,.5);font-size:14px;max-width:350px;animation:slideIn .3s}
+.toast.error{border-left-color:var(--red)}
+@keyframes slideIn{from{transform:translateX(400px);opacity:0}to{transform:translateX(0);opacity:1}}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:15px}
+.grid-4{display:grid;grid-template-columns:repeat(4, 1fr);gap:15px;margin-bottom:20px}
+@media(max-width:900px){.grid-4{grid-template-columns:1fr 1fr}}
+.depto-item{background:rgba(2,6,23,.6);border-radius:12px;padding:16px;margin-bottom:12px;border-left:4px solid var(--gold)}
+table{width:100%;border-collapse:collapse;margin-top:10px}
+th,td{padding:12px;text-align:left;border-bottom:1px solid var(--border)}
+th{color:var(--gold);font-size:12px;text-transform:uppercase}
+
+/* GALERIA */
+.album-card { background: rgba(2,6,23,.6); border-radius: 16px; overflow: hidden; border: 1px solid var(--border); margin-bottom: 15px; display: flex; flex-direction: column; }
+.album-capa { width: 100%; height: 180px; object-fit: cover; background: rgba(255,255,255,.05); }
+.album-info { padding: 15px; flex: 1; }
+.album-info h4 { color: var(--gold); font-size: 18px; margin-bottom: 5px; }
+.album-info p { color: var(--muted); font-size: 12px; margin-bottom: 10px; }
+.album-actions { display: flex; gap: 10px; }
+.foto-thumb { width: 100%; height: 120px; object-fit: cover; border-radius: 8px; background: rgba(255,255,255,.05); margin-bottom: 5px; }
+.foto-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 10px; margin-top: 15px; }
+.foto-item { position: relative; }
+.foto-item button { position: absolute; top: 5px; right: 5px; background: rgba(239,68,68,.9); border: none; border-radius: 50%; width: 24px; height: 24px; font-size: 12px; color: white; cursor: pointer; display: grid; place-items: center; }
+
+/* CHAT MENSAGENS */
+.chat-msg-item { background: rgba(2,6,23,.6); padding: 15px; border-radius: 10px; margin-bottom: 10px; border-left: 4px solid var(--blue); position: relative; }
+.chat-msg-item .autor { color: var(--gold); font-weight: bold; font-size: 13px; margin-bottom: 5px; display: block; }
+.chat-msg-item .texto { font-size: 14px; margin-bottom: 5px; }
+.chat-msg-item .hora { color: var(--muted); font-size: 11px; }
+.chat-msg-item .btn-delete { position: absolute; top: 10px; right: 10px; }
+
+/* ESTILOS PARA IMPRESSÃO (RELATÓRIOS) */
+@media print {
+  @page { margin: 10mm; size: A4 portrait; }
+  body { background: #ffffff !important; color: #000000 !important; font-family: 'Segoe UI', Arial, sans-serif; }
+  .sidebar, .topbar, .btn, .toast-container, nav, .nav-item, button, .card h3, .no-print { display: none !important; }
+  .painel { display: block !important; min-height: auto !important; }
+  .main { padding: 0 !important; margin: 0 !important; width: 100% !important; }
+  .section { display: none !important; }
+  .section.active { display: block !important; }
+  .card, #conteudoRelatorio > div { background: #ffffff !important; border: none !important; box-shadow: none !important; padding: 0 !important; margin: 0 !important; border-radius: 0 !important; }
+  
+  .print-header { display: block !important; text-align: center; margin-bottom: 30px; border-bottom: 3px solid #020617; padding-bottom: 15px; }
+  .print-header h1 { font-size: 24px; color: #020617; margin: 0 0 5px 0; text-transform: uppercase; letter-spacing: 2px; }
+  .print-header p { font-size: 14px; color: #64748b; margin: 0; font-weight: bold; }
+  .print-date { text-align: right; font-size: 12px; color: #64748b; margin-top: 10px; }
+}
+.print-header { display: none; }
+</style>
+</head>
+<body>
+
+<div class="login-screen" id="loginScreen">
+  <div class="login-card">
+    <div class="login-logo" id="loginLogo">⛪</div>
+    <h2 id="loginNome">A carregar...</h2>
+    <p>Painel de Gestão</p>
+    <form onsubmit="fazerLogin(event)">
+      <div class="login-field"><label>Email do Subadmin</label><input type="email" id="loginEmail" required></div>
+      <div class="login-field"><label>Senha</label><input type="password" id="loginSenha" required></div>
+      <button type="submit" class="btn-login">🔐 Entrar</button>
+      <div class="login-error" id="loginError"></div>
+    </form>
+  </div>
+</div>
+
+<div class="painel" id="painel">
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-icon" id="brandIcon">⛪</div>
+      <h1 id="brandNome">Igreja</h1>
+      <p>Painel Subadmin</p>
+    </div>
+    <div class="nav-section">
+      <div class="nav-title">Gestão</div>
+      <button class="nav-item active" onclick="section('sobre',this)"><span class="icon">📋</span> Sobre</button>
+      
+      <!-- NOVO BOTÃO: PAINEL DO PASTOR -->
+      <button class="nav-item" onclick="window.open('/igreja/' + slug + '/pastor', '_blank')">
+        <span class="icon">📖</span> Painel do Pastor
+      </button>
+      
+      <button class="nav-item" onclick="section('pastor',this)"><span class="icon">👤</span> Pastor</button>
+      <button class="nav-item" onclick="section('departamentos',this)"><span class="icon">🏛️</span> Departamentos</button>
+      <button class="nav-item" onclick="section('membros',this)"><span class="icon">👥</span> Membros</button>
+      <button class="nav-item" onclick="section('eventos',this)"><span class="icon">📅</span> Eventos</button>
+      <button class="nav-item" onclick="section('avisos',this)"><span class="icon">📢</span> Avisos</button>
+      <button class="nav-item" onclick="section('galeria',this)"><span class="icon">🖼️</span> Galeria</button>
+      <button class="nav-item" onclick="section('ofertas',this)"><span class="icon">💰</span> Ofertas</button>
+      <button class="nav-item" onclick="section('contas',this)"><span class="icon">🏦</span> Contas Bancárias</button>
+      <button class="nav-item" onclick="section('relatorios',this)"><span class="icon">📊</span> Relatórios</button>
+      <button class="nav-item" onclick="section('chat',this)"><span class="icon">💬</span> Moderar Chats</button>
+      <button class="nav-item" onclick="section('midia',this)"><span class="icon">🎬</span> Mídia</button>
+    </div>
+    <div class="nav-section">
+      <div class="nav-title">Aparência</div>
+      <button class="nav-item" onclick="section('tema',this)"><span class="icon">🎨</span> Tema</button>
+    </div>
+    <div class="sidebar-footer"><button onclick="logout()">🚪 Sair</button></div>
+  </aside>
+  
+  <main class="main">
+    <div class="topbar">
+      <div><h2 id="pageTitle">Sobre</h2><p id="pageSub">Editar informação da igreja</p></div>
+    </div>
+
+    <!-- SOBRE -->
+    <div id="section-sobre" class="section active">
+      <div class="card">
+        <h3>📋 Informação da Igreja</h3>
+        <div class="field"><label>Nome</label><input id="igNome"></div>
+        <div class="field"><label>Descrição Curta</label><input id="igDescricao"></div>
+        <div class="field"><label>Slogan (Hero)</label><input id="igSlogan" placeholder="Ex: Uma igreja que une a família"></div>
+        <div class="field"><label>Sobre (texto longo)</label><textarea id="igSobre"></textarea></div>
+        <div class="field"><label>Endereço</label><input id="igEndereco"></div>
+        <div class="field"><label>Telefone</label><input id="igTelefone"></div>
+        <div class="field"><label>Email</label><input id="igEmail"></div>
+        <div class="field" style="margin-top:20px;padding-top:20px;border-top:1px solid var(--border)">
+          <label style="color:var(--gold);font-size:15px">🎨 Textos do Hero (topo do site)</label>
+        </div>
+        <div class="field"><label>Texto Pequeno (topo)</label><input id="igHeroSmall"></div>
+        <div class="field"><label>Título Grande</label><input id="igHeroTitulo"></div>
+        <div class="field"><label>Destaque (dourado)</label><input id="igHeroDestaque"></div>
+        <button class="btn btn-primary" onclick="salvarSobre()" style="margin-top:15px;width:100%">💾 Salvar Alterações</button>
+      </div>
+    </div>
+
+    <!-- PASTOR -->
+    <div id="section-pastor" class="section">
+      <div class="card" id="formPastorCard">
+        <h3 id="formPastorTitulo">➕ Adicionar Pastor</h3>
+        <div class="grid-2">
+          <div class="field"><label>Nome *</label><input id="pNome"></div>
+          <div class="field"><label>Cargo</label><input id="pCargo"></div>
+          <div class="field"><label>Telefone</label><input id="pTelefone"></div>
+          <div class="field"><label>Email</label><input id="pEmail"></div>
+          <div class="field"><label>Versículo Favorito</label><input id="pVersiculo"></div>
+          <div class="field"><label>Foto</label><input type="file" id="pFoto" accept="image/*"></div>
+          <div class="field" style="grid-column:1/-1"><label>Biografia</label><textarea id="pBio"></textarea></div>
+          <div class="field" style="grid-column:1/-1"><label>Conselho da Semana</label><textarea id="pConselho"></textarea></div>
+          <div class="field" style="grid-column:1/-1">
+            <button class="btn btn-primary" onclick="salvarPastor()" style="width:100%" id="btnSalvarPastor">💾 Adicionar Pastor</button>
+            <button class="btn btn-outline" onclick="cancelarEdicaoPastor()" style="width:100%;margin-top:10px;display:none" id="btnCancelarPastor">Cancelar Edição</button>
+          </div>
+        </div>
+      </div>
+      <div class="card"><h3>📋 Pastores</h3><div id="listaPastores" class="empty">A carregar...</div></div>
+    </div>
+
+    <!-- DEPARTAMENTOS -->
+    <div id="section-departamentos" class="section">
+      <div class="grid-2">
+        <div class="card">
+          <h3>➕ Novo Departamento</h3>
+          <div class="field"><label>Nome *</label><input id="dNome" placeholder="Ex: Louvor"></div>
+          <div class="field"><label>Ícone</label><input id="dIcone" placeholder="🎶"></div>
+          <div class="field"><label>Líder do Departamento</label><select id="dLider"><option value="">A carregar membros...</option></select></div>
+          <button class="btn btn-primary" onclick="adicionarDepartamento()" style="width:100%">Criar Departamento</button>
+        </div>
+        <div class="card">
+          <h3>🏛️ Departamentos</h3>
+          <div id="listaDepartamentos" class="empty">A carregar...</div>
+        </div>
+      </div>
+      
+      <div class="card" id="sectorArea" style="display:none;margin-top:20px;border:2px solid var(--gold)">
+        <h3 id="sectorTitulo">Sectores do Departamento</h3>
+        <div style="display:flex;gap:10px;margin-bottom:15px">
+          <input id="sNome" placeholder="Nome do novo sector (ex: Vocal)" style="flex:1">
+          <button class="btn btn-primary" onclick="adicionarSector()">➕ Criar Sector</button>
+        </div>
+        <div id="listaSectores" class="empty">Nenhum sector criado.</div>
+      </div>
+    </div>
+
+    <!-- MEMBROS -->
+    <div id="section-membros" class="section">
+      <div class="card">
+        <h3>✅ Todos os Membros</h3>
+        <div id="listaMembros" class="empty">A carregar...</div>
+      </div>
+    </div>
+
+    <!-- EVENTOS -->
+    <div id="section-eventos" class="section">
+      <div class="card">
+        <h3>➕ Adicionar Evento</h3>
+        <div class="grid-2">
+          <div class="field"><label>Título *</label><input id="evTitle"></div>
+          <div class="field"><label>Data e Hora *</label><input type="datetime-local" id="evStartsAt"></div>
+          <div class="field" style="grid-column:1/-1"><label>Descrição</label><textarea id="evDescription"></textarea></div>
+          <div class="field"><label>Local</label><input id="evLocal"></div>
+          <div class="field"><label>Imagem (Opcional)</label><input type="file" id="evImagem" accept="image/*"></div>
+          <div class="field" style="grid-column:1/-1"><button class="btn btn-primary" onclick="adicionarEvento()" style="width:100%">💾 Adicionar Evento</button></div>
+        </div>
+      </div>
+      <div class="card">
+        <h3>📅 Eventos Agendados</h3>
+        <div id="listaEventos" class="empty">A carregar...</div>
+      </div>
+    </div>
+
+    <!-- AVISOS -->
+    <div id="section-avisos" class="section">
+      <div class="card">
+        <h3>➕ Adicionar Aviso</h3>
+        <div class="field"><label>Título *</label><input id="avTitulo"></div>
+        <div class="field"><label>Texto *</label><textarea id="avTexto"></textarea></div>
+        <button class="btn btn-primary" onclick="adicionarAviso()" style="width:100%">💾 Adicionar Aviso</button>
+      </div>
+      <div class="card">
+        <h3>📋 Avisos Publicados</h3>
+        <div id="listaAvisos" class="empty">A carregar...</div>
+      </div>
+    </div>
+
+    <!-- GALERIA -->
+    <div id="section-galeria" class="section">
+      <div class="card">
+        <h3>➕ Criar Álbum</h3>
+        <div class="grid-2">
+          <div class="field"><label>Nome do Álbum *</label><input id="gaNome" placeholder="Ex: Conferência 2026"></div>
+          <div class="field"><label>Data do Evento</label><input type="date" id="gaData"></div>
+          <div class="field" style="grid-column:1/-1"><label>Descrição</label><textarea id="gaDescricao" style="min-height:60px"></textarea></div>
+          <div class="field" style="grid-column:1/-1"><label>Foto de Capa</label><input type="file" id="gaCapa" accept="image/*"></div>
+          <div class="field" style="grid-column:1/-1"><button class="btn btn-primary" onclick="criarAlbum()" style="width:100%">💾 Criar Álbum</button></div>
+        </div>
+      </div>
+      <div class="card">
+        <h3>📚 Álbuns</h3>
+        <div id="listaAlbuns" class="empty">A carregar...</div>
+      </div>
+      <div class="card" id="albumDetalhe" style="display:none; border:2px solid var(--gold)">
+        <h3 id="albumTitulo">Fotos do Álbum</h3>
+        <div class="field"><label>Adicionar Fotos (Múltiplas)</label><input type="file" id="gaFotos" accept="image/*" multiple></div>
+        <button class="btn btn-primary" onclick="uploadFotosAlbum()" style="width:100%;margin-bottom:15px">📤 Enviar Fotos</button>
+        <div id="fotosAlbum" class="foto-grid"></div>
+      </div>
+    </div>
+
+    <!-- CONTAS BANCÁRIAS -->
+    <div id="section-contas" class="section">
+      <div class="card">
+        <h3>➕ Adicionar Conta Bancária</h3>
+        <div class="grid-2">
+          <div class="field"><label>Banco *</label><input id="cbBanco" placeholder="Ex: BAI, BFA"></div>
+          <div class="field"><label>Tipo *</label><input id="cbTipo" placeholder="Ex: IBAN, Multicaixa"></div>
+          <div class="field"><label>Número *</label><input id="cbNumero" placeholder="Ex: AO06... ou 923..."></div>
+          <div class="field"><label>Titular (Opcional)</label><input id="cbTitular" placeholder="Nome do titular"></div>
+        </div>
+        <button class="btn btn-primary" onclick="adicionarConta()" style="margin-top:15px;width:100%">💾 Guardar Conta</button>
+      </div>
+      <div class="card">
+        <h3>🏦 Contas Registadas</h3>
+        <div id="listaContas" class="empty">A carregar...</div>
+      </div>
+    </div>
+
+    <!-- OFERTAS -->
+    <div id="section-ofertas" class="section">
+      <div class="grid-4">
+        <div class="card" style="text-align:center; padding:15px; border-left:4px solid var(--green); margin-bottom:0;">
+          <h4 style="color:var(--muted); font-size:11px; text-transform:uppercase;">Dízimos</h4>
+          <p style="font-size:20px; font-weight:800; color:var(--green)" id="dashDizimos">0 Kz</p>
+        </div>
+        <div class="card" style="text-align:center; padding:15px; border-left:4px solid var(--gold); margin-bottom:0;">
+          <h4 style="color:var(--muted); font-size:11px; text-transform:uppercase;">Ofertas</h4>
+          <p style="font-size:20px; font-weight:800; color:var(--gold)" id="dashOfertas">0 Kz</p>
+        </div>
+        <div class="card" style="text-align:center; padding:15px; border-left:4px solid var(--red); margin-bottom:0;">
+          <h4 style="color:var(--muted); font-size:11px; text-transform:uppercase;">Saídas</h4>
+          <p style="font-size:20px; font-weight:800; color:var(--red)" id="dashSaidas">0 Kz</p>
+        </div>
+        <div class="card" style="text-align:center; padding:15px; border-left:4px solid var(--cyan); margin-bottom:0;">
+          <h4 style="color:var(--muted); font-size:11px; text-transform:uppercase;">Saldo Disponível</h4>
+          <p style="font-size:20px; font-weight:800; color:var(--cyan)" id="dashSaldo">0 Kz</p>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>📋 Gestão de Ofertas e Dízimos</h3>
+        <div id="listaOfertas" class="empty">A carregar...</div>
+      </div>
+    </div>
+
+    <!-- RELATÓRIOS -->
+    <div id="section-relatorios" class="section">
+      <div class="card no-print">
+        <h3>📊 Central de Relatórios</h3>
+        <p style="color:var(--muted); font-size:13px; margin-bottom:20px;">Selecione o relatório que deseja visualizar e imprimir.</p>
+        
+        <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:15px;">
+          <button class="btn btn-primary" onclick="gerarRelatorioMembros()" style="padding:20px; font-size:14px; display:flex; flex-direction:column; align-items:center; gap:10px;">
+            <span style="font-size:30px;">👥</span> Relatório de Membros
+          </button>
+          
+          <button class="btn btn-outline" onclick="gerarRelatorioDepartamentos()" style="padding:20px; font-size:14px; display:flex; flex-direction:column; align-items:center; gap:10px; color:var(--text); border-color:var(--text);">
+            <span style="font-size:30px;">🏛️</span> Departamentos
+          </button>
+
+          <button class="btn btn-outline" onclick="gerarRelatorioSectores()" style="padding:20px; font-size:14px; display:flex; flex-direction:column; align-items:center; gap:10px; color:#8b5cf6; border-color:#8b5cf6;">
+            <span style="font-size:30px;">🎯</span> Sectores Detalhados
+          </button>
+          
+          <button class="btn btn-success" onclick="gerarRelatorioFinancas()" style="padding:20px; font-size:14px; display:flex; flex-direction:column; align-items:center; gap:10px;">
+            <span style="font-size:30px;">💰</span> Extrato Financeiro
+          </button>
+        </div>
+      </div>
+
+      <div class="card" id="areaRelatorio" style="display:none; background:transparent; border:none; box-shadow:none; padding:0;">
+        <div id="conteudoRelatorio"></div>
+      </div>
+    </div>
+
+    <!-- TEMA -->
+    <div id="section-tema" class="section">
+      <div class="card">
+        <h3>🖼️ Logo da Igreja</h3>
+        <div class="field">
+          <label>Alterar Logo</label>
+          <input type="file" id="logoFile" accept="image/*">
+        </div>
+        <button class="btn btn-primary" onclick="uploadLogo()" style="width:100%">📤 Enviar Logo</button>
+      </div>
+
+      <div class="card">
+        <h3>🎞️ Imagens de Fundo do Hero (Máx 5)</h3>
+        <div class="field">
+          <label>Selecionar Imagens (5 no máximo)</label>
+          <input type="file" id="heroImagens" accept="image/*" multiple>
+        </div>
+        <button class="btn btn-primary" onclick="uploadHeroImagens()" style="width:100%">📤 Enviar Imagens</button>
+      </div>
+
+      <div class="card">
+        <h3>🎨 Cor de Fundo do Site</h3>
+        <div class="field">
+          <label>Escolher Cor</label>
+          <input type="color" id="corFundo" style="height:50px;padding:5px">
+        </div>
+        <button class="btn btn-primary" onclick="salvarCorFundo()" style="width:100%">💾 Guardar Cor</button>
+      </div>
+
+      <div class="card">
+        <h3>🎨 Cor da Barra de Título (Topo)</h3>
+        <div class="field">
+          <label>Escolher Cor</label>
+          <input type="color" id="corBarraTopo" style="height:50px;padding:5px">
+        </div>
+        <button class="btn btn-primary" onclick="salvarCorBarraTopo()" style="width:100%">💾 Guardar Cor</button>
+      </div>
+    </div>
+
+    <!-- CHAT MODERAÇÃO -->
+    <div id="section-chat" class="section">
+      <div class="card">
+        <h3>💬 Moderar Chats de Grupo</h3>
+        <p style="color:var(--muted); font-size:13px; margin-bottom:15px;">Selecione um departamento ou sector para visualizar e apagar mensagens inadequadas.</p>
+        
+        <div class="grid-2" style="margin-bottom:20px;">
+          <div class="field">
+            <label>Tipo de Chat</label>
+            <select id="chatTipo" onchange="carregarOpcoesChat()">
+              <option value="">Selecione...</option>
+              <option value="depto">Chat Geral do Departamento</option>
+              <option value="sector">Chat de Sector</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Selecione o Grupo</label>
+            <select id="chatAlvoId" disabled>
+              <option value="">Escolha o tipo primeiro</option>
+            </select>
+          </div>
+        </div>
+        <button class="btn btn-primary" onclick="carregarMensagensModeracao()" style="width:100%; margin-bottom:20px;">🔄 Carregar Mensagens</button>
+        
+        <div id="listaMensagensModeracao" class="empty">Nenhuma mensagem carregada.</div>
+      </div>
+    </div>
+
+    <!-- MÍDIA -->
+    <div id="section-midia" class="section">
+      
+      <!-- BLOCO LIVE -->
+      <div class="card">
+        <h3>🔴 Transmissão ao Vivo (YouTube)</h3>
+        <div class="field"><label>Link da Live do YouTube</label><input id="liveUrl" placeholder="https://www.youtube.com/watch?v=..."></div>
+        <div style="display:flex; gap:10px; margin-top:10px;">
+          <button class="btn btn-primary" onclick="ativarLive(true)" id="btnAtivarLive">🔴 Ativar Live no Site</button>
+          <button class="btn btn-danger" onclick="ativarLive(false)" id="btnDesativarLive" style="display:none;">⏹️ Encerrar Live</button>
+        </div>
+      </div>
+
+      <!-- BLOCO ADICIONAR MÍDIA -->
+      <div class="card">
+        <h3>🎬 Adicionar Nova Mídia</h3>
+        <div class="grid-2">
+          <div class="field">
+            <label>Tipo</label>
+            <select id="mdTipo"><option value="VIDEO">🎬 Vídeo</option><option value="AUDIO">🎧 Áudio</option></select>
+          </div>
+          <div class="field">
+            <label>Fonte</label>
+            <select id="mdFonte" onchange="toggleFonteMidia()">
+              <option value="LINK">🔗 Link do YouTube</option>
+              <option value="ARQUIVO">📁 Carregar Ficheiro (MP3, MP4, MKV)</option>
+            </select>
+          </div>
+        </div>
+        <div class="field"><label>Título da Mídia *</label><input id="mdTitulo" placeholder="Ex: Culto de Domingo"></div>
+        
+        <div class="field" id="campoLink">
+          <label>Link do YouTube *</label>
+          <input id="mdUrl" placeholder="https://www.youtube.com/watch?v=...">
+        </div>
+
+        <div class="field" id="campoArquivo" style="display:none;">
+          <label>Ficheiro (MP3, MP4, MKV) *</label>
+          <input type="file" id="mdArquivo" accept="audio/*,video/*,.mkv,.mp3,.mp4">
+        </div>
+
+        <button class="btn btn-primary" onclick="adicionarMidia()" style="width:100%">💾 Guardar Mídia</button>
+      </div>
+
+      <!-- BLOCO LISTA DE MÍDIA -->
+      <div class="card">
+        <h3>📋 Mídia Publicada</h3>
+        <div id="listaMidiaAdmin" class="empty">A carregar...</div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- MODAL PARA GERIR SECTORES DO MEMBRO -->
+<div id="modalSectores" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:1000;place-items:center;padding:20px">
+  <div class="card" style="max-width:500px;width:100%;border-color:var(--gold)">
+    <h3>👥 Sectores do Membro</h3>
+    <p id="modalMembroNome" style="margin-bottom:15px;color:var(--gold)"></p>
+    <div id="checkSectores" style="display:flex;flex-direction:column;gap:10px;max-height:200px;overflow-y:auto;margin-bottom:20px"></div>
+    <div style="display:flex;gap:10px;justify-content:flex-end">
+      <button class="btn btn-outline" onclick="document.getElementById('modalSectores').style.display='none'">Cancelar</button>
+      <button class="btn btn-primary" onclick="salvarSectoresMembro()">Guardar</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast-container" id="toasts"></div>
+
+<script>
+const API = '/api';
+const pathParts = window.location.pathname.split('/');
+const slug = pathParts[pathParts.length - 2];
+let igrejaAtual = null;
+let currentDeptoId = null;
+let membrosLista = [];
+let sectoresLista = [];
+let membroEditando = null;
+let membrosAtivosLista = [];
+let pastorEditandoId = null;
+let albumAtualId = null;
+let deptosListaGlobal = [];
+
+function toast(msg, type='success') {
+  const el = document.createElement('div');
+  el.className = 'toast ' + type;
+  el.textContent = msg;
+  document.getElementById('toasts').appendChild(el);
+  setTimeout(() => el.remove(), 4000);
+}
+
+async function initLogin() {
+  try {
+    const r = await fetch(API + '/igrejas');
+    const lista = await r.json();
+    const ig = lista.find(i => i.slug === slug);
+    if (!ig) return document.getElementById('loginNome').textContent = 'Igreja não encontrada';
+    
+    document.getElementById('loginNome').textContent = ig.nome;
+    if (ig.icone && ig.icone.startsWith('/logos/')) {
+      document.getElementById('loginLogo').innerHTML = `<img src="${ig.icone}">`;
+    } else {
+      document.getElementById('loginLogo').textContent = ig.icone || '⛪';
+    }
+    const saved = localStorage.getItem('subadmin_' + slug);
+    if (saved) {
+      igrejaAtual = JSON.parse(saved);
+      mostrarPainel();
+    }
+  } catch (e) { console.error(e); }
+}
+
+async function fazerLogin(e) {
+  e.preventDefault();
+  const email = document.getElementById('loginEmail').value.trim();
+  const senha = document.getElementById('loginSenha').value;
+  const err = document.getElementById('loginError');
+  err.classList.remove('show');
+  try {
+    const r = await fetch(API + '/igrejas/login', {
+      method: 'POST', headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ email, senha })
+    });
+    const d = await r.json();
+    if (!r.ok) throw new Error(d.message || 'Erro no login');
+    if (d.igreja.slug !== slug) throw new Error('Login não pertence a esta igreja');
+    igrejaAtual = d.igreja;
+    localStorage.setItem('subadmin_' + slug, JSON.stringify(d.igreja));
+    mostrarPainel();
+  } catch (e) {
+    err.textContent = '❌ ' + e.message;
+    err.classList.add('show');
+  }
+}
+
+function mostrarPainel() {
+  document.getElementById('loginScreen').style.display = 'none';
+  document.getElementById('painel').classList.add('show');
+  document.getElementById('brandNome').textContent = igrejaAtual.nome;
+  if (igrejaAtual.icone && igrejaAtual.icone.startsWith('/logos/')) {
+    document.getElementById('brandIcon').innerHTML = `<img src="${igrejaAtual.icone}">`;
+  } else {
+    document.getElementById('brandIcon').textContent = igrejaAtual.icone || '⛪';
+  }
+  carregarSobre();
+  carregarMembrosAtivosSilencioso(); 
+}
+
+function section(name, btn) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+  document.getElementById('section-' + name).classList.add('active');
+  btn.classList.add('active');
+  const titles = {sobre:['Sobre','Editar informação'],pastor:['Pastor','Gerir pastores'],departamentos:['Departamentos','Gerir departamentos e sectores'],membros:['Membros','Gerir todos os membros'],eventos:['Eventos','Agenda'],avisos:['Avisos','Comunicados'],galeria:['Galeria','Álbuns e Fotos'],ofertas:['Ofertas','Ver e validar'],contas:['Contas Bancárias','Gerir IBANs e Multicaixas'],relatorios:['Relatórios','Visão Global da Igreja'],chat:['Chat','Moderação de Mensagens'],midia:['Mídia','Gerir Vídeos, Áudios e Live'],tema:['Tema','Personalizar aparência']};
+  document.getElementById('pageTitle').textContent = titles[name][0];
+  document.getElementById('pageSub').textContent = titles[name][1];
+
+  if (name === 'pastor') { cancelarEdicaoPastor(); carregarPastores(); }
+  if (name === 'departamentos') { carregarDepartamentos(); document.getElementById('sectorArea').style.display = 'none'; }
+  if (name === 'membros') carregarMembros();
+  if (name === 'eventos') carregarEventos();
+  if (name === 'avisos') carregarAvisos();
+  if (name === 'galeria') carregarAlbuns();
+  if (name === 'contas') carregarContas();
+  if (name === 'ofertas') { carregarOfertas(); carregarEstatisticas(); }
+  if (name === 'relatorios') document.getElementById('areaRelatorio').style.display = 'none';
+  if (name === 'tema') carregarTema();
+  if (name === 'chat') { document.getElementById('listaMensagensModeracao').innerHTML = '<div class="empty">Nenhuma mensagem carregada.</div>'; }
+  if (name === 'midia') { carregarMidiaAdmin(); carregarEstadoLive(); }
+}
+
+function logout() {
+  localStorage.removeItem('subadmin_' + slug);
+  igrejaAtual = null;
+  document.getElementById('painel').classList.remove('show');
+  document.getElementById('loginScreen').style.display = 'grid';
+}
+
+// --- SOBRE ---
+async function carregarSobre() {
+  try {
+    const r = await fetch(API + '/igrejas/' + igrejaAtual.id);
+    const ig = await r.json();
+    document.getElementById('igNome').value = ig.nome || '';
+    document.getElementById('igDescricao').value = ig.descricao || '';
+    document.getElementById('igSlogan').value = ig.slogan || '';
+    document.getElementById('igSobre').value = ig.sobre || '';
+    document.getElementById('igEndereco').value = ig.endereco || '';
+    document.getElementById('igTelefone').value = ig.telefone || '';
+    document.getElementById('igEmail').value = ig.email || '';
+    document.getElementById('igHeroSmall').value = ig.heroSmall || '';
+    document.getElementById('igHeroTitulo').value = ig.heroTitulo || '';
+    document.getElementById('igHeroDestaque').value = ig.heroDestaque || '';
+  } catch (e) { toast('Erro ao carregar', 'error'); }
+}
+
+async function salvarSobre() {
+  try {
+    const dados = {
+      nome: document.getElementById('igNome').value, slug: igrejaAtual.slug,
+      descricao: document.getElementById('igDescricao').value, 
+      slogan: document.getElementById('igSlogan').value,
+      sobre: document.getElementById('igSobre').value,
+      endereco: document.getElementById('igEndereco').value, telefone: document.getElementById('igTelefone').value,
+      email: document.getElementById('igEmail').value, heroSmall: document.getElementById('igHeroSmall').value,
+      heroTitulo: document.getElementById('igHeroTitulo').value, heroDestaque: document.getElementById('igHeroDestaque').value,
+      icone: igrejaAtual.icone
+    };
+    const r = await fetch(API + '/igrejas/' + igrejaAtual.id, {
+      method: 'PUT', headers: {'Content-Type':'application/json'}, body: JSON.stringify(dados)
+    });
+    if (!r.ok) throw new Error('Erro');
+    toast('Alterações salvas!', 'success');
+  } catch (e) { toast(e.message, 'error'); }
+}
+
+// --- GALERIA ---
+async function carregarAlbuns() {
+  try {
+    const r = await fetch(API + '/galeria/albuns/igreja/' + igrejaAtual.id);
+    const lista = await r.json();
+    const div = document.getElementById('listaAlbuns');
+    if (!lista.length) return div.innerHTML = '<div class="empty">Nenhum álbum criado.</div>';
+    
+    div.innerHTML = `<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:15px;">` + lista.map(a => `
+      <div class="album-card">
+        ${a.capaUrl ? `<img src="${a.capaUrl}" class="album-capa">` : `<div class="album-capa" style="display:grid;place-items:center;font-size:40px">🖼️</div>`}
+        <div class="album-info">
+          <h4>${a.nome}</h4>
+          <p>${a.descricao || 'Sem descrição'} • ${a._count?.fotos || 0} fotos</p>
+          <div class="album-actions">
+            <button class="btn btn-outline" style="flex:1" onclick="abrirAlbum(${a.id}, '${a.nome}')">Ver Fotos</button>
+            <button class="btn btn-danger" onclick="apagarAlbum(${a.id})">🗑️</button>
+          </div>
+        </div>
+      </div>
+    `).join('') + `</div>`;
+  } catch (e) { document.getElementById('listaAlbuns').innerHTML = '<div class="empty" style="color:var(--red)">Erro ao carregar álbuns</div>'; }
+}
+
+async function criarAlbum() {
+  const nome = document.getElementById('gaNome').value.trim();
+  if (!nome) return toast('Nome do álbum obrigatório', 'error');
+  
+  try {
+    const r = await fetch(API + '/galeria/albuns/igreja/' + igrejaAtual.id, {
+      method: 'POST', headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({
+        nome,
+        descricao: document.getElementById('gaDescricao').value,
+        dataEvento: document.getElementById('gaData').value || null
+      })
+    });
+    if (!r.ok) throw new Error('Erro ao criar álbum');
+    const album = await r.json();
+
+    const file = document.getElementById('gaCapa').files[0];
+    if (file) {
+      const fd = new FormData(); fd.append('capa', file);
+      await fetch(API + '/galeria/albuns/' + album.id + '/capa', { method: 'POST', body: fd });
+    }
+
+    toast('Álbum criado!', 'success');
+    ['gaNome','gaDescricao','gaData','gaCapa'].forEach(id => document.getElementById(id).value = '');
+    carregarAlbuns();
+  } catch (e) { toast(e.message, 'error'); }
+}
+
+async function apagarAlbum(id) {
+  if (!confirm('Apagar este álbum e todas as suas fotos?')) return;
+  await fetch(API + '/galeria/albuns/' + id, { method: 'DELETE' });
+  toast('Álbum apagado', 'success'); carregarAlbuns();
+  document.getElementById('albumDetalhe').style.display = 'none';
+}
+
+async function abrirAlbum(id, nome) {
+  albumAtualId = id;
+  document.getElementById('albumTitulo').textContent = `Fotos do Álbum: ${nome}`;
+  document.getElementById('albumDetalhe').style.display = 'block';
+  carregarFotosAlbum();
+}
+
+async function carregarFotosAlbum() {
+  try {
+    const r = await fetch(API + '/galeria/fotos/album/' + albumAtualId);
+    const lista = await r.json();
+    const div = document.getElementById('fotosAlbum');
+    if (!lista.length) return div.innerHTML = '<p style="color:var(--muted)">Nenhuma foto neste álbum.</p>';
+    
+    div.innerHTML = lista.map(f => `
+      <div class="foto-item">
+        <img src="${f.url}" class="foto-thumb">
+        <button onclick="apagarFoto(${f.id})">x</button>
+      </div>
+    `).join('');
+  } catch (e) { toast('Erro ao carregar fotos', 'error'); }
+}
+
+async function uploadFotosAlbum() {
+  const input = document.getElementById('gaFotos');
+  if (!input.files || input.files.length === 0) return toast('Selecione pelo menos 1 foto', 'error');
+  
+  const formData = new FormData();
+  for (let i = 0; i < input.files.length; i++) {
+    formData.append('fotos', input.files[i]);
+  }
+  
+  try {
+    const r = await fetch(API + '/galeria/fotos/igreja/' + igrejaAtual.id + '/album/' + albumAtualId, {
+      method: 'POST', body: formData
+    });
+    if (!r.ok) throw new Error('Erro no upload');
+    toast('Fotos enviadas!', 'success');
+    input.value = '';
+    carregarFotosAlbum();
+    carregarAlbuns();
+  } catch (e) { toast(e.message, 'error'); }
+}
+
+async function apagarFoto(id) {
+  if (!confirm('Apagar esta foto?')) return;
+  await fetch(API + '/galeria/fotos/' + id, { method: 'DELETE' });
+  toast('Foto apagada', 'success'); carregarFotosAlbum(); carregarAlbuns();
+}
+
+// --- CONTAS BANCÁRIAS ---
+async function carregarContas() {
+  try {
+    const r = await fetch(API + '/contas/igreja/' + igrejaAtual.id);
+    const lista = await r.json();
+    const div = document.getElementById('listaContas');
+    if (!lista.length) return div.innerHTML = '<div class="empty">Nenhuma conta registada.</div>';
+    
+    div.innerHTML = lista.map(c => `
+      <div class="depto-item" style="display:flex;justify-content:space-between;align-items:center">
+        <div>
+          <strong style="color:var(--gold);font-size:16px">${c.banco} (${c.tipo})</strong>
+          <p style="color:var(--text);font-size:14px;margin-top:4px;font-family:monospace">${c.numero}</p>
+          <p style="color:var(--muted);font-size:12px">${c.titular || 'Sem titular'}</p>
+        </div>
+        <button class="btn btn-danger" onclick="apagarConta(${c.id})">🗑️</button>
+      </div>
+    `).join('');
+  } catch (e) { document.getElementById('listaContas').innerHTML = '<div class="empty" style="color:var(--red)">Erro ao carregar</div>'; }
+}
+
+async function adicionarConta() {
+  const banco = document.getElementById('cbBanco').value.trim();
+  const tipo = document.getElementById('cbTipo').value.trim();
+  const numero = document.getElementById('cbNumero').value.trim();
+  const titular = document.getElementById('cbTitular').value.trim();
+  
+  if (!banco || !tipo || !numero) return toast('Banco, tipo e número são obrigatórios', 'error');
+  
+  try {
+    const r = await fetch(API + '/contas/igreja/' + igrejaAtual.id, {
+      method: 'POST', headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ banco, tipo, numero, titular })
+    });
+    if (!r.ok) throw new Error('Erro');
+    toast('Conta adicionada!', 'success');
+    ['cbBanco','cbTipo','cbNumero','cbTitular'].forEach(id => document.getElementById(id).value = '');
+    carregarContas();
+  } catch (e) { toast(e.message, 'error'); }
+}
+
+async function apagarConta(id) {
+  if (!confirm('Apagar esta conta?')) return;
+  await fetch(API + '/contas/' + id, { method: 'DELETE' });
+  toast('Conta apagada', 'success'); carregarContas();
+}
+
+// --- OFERTAS ---
+async function carregarEstatisticas() {
+  try {
+    const r = await fetch(API + '/ofertas/estatisticas/' + igrejaAtual.id);
+    const d = await r.json();
+    document.getElementById('dashDizimos').textContent = (d.totalDizimos || 0).toLocaleString('pt-AO') + ' Kz';
+    document.getElementById('dashOfertas').textContent = (d.totalOfertas || 0).toLocaleString('pt-AO') + ' Kz';
+    document.getElementById('dashSaidas').textContent = (d.totalSaidas || 0).toLocaleString('pt-AO') + ' Kz';
+    document.getElementById('dashSaldo').textContent = (d.saldoReal || 0).toLocaleString('pt-AO') + ' Kz';
+  } catch (e) {}
+}
+
+async function carregarOfertas() {
+  try {
+    const r = await fetch(API + '/ofertas/igreja/' + igrejaAtual.id);
+    const lista = await r.json();
+    const div = document.getElementById('listaOfertas');
+    
+    if (!lista.length) return div.innerHTML = '<div class="empty">Nenhuma oferta registada.</div>';
+    
+    div.innerHTML = `
+      <table>
+        <thead><tr><th>Código</th><th>Doador / Descrição</th><th>Finalidade</th><th>Valor</th><th>Estado</th><th>Ações</th></tr></thead>
+        <tbody>
+          ${lista.map(o => {
+            let bgColor = o.status === 'VALIDADO' ? 'rgba(16,185,129,0.1)' : (o.status === 'AGUARDANDO_PASTOR' ? 'rgba(250,204,21,0.1)' : 'transparent');
+            let statusTxt = o.status === 'VALIDADO' ? '✅ Validado' : (o.status === 'AGUARDANDO_PASTOR' ? '⏳ Aguarda Pastor' : (o.status === 'NEGADO' ? '❌ Negado' : '🕒 Pendente'));
+            
+            let valorTxt = o.finalidade === 'SAIDA' 
+              ? `<span style="color:var(--red)">- ${o.valor.toLocaleString('pt-AO')} Kz</span>` 
+              : `<strong>${o.valor.toLocaleString('pt-AO')} Kz</strong>`;
+
+            let acoes = '';
+            if (o.status === 'PENDENTE') {
+              if (o.finalidade === 'Dízimo') {
+                acoes = `<button class="btn btn-primary" style="padding:4px 8px;font-size:11px" onclick="preValidar(${o.id})">Pré-Validar</button>`;
+              } else {
+                acoes = `<button class="btn btn-success" style="padding:4px 8px;font-size:11px" onclick="validarOferta(${o.id})">Validar</button>`;
+              }
+              acoes += ` <button class="btn btn-danger" style="padding:4px 8px;font-size:11px" onclick="negarOferta(${o.id})">Negar</button>`;
+            }
+            
+            return `
+              <tr style="background:${bgColor}">
+                <td style="font-family:monospace">${o.codigo || '-'}</td>
+                <td>${o.membro ? o.membro.nome : (o.nomeDoador || 'Anónimo')}</td>
+                <td>${o.finalidade}</td>
+                <td>${valorTxt}</td>
+                <td>${statusTxt}</td>
+                <td>${acoes}</td>
+              </tr>
+            `;
+          }).join('')}
+        </tbody>
+      </table>
+    `;
+  } catch (e) { document.getElementById('listaOfertas').innerHTML = '<div class="empty" style="color:var(--red)">Erro ao carregar ofertas</div>'; }
+}
+
+async function preValidar(id) {
+  if (!confirm('Confirma que os dados deste dízimo estão corretos? (Irá para o Pastor validar)')) return;
+  await fetch(API + '/ofertas/' + id + '/pre-validar', { method: 'PUT' });
+  toast('Dízimo pré-validado. Aguarda o Pastor.', 'success'); carregarOfertas(); carregarEstatisticas();
+}
+
+async function validarOferta(id) {
+  if (!confirm('Confirma que o dinheiro já entrou na conta?')) return;
+  await fetch(API + '/ofertas/' + id + '/validar', { method: 'PUT' });
+  toast('Oferta validada!', 'success'); carregarOfertas(); carregarEstatisticas();
+}
+
+async function negarOferta(id) {
+  if (!confirm('Tem a certeza que deseja NEGAR esta oferta?')) return;
+  await fetch(API + '/ofertas/' + id + '/negar', { method: 'PUT' });
+  toast('Oferta negada', 'success'); carregarOfertas(); carregarEstatisticas();
+}
+
+// --- RELATÓRIOS ---
+async function gerarRelatorioMembros() {
+  const div = document.getElementById('areaRelatorio');
+  const content = document.getElementById('conteudoRelatorio');
+  div.style.display = 'block';
+  content.innerHTML = '<div class="empty">A preparar o relatório...</div>';
+
+  try {
+    const r = await fetch(API + '/membros/igreja/' + igrejaAtual.id);
+    const lista = await r.json();
+
+    if (!lista.length) return content.innerHTML = '<div class="empty">Nenhum membro registado.</div>';
+
+    const html = `
+      <div style="background: #ffffff; color: #000000; padding: 40px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); margin-top: 20px;">
+        <div class="print-header" style="text-align:center; margin-bottom:30px; border-bottom:2px solid #020617; padding-bottom:15px;">
+          <h1 style="font-size:24px; text-transform:uppercase;">${igrejaAtual.nome}</h1>
+          <p style="color:#64748b; font-weight:bold;">Lista Oficial de Membros</p>
+          <div style="text-align:right; font-size:12px; color:#64748b; margin-top:10px;">Emitido em: ${new Date().toLocaleDateString('pt-PT')}</div>
+        </div>
+        
+        <table style="width:100%; border-collapse:collapse; font-size:14px;">
+          <thead>
+            <tr style="background:#020617; color:#fff;">
+              <th style="padding:12px; text-align:left;">Nome</th>
+              <th style="padding:12px; text-align:left;">Email</th>
+              <th style="padding:12px; text-align:left;">Telefone</th>
+              <th style="padding:12px; text-align:left;">Cargo</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${lista.map(m => `
+              <tr style="border-bottom:1px solid #e2e8f0;">
+                <td style="padding:12px;"><strong>${m.nome}</strong></td>
+                <td style="padding:12px;">${m.email}</td>
+                <td style="padding:12px;">${m.telefone || '-'}</td>
+                <td style="padding:12px;">${m.cargo || 'Membro'}</td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+        <button class="btn btn-primary no-print" style="margin-top:30px; width:100%;" onclick="window.print()">🖨️ Imprimir / Exportar PDF</button>
+      </div>
+    `;
+
+    content.innerHTML = html;
+    div.scrollIntoView({ behavior: 'smooth' });
+  } catch (e) { content.innerHTML = '<div class="empty" style="color:var(--red)">Erro ao gerar relatório.</div>'; }
+}
+
+async function gerarRelatorioDepartamentos() {
+  const div = document.getElementById('areaRelatorio');
+  const content = document.getElementById('conteudoRelatorio');
+  div.style.display = 'block';
+  content.innerHTML = '<div class="empty">A preparar o relatório...</div>';
+
+  try {
+    const r = await fetch(API + '/departamentos/igreja/' + igrejaAtual.id);
+    const lista = await r.json();
+
+    if (!lista.length) return content.innerHTML = '<div class="empty">Nenhum departamento registado.</div>';
+
+    const html = `
+      <div style="background: #ffffff; color: #000000; padding: 40px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); margin-top: 20px;">
+        <div class="print-header" style="text-align:center; margin-bottom:30px; border-bottom:2px solid #020617; padding-bottom:15px;">
+          <h1 style="font-size:24px; text-transform:uppercase;">${igrejaAtual.nome}</h1>
+          <p style="color:#64748b; font-weight:bold;">Relatório de Departamentos e Sectores</p>
+          <div style="text-align:right; font-size:12px; color:#64748b; margin-top:10px;">Emitido em: ${new Date().toLocaleDateString('pt-PT')}</div>
+        </div>
+        
+        <table style="width:100%; border-collapse:collapse; font-size:14px;">
+          <thead>
+            <tr style="background:#020617; color:#fff;">
+              <th style="padding:12px; text-align:left;">Departamento</th>
+              <th style="padding:12px; text-align:left;">Nº de Sectores</th>
+              <th style="padding:12px; text-align:left;">Nº de Membros</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${lista.map(d => {
+              // Calcula os membros únicos somando os membros de todos os sectores do departamento
+              const membrosUnicos = new Set();
+              if (d.sectores) {
+                d.sectores.forEach(s => {
+                  if (s.membros) s.membros.forEach(m => membrosUnicos.add(m.id));
+                });
+              }
+              const totalMembros = membrosUnicos.size;
+              const totalSectores = d.sectores ? d.sectores.length : 0;
+
+              return `
+                <tr style="border-bottom:1px solid #e2e8f0;">
+                  <td style="padding:12px;"><strong>${d.nome}</strong></td>
+                  <td style="padding:12px;">${totalSectores} sectores</td>
+                  <td style="padding:12px;">${totalMembros} membros</td>
+                </tr>
+              `;
+            }).join('')}
+          </tbody>
+        </table>
+        <button class="btn btn-primary no-print" style="margin-top:30px; width:100%;" onclick="window.print()">🖨️ Imprimir / Exportar PDF</button>
+      </div>
+    `;
+
+    content.innerHTML = html;
+    div.scrollIntoView({ behavior: 'smooth' });
+  } catch (e) { content.innerHTML = '<div class="empty" style="color:var(--red)">Erro ao gerar relatório.</div>'; }
+}
+
+// NOVO RELATÓRIO: SECTORES DETALHADOS
+async function gerarRelatorioSectores() {
+  const div = document.getElementById('areaRelatorio');
+  const content = document.getElementById('conteudoRelatorio');
+  div.style.display = 'block';
+  content.innerHTML = '<div class="empty">A preparar o relatório...</div>';
+
+  try {
+    const r = await fetch(API + '/departamentos/igreja/' + igrejaAtual.id);
+    const deptos = await r.json();
+
+    if (!deptos.length) return content.innerHTML = '<div class="empty">Nenhum departamento registado.</div>';
+
+    const html = `
+      <div style="background: #ffffff; color: #000000; padding: 40px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); margin-top: 20px;">
+        <div class="print-header" style="text-align:center; margin-bottom:30px; border-bottom:2px solid #020617; padding-bottom:15px;">
+          <h1 style="font-size:24px; text-transform:uppercase;">${igrejaAtual.nome}</h1>
+          <p style="color:#64748b; font-weight:bold;">Relatório Detalhado de Sectores</p>
+          <div style="text-align:right; font-size:12px; color:#64748b; margin-top:10px;">Emitido em: ${new Date().toLocaleDateString('pt-PT')}</div>
+        </div>
+        
+        <table style="width:100%; border-collapse:collapse; font-size:12px;">
+          <thead>
+            <tr style="background:#020617; color:#fff;">
+              <th style="padding:10px; text-align:left; width:25%;">Departamento</th>
+              <th style="padding:10px; text-align:left; width:25%;">Sector</th>
+              <th style="padding:10px; text-align:left; width:20%;">Líder</th>
+              <th style="padding:10px; text-align:left; width:30%;">Membros Associados</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${deptos.map(depto => {
+              if (!depto.sectores || depto.sectores.length === 0) {
+                return `
+                  <tr style="border-bottom:1px solid #e2e8f0;">
+                    <td style="padding:10px; color:#64748b;">${depto.nome}</td>
+                    <td style="padding:10px; font-style:italic; color:#94a3b8;">Sem sectores</td>
+                    <td style="padding:10px;">-</td>
+                    <td style="padding:10px;">0</td>
+                  </tr>
+                `;
+              }
+              return depto.sectores.map(sector => {
+                const qtdMembros = sector.membros ? sector.membros.length : 0;
+                return `
+                  <tr style="border-bottom:1px solid #e2e8f0;">
+                    <td style="padding:10px; color:#64748b; background:#f8fafc;">${depto.nome}</td>
+                    <td style="padding:10px;"><strong>${sector.nome}</strong></td>
+                    <td style="padding:10px;">${sector.lider ? sector.lider.nome : 'A definir'}</td>
+                    <td style="padding:10px;">
+                      ${qtdMembros} membros<br>
+                      <small style="color:#94a3b8;">${qtdMembros > 0 ? sector.membros.map(m => m.nome).join(', ') : 'Nenhum membro'}</small>
+                    </td>
+                  </tr>
+                `;
+              }).join('');
+            }).join('')}
+          </tbody>
+        </table>
+        <button class="btn btn-primary no-print" style="margin-top:30px; width:100%;" onclick="window.print()">🖨️ Imprimir / Exportar PDF</button>
+      </div>
+    `;
+
+    content.innerHTML = html;
+    div.scrollIntoView({ behavior: 'smooth' });
+  } catch (e) { content.innerHTML = '<div class="empty" style="color:var(--red)">Erro ao gerar relatório.</div>'; }
+}
+
+async function gerarRelatorioFinancas() {
+  const div = document.getElementById('areaRelatorio');
+  const content = document.getElementById('conteudoRelatorio');
+  div.style.display = 'block';
+  content.innerHTML = '<div class="empty">A preparar o extrato...</div>';
+
+  try {
+    const [resStats, resTransacoes] = await Promise.all([
+      fetch(API + '/ofertas/estatisticas/' + igrejaAtual.id),
+      fetch(API + '/ofertas/igreja/' + igrejaAtual.id)
+    ]);
+
+    const stats = await resStats.json();
+    const transacoes = await resTransacoes.json();
+
+    const validadas = transacoes.filter(t => t.status === 'VALIDADO');
+
+    const html = `
+      <div style="background: #ffffff; color: #000000; padding: 40px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); margin-top: 20px;">
+        <div class="print-header" style="text-align:center; margin-bottom:30px; border-bottom:2px solid #020617; padding-bottom:15px;">
+          <h1 style="font-size:24px; text-transform:uppercase;">${igrejaAtual.nome}</h1>
+          <p style="color:#64748b; font-weight:bold;">Extrato Financeiro Oficial</p>
+          <div style="text-align:right; font-size:12px; color:#64748b; margin-top:10px;">Emitido em: ${new Date().toLocaleDateString('pt-PT')} às ${new Date().toLocaleTimeString('pt-PT')}</div>
+        </div>
+        
+        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 15px; margin-bottom: 40px;">
+          <div style="border: 1px solid #cbd5e1; border-radius: 12px; padding: 20px; text-align: center; background: #f8fafc;">
+            <h4 style="font-size: 12px; color: #64748b; text-transform: uppercase; margin: 0 0 10px 0;">Dízimos</h4>
+            <p style="font-size: 22px; font-weight: 900; color: #020617; margin: 0;">${(stats.totalDizimos || 0).toLocaleString('pt-AO')} Kz</p>
+          </div>
+          <div style="border: 1px solid #cbd5e1; border-radius: 12px; padding: 20px; text-align: center; background: #f8fafc;">
+            <h4 style="font-size: 12px; color: #64748b; text-transform: uppercase; margin: 0 0 10px 0;">Ofertas</h4>
+            <p style="font-size: 22px; font-weight: 900; color: #020617; margin: 0;">${(stats.totalOfertas || 0).toLocaleString('pt-AO')} Kz</p>
+          </div>
+          <div style="border: 1px solid #cbd5e1; border-radius: 12px; padding: 20px; text-align: center; background: #f8fafc;">
+            <h4 style="font-size: 12px; color: #64748b; text-transform: uppercase; margin: 0 0 10px 0;">Saídas</h4>
+            <p style="font-size: 22px; font-weight: 900; color: #dc2626; margin: 0;">-${(stats.totalSaidas || 0).toLocaleString('pt-AO')} Kz</p>
+          </div>
+          <div style="border: 1px solid #020617; border-radius: 12px; padding: 20px; text-align: center; background: #020617; color: white;">
+            <h4 style="font-size: 12px; color: #facc15; text-transform: uppercase; margin: 0 0 10px 0;">SALDO REAL</h4>
+            <p style="font-size: 22px; font-weight: 900; color: #ffffff; margin: 0;">${(stats.saldoReal || 0).toLocaleString('pt-AO')} Kz</p>
+          </div>
+        </div>
+
+        <h3 style="text-align:center; margin-bottom:20px; color:#020617; font-size:18px; text-transform: uppercase;">Detalhes das Transações</h3>
+        
+        <table style="width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 14px; color: #000;">
+          <thead>
+            <tr>
+              <th style="background: #020617; color: #ffffff; padding: 12px; text-align: left; font-size: 12px; text-transform: uppercase;">Data</th>
+              <th style="background: #020617; color: #ffffff; padding: 12px; text-align: left; font-size: 12px; text-transform: uppercase;">Descrição / Doador</th>
+              <th style="background: #020617; color: #ffffff; padding: 12px; text-align: left; font-size: 12px; text-transform: uppercase;">Finalidade</th>
+              <th style="background: #020617; color: #ffffff; padding: 12px; text-align: right; font-size: 12px; text-transform: uppercase;">Valor (Kz)</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${validadas.length === 0 ? '<tr><td colspan="4" style="text-align:center; padding: 20px;">Nenhuma transação registada.</td></tr>' : ''}
+            ${validadas.map(t => {
+              const data = new Date(t.criadoEm).toLocaleDateString('pt-PT');
+              const isSaida = t.finalidade === 'SAIDA';
+              const desc = t.membro ? t.membro.nome : (t.nomeDoador || 'Anónimo');
+              
+              return `
+                <tr style="border-bottom: 1px solid #e2e8f0;">
+                  <td style="padding: 12px;">${data}</td>
+                  <td style="padding: 12px;">${desc}</td>
+                  <td style="padding: 12px;">${t.finalidade}</td>
+                  <td style="padding: 12px; text-align: right; color: ${isSaida ? '#dc2626' : '#059669'}; font-weight: bold;">
+                    ${isSaida ? '-' : '+'} ${t.valor.toLocaleString('pt-AO')}
+                  </td>
+                </tr>
+              `;
+            }).join('')}
+          </tbody>
+        </table>
+        
+        <button class="btn btn-primary no-print" style="margin-top:30px; width:100%;" onclick="window.print()">🖨️ Imprimir / Exportar PDF</button>
+      </div>
+    `;
+
+    content.innerHTML = html;
+  } catch (e) {
+    content.innerHTML = `<div class="empty" style="color:red">Erro ao gerar relatório: ${e.message}</div>`;
+  }
+}
+
+// --- PASTOR ---
+async function carregarPastores() {
+  try {
+    const r = await fetch(API + '/pastores/igreja/' + igrejaAtual.id);
+    const lista = await r.json();
+    const div = document.getElementById('listaPastores');
+    if (!lista.length) return div.innerHTML = '<div class="empty">Nenhum pastor.</div>';
+    div.innerHTML = lista.map(p => `
+      <div class="depto-item" style="display:flex;gap:15px;align-items:center">
+        ${p.foto ? `<img src="${p.foto}" style="width:50px;height:50px;border-radius:10px;object-fit:cover">` : `<div style="width:50px;height:50px;border-radius:10px;background:rgba(250,204,21,.1);display:grid;place-items:center">👤</div>`}
+        <div style="flex:1"><strong style="color:var(--gold)">${p.nome}</strong><p style="color:var(--muted);font-size:12px">${p.cargo}</p></div>
+        <button class="btn btn-outline" style="padding:5px 10px;font-size:12px" onclick="editarPastor(${p.id})">✏️ Editar</button>
+        <button class="btn btn-danger" onclick="apagarPastor(${p.id})">🗑️</button>
+      </div>
+    `).join('');
+  } catch (e) { document.getElementById('listaPastores').innerHTML = '<div class="empty" style="color:var(--red)">Erro</div>'; }
+}
+
+async function salvarPastor() {
+  const nome = document.getElementById('pNome').value.trim();
+  if (!nome) return toast('Nome obrigatório', 'error');
+  
+  const payload = {
+    nome, cargo: document.getElementById('pCargo').value, telefone: document.getElementById('pTelefone').value,
+    email: document.getElementById('pEmail').value, versiculo: document.getElementById('pVersiculo').value,
+    bio: document.getElementById('pBio').value, conselho: document.getElementById('pConselho').value
+  };
+
+  try {
+    let url = API + '/pastores/igreja/' + igrejaAtual.id;
+    let method = 'POST';
+
+    if (pastorEditandoId) {
+      url = API + '/pastores/' + pastorEditandoId;
+      method = 'PUT';
+    }
+
+    const r = await fetch(url, {
+      method: method, headers: {'Content-Type':'application/json'},
+      body: JSON.stringify(payload)
+    });
+    const d = await r.json();
+    if (!r.ok) throw new Error(d.message);
+
+    const file = document.getElementById('pFoto').files[0];
+    if (file) {
+      const fd = new FormData(); fd.append('foto', file);
+      await fetch(API + '/pastores/igreja/' + igrejaAtual.id + '/' + (pastorEditandoId || d.id) + '/foto', { method: 'POST', body: fd });
+    }
+
+    toast(pastorEditandoId ? 'Pastor atualizado!' : 'Pastor adicionado!', 'success');
+    cancelarEdicaoPastor();
+    carregarPastores();
+  } catch (e) { toast(e.message, 'error'); }
+}
+
+async function editarPastor(id) {
+  try {
+    const r = await fetch(API + '/pastores/' + id);
+    const p = await r.json();
+
+    document.getElementById('pNome').value = p.nome || '';
+    document.getElementById('pCargo').value = p.cargo || '';
+    document.getElementById('pTelefone').value = p.telefone || '';
+    document.getElementById('pEmail').value = p.email || '';
+    document.getElementById('pVersiculo').value = p.versiculo || '';
+    document.getElementById('pBio').value = p.bio || '';
+    document.getElementById('pConselho').value = p.conselho || '';
+
+    pastorEditandoId = id;
+    document.getElementById('formPastorTitulo').textContent = '✏️ Editar Pastor';
+    document.getElementById('btnSalvarPastor').textContent = '💾 Guardar Alterações';
+    document.getElementById('btnCancelarPastor').style.display = 'block';
+  } catch (e) { toast('Erro ao carregar os dados do pastor', 'error'); }
+}
+
+function cancelarEdicaoPastor() {
+  pastorEditandoId = null;
+  document.getElementById('formPastorTitulo').textContent = '➕ Adicionar Pastor';
+  document.getElementById('btnSalvarPastor').textContent = '💾 Adicionar Pastor';
+  document.getElementById('btnCancelarPastor').style.display = 'none';
+  ['pNome','pCargo','pTelefone','pEmail','pVersiculo','pBio','pConselho'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('pFoto').value = '';
+}
+
+async function apagarPastor(id) {
+  if (!confirm('Apagar pastor?')) return;
+  await fetch(API + '/pastores/' + id, { method: 'DELETE' });
+  toast('Apagado', 'success'); carregarPastores();
+}
+
+// --- DEPARTAMENTOS E SECTORES ---
+async function carregarDepartamentos() {
+  try {
+    await carregarMembrosAtivosSilencioso();
+    const selLider = document.getElementById('dLider');
+    selLider.innerHTML = '<option value="">Sem líder</option>' + membrosAtivosLista.map(m => `<option value="${m.id}">${m.nome} (${m.cargo || 'Membro'})</option>`).join('');
+
+    const r = await fetch(API + '/departamentos/igreja/' + igrejaAtual.id);
+    const lista = await r.json();
+    deptosListaGlobal = lista; 
+    
+    const div = document.getElementById('listaDepartamentos');
+    if (!lista.length) return div.innerHTML = '<div class="empty">Nenhum departamento.</div>';
+    
+    div.innerHTML = lista.map(d => `
+      <div class="depto-item" style="display:flex;justify-content:space-between;align-items:center; flex-wrap:wrap; gap:10px;">
+        <div>
+          <strong style="color:var(--gold);font-size:16px">${d.icone || '🏛️'} ${d.nome}</strong>
+          <p style="color:var(--muted);font-size:12px;margin-top:4px">${d._count?.sectores || 0} sectores · ${d._count?.membros || 0} membros</p>
+        </div>
+        <div style="display:flex; align-items:center; gap:8px;">
+          <select onchange="definirLiderDepto(${d.id}, this.value)" style="padding:5px;font-size:12px;width:150px; border-color:var(--gold);">
+            <option value="">Líder: A definir</option>
+            ${membrosAtivosLista.map(m => `<option value="${m.id}" ${d.liderId === m.id ? 'selected' : ''}>Líder: ${m.nome}</option>`).join('')}
+          </select>
+          <button class="btn btn-outline" onclick="verSectores(${d.id}, '${d.nome}')">Ver Sectores</button>
+          <button class="btn btn-danger" onclick="apagarDepartamento(${d.id})">🗑️</button>
+        </div>
+      </div>
+    `).join('');
+  } catch (e) { document.getElementById('listaDepartamentos').innerHTML = '<div class="empty" style="color:var(--red)">Erro</div>'; }
+}
+
+async function adicionarDepartamento() {
+  const nome = document.getElementById('dNome').value.trim();
+  const icone = document.getElementById('dIcone').value.trim() || '🏛️';
+  const liderId = document.getElementById('dLider').value;
+  if (!nome) return toast('Nome obrigatório', 'error');
+  try {
+    const r = await fetch(API + '/departamentos/igreja/' + igrejaAtual.id, {
+      method: 'POST', headers: {'Content-Type':'application/json'}, 
+      body: JSON.stringify({ nome, icone, liderId: liderId || null })
+    });
+    if (!r.ok) throw new Error('Erro');
+    toast('Departamento criado', 'success');
+    document.getElementById('dNome').value = ''; 
+    document.getElementById('dIcone').value = '';
+    document.getElementById('dLider').value = '';
+    carregarDepartamentos();
+  } catch (e) { toast(e.message, 'error'); }
+}
+
+async function definirLiderDepto(deptoId, membroId) {
+  try {
+    await fetch(API + '/departamentos/' + deptoId, {
+      method: 'PUT', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ liderId: membroId || null })
+    });
+    toast('Líder do Depto atualizado!', 'success');
+  } catch (e) { toast('Erro ao definir líder', 'error'); }
+}
+
+async function apagarDepartamento(id) {
+  if (!confirm('Apagar departamento? Todos os sectores serão perdidos.')) return;
+  await fetch(API + '/departamentos/' + id, { method: 'DELETE' });
+  toast('Apagado', 'success'); carregarDepartamentos();
+  document.getElementById('sectorArea').style.display = 'none';
+}
+
+async function verSectores(id, nome) {
+  currentDeptoId = id;
+  document.getElementById('sectorTitulo').textContent = `Sectores de: ${nome}`;
+  document.getElementById('sectorArea').style.display = 'block';
+  await carregarMembrosAtivosSilencioso();
+  carregarSectores();
+}
+
+async function carregarSectores() {
+  try {
+    const r = await fetch(API + '/sectores/igreja/' + igrejaAtual.id);
+    let lista = await r.json();
+    sectoresLista = lista;
+    lista = lista.filter(s => s.departamentoId === currentDeptoId);
+    
+    const div = document.getElementById('listaSectores');
+    if (!lista.length) return div.innerHTML = '<div class="empty">Nenhum sector neste departamento.</div>';
+    
+    div.innerHTML = lista.map(s => {
+      let nomes = "Nenhum membro associado";
+      if (s.membros && s.membros.length > 0) {
+        nomes = s.membros.map(m => m.nome).join(', ');
+      }
+
+      return `
+      <div style="background:rgba(2,6,23,.6);border:1px solid var(--border);border-radius:8px;padding:15px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px">
+        <div style="flex:1;">
+          <strong style="color:var(--text);font-size:16px">${s.nome}</strong>
+          <span style="color:var(--muted);font-size:12px;margin-left:10px">(${s._count?.membros || 0} membros)</span>
+          <p style="color:var(--gold2); font-size:13px; margin-top:6px; font-weight:bold;">👥 ${nomes}</p>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px">
+          <select onchange="definirLiderSector(${s.id}, this.value)" style="padding:6px;font-size:12px;width:150px;">
+            <option value="">Sem líder</option>
+            ${membrosAtivosLista.map(m => `<option value="${m.id}" ${s.liderId === m.id ? 'selected' : ''}>${m.nome}</option>`).join('')}
+          </select>
+          <button class="btn btn-danger" style="padding:2px 8px;font-size:10px" onclick="apagarSector(${s.id})">x</button>
+        </div>
+      </div>
+    `;
+    }).join('');
+  } catch (e) { toast('Erro sectores', 'error'); }
+}
+
+async function adicionarSector() {
+  const nome = document.getElementById('sNome').value.trim();
+  if (!nome || !currentDeptoId) return toast('Preenche o nome', 'error');
+  try {
+    const r = await fetch(API + '/sectores/igreja/' + igrejaAtual.id, {
+      method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ nome, departamentoId: currentDeptoId })
+    });
+    if (!r.ok) throw new Error('Erro');
+    toast('Sector criado', 'success'); document.getElementById('sNome').value = '';
+    carregarSectores(); carregarDepartamentos();
+  } catch (e) { toast(e.message, 'error'); }
+}
+
+async function apagarSector(id) {
+  if (!confirm('Apagar sector?')) return;
+  await fetch(API + '/sectores/' + id, { method: 'DELETE' });
+  toast('Apagado', 'success'); carregarSectores(); carregarDepartamentos();
+}
+
+async function definirLiderSector(sectorId, membroId) {
+  try {
+    await fetch(API + '/departamentos/sectores/' + sectorId + '/lider', {
+      method: 'PUT', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ membroId: membroId || null })
+    });
+    toast('Líder do Sector atualizado!', 'success');
+  } catch (e) { toast('Erro ao definir líder', 'error'); }
+}
+
+// --- MEMBROS ---
+async function carregarMembros() {
+  try {
+    const r = await fetch(API + '/membros/igreja/' + igrejaAtual.id);
+    const lista = await r.json();
+    membrosLista = lista;
+    
+    const rs = await fetch(API + '/sectores/igreja/' + igrejaAtual.id);
+    sectoresLista = await rs.json();
+
+    const div = document.getElementById('listaMembros');
+    if (!lista.length) {
+      div.innerHTML = '<div class="empty">Nenhum membro registado.</div>';
+      return;
+    }
+    
+    div.innerHTML = `
+      <table>
+        <thead><tr><th>Nome</th><th>Email</th><th>Cargo</th><th>Sectores</th><th>Ações</th></tr></thead>
+        <tbody>
+          ${lista.map(m => `
+            <tr>
+              <td><strong>${m.nome}</strong></td>
+              <td>${m.email}</td>
+              <td>
+                <select onchange="mudarCargoMembro(${m.id}, this.value)" style="padding:6px; font-size:13px; background:${m.cargo === 'Pastor' ? 'var(--gold)' : 'rgba(2,6,23,.6)'}; color:${m.cargo === 'Pastor' ? '#000' : 'var(--text)'}; border:1px solid var(--border); border-radius:6px; font-weight:bold; cursor:pointer;">
+                  <option value="Membro" ${m.cargo === 'Membro' || !m.cargo ? 'selected' : ''}>Membro</option>
+                  <option value="Diácono" ${m.cargo === 'Diácono' ? 'selected' : ''}>Diácono</option>
+                  <option value="Presbítero" ${m.cargo === 'Presbítero' ? 'selected' : ''}>Presbítero</option>
+                  <option value="Evangelista" ${m.cargo === 'Evangelista' ? 'selected' : ''}>Evangelista</option>
+                  <option value="Pastor" ${m.cargo === 'Pastor' ? 'selected' : ''}>Pastor</option>
+                  <option value="Administrador" ${m.cargo === 'Administrador' ? 'selected' : ''}>Administrador</option>
+                </select>
+              </td>
+              <td style="font-size:12px;color:var(--gold)">${(m.sectores || []).map(s=>s.nome).join(', ') || 'Nenhum'}</td>
+              <td style="display:flex;gap:5px;flex-wrap:wrap;">
+                <button class="btn btn-outline" style="padding:5px 10px;font-size:12px" onclick="abrirModalSectores(${m.id}, '${m.nome.replace(/'/g,"\\'")}', [${(m.sectores||[]).map(s=>s.id)}])">Sectores</button>
+                <button class="btn btn-primary" style="padding:5px 10px;font-size:12px; background:#3b82f6" onclick="criarPerfilPublico('${m.nome.replace(/'/g,"\\'")}', '${m.email}')">🌐 Criar Perfil</button>
+                <button class="btn btn-primary" style="padding:5px 10px;font-size:12px" onclick="redefinirSenha(${m.id})">🔑</button>
+                <button class="btn btn-danger" style="padding:5px 10px;font-size:12px" onclick="eliminarMembro(${m.id})">🗑️</button>
+              </td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+    `;
+  } catch (e) { toast('Erro ao carregar membros', 'error'); }
+}
+
+async function mudarCargoMembro(id, novoCargo) {
+  if (!confirm(`Tem a certeza que quer mudar o cargo deste membro para "${novoCargo}"?`)) {
+    carregarMembros(); // Reverte o dropdown se cancelar
+    return;
+  }
+  try {
+    const r = await fetch(API + '/membros/' + id + '/cargo', {
+      method: 'PUT', headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ cargo: novoCargo })
+    });
+    if (!r.ok) throw new Error('Erro ao atualizar cargo');
+    toast('Cargo atualizado com sucesso!', 'success');
+    carregarMembros();
+  } catch (e) { 
+    toast(e.message, 'error'); 
+    carregarMembros(); 
+  }
+}
+
+async function criarPerfilPublico(nome, email) {
+  if (!confirm(`Criar o perfil público do Pastor ${nome} no site?`)) return;
+  
+  try {
+    const r = await fetch(API + '/pastores/igreja/' + igrejaAtual.id, {
+      method: 'POST', headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ 
+        nome: nome, 
+        cargo: "Pastor", 
+        email: email,
+        bio: "Servo dedicado à obra de Deus.",
+        conselho: "Deus tem o melhor para a sua vida."
+      })
+    });
+    
+    if (!r.ok) throw new Error('Erro ao criar perfil');
+    toast('Perfil público do Pastor criado!', 'success');
+    
+    setTimeout(() => {
+      document.querySelector('[onclick="section(\'pastor\',this)"]').click();
+    }, 1000);
+    
+  } catch (e) { toast(e.message, 'error'); }
+}
+
+async function redefinirSenha(id) {
+  if (!confirm('Redefinir a senha deste membro para 123456?')) return;
+  try {
+    const r = await fetch(API + '/membros/' + id + '/reset-password', { method: 'PUT' });
+    if (!r.ok) throw new Error('Erro');
+    toast('Senha redefinida para 123456', 'success');
+  } catch (e) { toast(e.message, 'error'); }
+}
+
+async function eliminarMembro(id) {
+  if (!confirm('Apagar este membro permanentemente?')) return;
+  try {
+    const r = await fetch(API + '/membros/' + id, { method: 'DELETE' });
+    if (!r.ok) throw new Error('Erro');
+    toast('Membro eliminado', 'success');
+    carregarMembros();
+  } catch (e) { toast(e.message, 'error'); }
+}
+
+// --- MODAL SECTORES ---
+function abrirModalSectores(id, nome, sectoresAtuais) {
+  membroEditando = id;
+  document.getElementById('modalMembroNome').textContent = `Membro: ${nome}`;
+  const div = document.getElementById('checkSectores');
+  
+  if (!sectoresLista.length) {
+    div.innerHTML = '<p style="color:var(--red)">Crie sectores primeiro na aba Departamentos.</p>';
+  } else {
+    div.innerHTML = sectoresLista.map(s => `
+      <label style="display:flex;align-items:center;gap:10px;cursor:pointer">
+        <input type="checkbox" value="${s.id}" ${sectoresAtuais.includes(s.id) ? 'checked' : ''} style="width:auto">
+        ${s.nome}
+      </label>
+    `).join('');
+  }
+  document.getElementById('modalSectores').style.display = 'grid';
+}
+
+async function salvarSectoresMembro() {
+  const checks = document.querySelectorAll('#checkSectores input:checked');
+  const sectorIds = Array.from(checks).map(c => Number(c.value));
+  
+  try {
+    await fetch(API + '/membros/' + membroEditando + '/sectores', {
+      method: 'PUT', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ sectorIds })
+    });
+    toast('Sectores atualizados!', 'success');
+    document.getElementById('modalSectores').style.display = 'none';
+    carregarMembros();
+  } catch (e) { toast('Erro ao guardar sectores', 'error'); }
+}
+
+async function carregarMembrosAtivosSilencioso() {
+  try {
+    const r = await fetch(API + '/membros/igreja/' + igrejaAtual.id);
+    const lista = await r.json();
+    // Aceita todos os membros, a não ser que o estado seja explicitamente "INATIVO"
+    membrosAtivosLista = lista.filter(m => m.status !== 'INATIVO' && m.status !== 'inativo');
+  } catch (e) { console.error("Erro ao carregar membros", e); }
+}
+
+// --- EVENTOS ---
+async function carregarEventos() {
+  try {
+    const r = await fetch(API + '/eventos/igreja/' + igrejaAtual.id);
+    const lista = await r.json();
+    const div = document.getElementById('listaEventos');
+    if (!lista.length) return div.innerHTML = '<div class="empty">Nenhum evento agendado.</div>';
+    
+    div.innerHTML = lista.map(e => `
+      <div class="depto-item" style="display:flex;justify-content:space-between;align-items:center">
+        <div>
+          <strong style="color:var(--gold);font-size:16px">${e.title}</strong>
+          <p style="color:var(--muted);font-size:12px;margin-top:4px">${new Date(e.startsAt).toLocaleString('pt-PT')} • ${e.local || 'Local não definido'}</p>
+        </div>
+        <button class="btn btn-danger" onclick="apagarEvento(${e.id})">🗑️</button>
+      </div>
+    `).join('');
+  } catch (e) { document.getElementById('listaEventos').innerHTML = '<div class="empty" style="color:var(--red)">Erro</div>'; }
+}
+
+async function adicionarEvento() {
+  const title = document.getElementById('evTitle').value.trim();
+  const startsAt = document.getElementById('evStartsAt').value;
+  if (!title || !startsAt) return toast('Título e data são obrigatórios', 'error');
+  
+  try {
+    const r = await fetch(API + '/eventos/igreja/' + igrejaAtual.id, {
+      method: 'POST', headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({
+        title, startsAt,
+        description: document.getElementById('evDescription').value,
+        local: document.getElementById('evLocal').value,
+        imagem: null
+      })
+    });
+    if (!r.ok) throw new Error('Erro');
+    toast('Evento adicionado!', 'success');
+    ['evTitle','evStartsAt','evDescription','evLocal'].forEach(id => document.getElementById(id).value = '');
+    carregarEventos();
+  } catch (e) { toast(e.message, 'error'); }
+}
+
+async function apagarEvento(id) {
+  if (!confirm('Apagar este evento?')) return;
+  await fetch(API + '/eventos/' + id, { method: 'DELETE' });
+  toast('Evento apagado', 'success'); carregarEventos();
+}
+
+// --- AVISOS ---
+async function carregarAvisos() {
+  try {
+    const r = await fetch(API + '/avisos/igreja/' + igrejaAtual.id);
+    const resposta = await r.json();
+    const lista = resposta.avisos || resposta; 
+    
+    const div = document.getElementById('listaAvisos');
+    
+    if (!lista || lista.length === 0) {
+      div.innerHTML = '<div class="empty">Nenhum aviso publicado.</div>';
+      return;
+    }
+    
+    div.innerHTML = lista.map(a => `
+      <div class="depto-item" style="display:flex;justify-content:space-between;align-items:center">
+        <div>
+          <strong style="color:var(--gold);font-size:16px">${a.titulo}</strong>
+          <p style="color:var(--muted);font-size:12px;margin-top:4px">${a.texto}</p>
+        </div>
+        <button class="btn btn-danger" onclick="apagarAviso(${a.id})">🗑️</button>
+      </div>
+    `).join('');
+  } catch (e) { 
+    document.getElementById('listaAvisos').innerHTML = '<div class="empty" style="color:var(--red)">Erro ao carregar avisos</div>'; 
+  }
+}
+
+async function adicionarAviso() {
+  const titulo = document.getElementById('avTitulo').value.trim();
+  const texto = document.getElementById('avTexto').value.trim();
+  if (!titulo || !texto) return toast('Título e texto são obrigatórios', 'error');
+  
+  try {
+    const r = await fetch(API + '/avisos/igreja/' + igrejaAtual.id, {
+      method: 'POST', headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ titulo, texto })
+    });
+    if (!r.ok) throw new Error('Erro');
+    toast('Aviso publicado!', 'success');
+    document.getElementById('avTitulo').value = '';
+    document.getElementById('avTexto').value = '';
+    carregarAvisos();
+  } catch (e) { toast(e.message, 'error'); }
+}
+
+async function apagarAviso(id) {
+  if (!confirm('Apagar este aviso?')) return;
+  await fetch(API + '/avisos/' + id, { method: 'DELETE' });
+  toast('Aviso apagado', 'success'); carregarAvisos();
+}
+
+// --- CHAT MODERAÇÃO ---
+async function carregarOpcoesChat() {
+  const tipo = document.getElementById('chatTipo').value;
+  const sel = document.getElementById('chatAlvoId');
+  
+  if (!tipo) {
+    sel.innerHTML = '<option value="">Escolha o tipo primeiro</option>';
+    sel.disabled = true;
+    return;
+  }
+
+  if (tipo === 'depto') {
+    sel.innerHTML = deptosListaGlobal.map(d => `<option value="${d.id}">${d.nome}</option>`).join('');
+    sel.disabled = false;
+  } else {
+    try {
+      const r = await fetch(API + '/sectores/igreja/' + igrejaAtual.id);
+      const sectores = await r.json();
+      sel.innerHTML = sectores.map(s => `<option value="${s.id}">${s.nome}</option>`).join('');
+      sel.disabled = false;
+    } catch (e) { toast('Erro ao carregar sectores', 'error'); }
+  }
+}
+
+async function carregarMensagensModeracao() {
+  const tipo = document.getElementById('chatTipo').value;
+  const alvoId = document.getElementById('chatAlvoId').value;
+  const div = document.getElementById('listaMensagensModeracao');
+
+  if (!tipo || !alvoId) return toast('Selecione o tipo e o grupo', 'error');
+  
+  div.innerHTML = 'A carregar mensagens...';
+  
+  try {
+    const url = tipo === 'depto' 
+      ? `/api/grupos/mensagens/depto/${alvoId}` 
+      : `/api/grupos/mensagens/sector/${alvoId}`;
+      
+    const r = await fetch(url);
+    const msgs = await r.json();
+    
+    if (!Array.isArray(msgs)) {
+       div.innerHTML = `<p style="color:var(--red)">${msgs.message || 'Erro ao carregar.'}</p>`;
+       return;
+    }
+
+    if (msgs.length === 0) {
+      div.innerHTML = '<div class="empty">Nenhuma mensagem neste grupo.</div>';
+      return;
+    }
+
+    div.innerHTML = msgs.map(m => {
+      const hora = new Date(m.criadoEm).toLocaleString('pt-PT');
+      return `
+        <div class="chat-msg-item">
+          <button class="btn btn-danger btn-delete" onclick="apagarMensagem(${m.id})">🗑️ Apagar</button>
+          <span class="autor">${m.membro.nome}</span>
+          <p class="texto">${m.texto}</p>
+          <span class="hora">${hora}</span>
+        </div>
+      `;
+    }).join('');
+
+  } catch (e) {
+    div.innerHTML = '<p style="color:var(--red)">Erro de ligação.</p>';
+  }
+}
+
+async function apagarMensagem(msgId) {
+  if (!confirm('Tem a certeza que deseja APAGAR esta mensagem? (Ficará oculta para todos)')) return;
+  try {
+    const r = await fetch(API + '/grupos/mensagens/' + msgId + '/silenciar', { method: 'PUT' });
+    if (!r.ok) throw new Error('Erro ao apagar');
+    toast('Mensagem apagada!', 'success');
+    carregarMensagensModeracao(); 
+  } catch (e) { toast(e.message, 'error'); }
+}
+
+// --- TEMA ---
+async function carregarTema() {
+  try {
+    const r = await fetch(API + '/igrejas/' + igrejaAtual.id);
+    const ig = await r.json();
+    if (ig.corFundo) document.getElementById('corFundo').value = ig.corFundo;
+    if (ig.corBarraTopo) document.getElementById('corBarraTopo').value = ig.corBarraTopo;
+  } catch (e) { toast('Erro ao carregar tema', 'error'); }
+}
+
+async function uploadLogo() {
+  const input = document.getElementById('logoFile');
+  if (!input.files || input.files.length === 0) return toast('Selecione um logo', 'error');
+  const formData = new FormData();
+  formData.append('logo', input.files[0]);
+  
+  try {
+    const r = await fetch(API + '/igrejas/' + igrejaAtual.id + '/logo', {
+      method: 'POST', body: formData
+    });
+    if (!r.ok) throw new Error('Erro no upload');
+    toast('Logo atualizado!', 'success');
+  } catch (e) { toast(e.message, 'error'); }
+}
+
+async function uploadHeroImagens() {
+  const input = document.getElementById('heroImagens');
+  if (!input.files || input.files.length === 0) return toast('Selecione pelo menos 1 imagem', 'error');
+  if (input.files.length > 5) return toast('Máximo de 5 imagens', 'error');
+  
+  const formData = new FormData();
+  for (let i = 0; i < input.files.length; i++) {
+    formData.append('imagens', input.files[i]);
+  }
+  
+  try {
+    const r = await fetch(API + '/igrejas/' + igrejaAtual.id + '/imagens-hero', {
+      method: 'POST', body: formData
+    });
+    if (!r.ok) throw new Error('Erro no upload');
+    toast('Imagens enviadas com sucesso!', 'success');
+  } catch (e) { toast(e.message, 'error'); }
+}
+
+async function salvarCorFundo() {
+  const cor = document.getElementById('corFundo').value;
+  try {
+    const r = await fetch(API + '/igrejas/' + igrejaAtual.id + '/cor-fundo', {
+      method: 'PUT', headers: {'Content-Type':'application/json'}, 
+      body: JSON.stringify({ cor: cor })
+    });
+    if (!r.ok) throw new Error('Erro ao guardar');
+    toast('Cor de fundo guardada!', 'success');
+  } catch (e) { toast(e.message, 'error'); }
+}
+
+async function salvarCorBarraTopo() {
+  const cor = document.getElementById('corBarraTopo').value;
+  try {
+    const r = await fetch(API + '/igrejas/' + igrejaAtual.id + '/cor-barra-topo', {
+      method: 'PUT', headers: {'Content-Type':'application/json'}, 
+      body: JSON.stringify({ cor: cor })
+    });
+    if (!r.ok) throw new Error('Erro ao guardar');
+    toast('Cor da barra guardada!', 'success');
+  } catch (e) { toast(e.message, 'error'); }
+}
+
+// ===== GESTÃO DE MÍDIA =====
+async function carregarEstadoLive() {
+  try {
+    const r = await fetch(API + '/igrejas/' + igrejaAtual.id);
+    const ig = await r.json();
+    document.getElementById('liveUrl').value = ig.liveUrl || '';
+    if (ig.liveAtiva) {
+      document.getElementById('btnAtivarLive').style.display = 'none';
+      document.getElementById('btnDesativarLive').style.display = 'block';
+    } else {
+      document.getElementById('btnAtivarLive').style.display = 'block';
+      document.getElementById('btnDesativarLive').style.display = 'none';
+    }
+  } catch (e) { console.error(e); }
+}
+
+async function ativarLive(status) {
+  const url = document.getElementById('liveUrl').value.trim();
+  if (status && !url) return toast('Cole o link da live primeiro.', 'error');
+
+  try {
+    await fetch(API + '/igrejas/' + igrejaAtual.id + '/live', {
+      method: 'PUT', headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ liveUrl: url, liveAtiva: status })
+    });
+    toast(status ? 'Live ativada no site!' : 'Live encerrada.', 'success');
+    carregarEstadoLive();
+  } catch (e) { toast('Erro ao atualizar a live', 'error'); }
+}
+
+function toggleFonteMidia() {
+  const fonte = document.getElementById('mdFonte').value;
+  document.getElementById('campoLink').style.display = fonte === 'LINK' ? 'block' : 'none';
+  document.getElementById('campoArquivo').style.display = fonte === 'ARQUIVO' ? 'block' : 'none';
+}
+
+async function adicionarMidia() {
+  const titulo = document.getElementById('mdTitulo').value.trim();
+  const tipo = document.getElementById('mdTipo').value;
+  const fonte = document.getElementById('mdFonte').value;
+  const url = document.getElementById('mdUrl').value.trim();
+  const arquivo = document.getElementById('mdArquivo').files[0];
+
+  if (!titulo) return toast('Título obrigatório', 'error');
+  if (fonte === 'LINK' && !url) return toast('Link obrigatório', 'error');
+  if (fonte === 'ARQUIVO' && !arquivo) return toast('Ficheiro obrigatório', 'error');
+
+  const formData = new FormData();
+  formData.append('titulo', titulo);
+  formData.append('tipo', tipo);
+  if (fonte === 'LINK') formData.append('url', url);
+  else formData.append('arquivo', arquivo);
+
+  try {
+    await fetch(API + '/midia/igreja/' + igrejaAtual.id, { method: 'POST', body: formData });
+    toast('Mídia adicionada!', 'success');
+    document.getElementById('mdTitulo').value = '';
+    document.getElementById('mdUrl').value = '';
+    document.getElementById('mdArquivo').value = '';
+    carregarMidiaAdmin();
+  } catch (e) { toast('Erro ao guardar', 'error'); }
+}
+
+async function carregarMidiaAdmin() {
+  const div = document.getElementById('listaMidiaAdmin');
+  if (!div) return;
+  div.innerHTML = 'A carregar...';
+  
+  try {
+    const r = await fetch(API + '/midia/igreja/' + igrejaAtual.id);
+    const lista = await r.json();
+    if (!lista.length) return div.innerHTML = '<div class="empty">Nenhuma mídia registada.</div>';
+    
+    div.innerHTML = lista.map(m => `
+      <div class="depto-item" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+        <div>
+          <strong style="color:var(--gold);font-size:16px">${m.tipo === 'VIDEO' ? '🎬' : '🎧'} ${m.titulo}</strong>
+          <p style="color:var(--muted);font-size:12px;margin-top:4px;">${m.isArquivo ? '📁 Ficheiro Carregado' : '🔗 Link Externo'}</p>
+        </div>
+        <button class="btn btn-danger" onclick="apagarMidia(${m.id})">🗑️ Apagar</button>
+      </div>
+    `).join('');
+  } catch (e) { div.innerHTML = '<div class="empty" style="color:red">Erro ao carregar.</div>'; }
+}
+
+async function apagarMidia(id) {
+  if (!confirm('Apagar esta mídia?')) return;
+  try {
+    await fetch(API + '/midia/' + id, { method: 'DELETE' });
+    toast('Apagado', 'success');
+    carregarMidiaAdmin();
+  } catch (e) { toast('Erro ao apagar', 'error'); }
+}
+
+initLogin();
+</script>
+</body>
+</html>

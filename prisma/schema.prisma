@@ -1,0 +1,287 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Igreja {
+  id              Int      @id @default(autoincrement())
+  nome            String   @unique
+  slug            String   @unique
+  descricao       String?
+  icone           String?
+  endereco        String?
+  telefone        String?
+  email           String?
+  sobre           String?
+  heroSmall       String?  @default("ASSEMBLEIA DE DEUS PENTECOSTAL")
+  heroTitulo      String?  @default("Onde a fé encontra")
+  heroDestaque    String?  @default("o coração")
+  logoUrl         String?  
+  imagensHero     String?  
+  corFundo        String?  @default("#f1f5f9") 
+  corBarraTopo    String?  @default("#020617")
+  ativo           Boolean  @default(true)
+  subadminEmail   String   @unique
+  subadminSenha   String
+  
+  // NOVOS CAMPOS DA LIVE
+  liveAtiva       Boolean  @default(false)
+  liveUrl         String?
+  
+  membros         Membro[]
+  departamentos   Departamento[]
+  sectores        Sector[]
+  eventos         Evento[]
+  avisos          Aviso[]
+  pastores        Pastor[]
+  ofertas         Oferta[]
+  contasBancarias ContaBancaria[]
+  fotos           Foto[]
+  albuns          Album[]
+  mensagens       Mensagem[]
+  pedidosOracao   PedidoOracao[]
+  mensagensGrupo  MensagemGrupo[]
+  fotosAtividade  FotoAtividade[]
+  midias          Midia[]          // <-- NOVA RELAÇÃO DE MÍDIA
+  
+  criadoEm        DateTime @default(now())
+  atualizadoEm    DateTime @updatedAt
+}
+
+model Membro {
+  id              Int      @id @default(autoincrement())
+  igrejaId        Int
+  igreja          Igreja   @relation(fields: [igrejaId], references: [id], onDelete: Cascade)
+  nome            String
+  email           String   @unique
+  password        String
+  telefone        String
+  bi              String?
+  endereco        String?
+  foto            String?
+  resetCode       String?
+  dataNascimento  DateTime?
+  dataBatismo     DateTime?
+  cargo           String   @default("Membro")
+  status          String   @default("PENDENTE")
+  role            String   @default("member")
+  
+  departamentoId  Int?
+  departamento    Departamento? @relation("MembrosDoDepartamento", fields: [departamentoId], references: [id])
+  
+  sectores        Sector[] @relation("MembrosDosSectores")
+  lideraDeptos    Departamento[] @relation("LiderDepartamento")
+  lideraSetores   Sector[]       @relation("LiderSector")
+  ofertas         Oferta[]
+  mensagensEnviadas  Mensagem[] @relation("MensagensEnviadas")
+  mensagensRecebidas Mensagem[] @relation("MensagensRecebidas")
+  mensagensGrupo  MensagemGrupo[]
+  
+  criadoEm        DateTime @default(now())
+  atualizadoEm    DateTime @updatedAt
+}
+
+model Departamento {
+  id          Int      @id @default(autoincrement())
+  igrejaId    Int
+  igreja      Igreja   @relation(fields: [igrejaId], references: [id], onDelete: Cascade)
+  nome        String
+  icone       String?
+  descricao   String?
+  liderId     Int?
+  lider       Membro?  @relation("LiderDepartamento", fields: [liderId], references: [id])
+  membros     Membro[] @relation("MembrosDoDepartamento")
+  sectores    Sector[]
+  mensagensGrupo MensagemGrupo[]
+  criadoEm    DateTime @default(now())
+  atualizadoEm DateTime @updatedAt
+  @@unique([igrejaId, nome])
+}
+
+model Sector {
+  id              Int      @id @default(autoincrement())
+  igrejaId        Int
+  igreja          Igreja   @relation(fields: [igrejaId], references: [id], onDelete: Cascade)
+  nome            String
+  descricao       String?
+  departamentoId  Int
+  departamento    Departamento @relation(fields: [departamentoId], references: [id], onDelete: Cascade)
+  liderId         Int?
+  lider           Membro?  @relation("LiderSector", fields: [liderId], references: [id])
+  membros         Membro[] @relation("MembrosDosSectores")
+  mensagensGrupo  MensagemGrupo[]
+  fotosAtividade  FotoAtividade[]
+  criadoEm        DateTime @default(now())
+  atualizadoEm    DateTime @updatedAt
+}
+
+model Evento {
+  id          Int      @id @default(autoincrement())
+  igrejaId    Int
+  igreja      Igreja   @relation(fields: [igrejaId], references: [id], onDelete: Cascade)
+  title       String
+  description String?
+  local       String?  
+  imagem      String?  
+  startsAt    DateTime
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Aviso {
+  id          Int      @id @default(autoincrement())
+  igrejaId    Int
+  igreja      Igreja   @relation(fields: [igrejaId], references: [id], onDelete: Cascade)
+  titulo      String
+  texto       String
+  criadoEm    DateTime @default(now())
+}
+
+model Pastor {
+  id          Int      @id @default(autoincrement())
+  igrejaId    Int
+  igreja      Igreja   @relation(fields: [igrejaId], references: [id], onDelete: Cascade)
+  nome        String
+  cargo       String   @default("Pastor Presidente")
+  bio         String?
+  foto        String?
+  telefone    String?
+  email       String?
+  versiculo   String?
+  conselho    String?
+  criadoEm    DateTime @default(now())
+}
+
+model ContaBancaria {
+  id        Int      @id @default(autoincrement())
+  igrejaId  Int
+  igreja    Igreja   @relation(fields: [igrejaId], references: [id], onDelete: Cascade)
+  banco     String   
+  tipo      String   
+  numero    String   
+  titular   String?  
+  criadoEm  DateTime @default(now())
+}
+
+model Oferta {
+  id          Int      @id @default(autoincrement())
+  igrejaId    Int
+  igreja      Igreja   @relation(fields: [igrejaId], references: [id], onDelete: Cascade)
+  
+  membroId    Int?
+  membro      Membro?  @relation(fields: [membroId], references: [id], onDelete: SetNull)
+  
+  codigo      String   @unique 
+  nomeDoador  String?  
+  bi          String?  
+  telefone    String?  
+  finalidade  String   
+  valor       Float    
+  metodo      String   
+  referencia  String?  
+  
+  status      String   @default("PENDENTE") 
+  criadoEm    DateTime @default(now())
+  validadoEm  DateTime?
+}
+
+model Album {
+  id          Int      @id @default(autoincrement())
+  igrejaId    Int
+  igreja      Igreja   @relation(fields: [igrejaId], references: [id], onDelete: Cascade)
+  
+  nome        String
+  descricao   String?
+  capaUrl     String?
+  dataEvento  DateTime?
+  privado     Boolean  @default(false)
+  
+  fotos       Foto[]
+  criadoEm    DateTime @default(now())
+}
+
+model Foto {
+  id          Int      @id @default(autoincrement())
+  igrejaId    Int
+  igreja      Igreja   @relation(fields: [igrejaId], references: [id], onDelete: Cascade)
+  
+  albumId     Int?
+  album       Album?   @relation(fields: [albumId], references: [id], onDelete: SetNull)
+  
+  titulo      String?
+  url         String
+  criadoEm    DateTime @default(now())
+}
+
+model Mensagem {
+  id          Int      @id @default(autoincrement())
+  igrejaId    Int
+  igreja      Igreja   @relation(fields: [igrejaId], references: [id], onDelete: Cascade)
+  
+  deId        Int
+  de          Membro   @relation("MensagensEnviadas", fields: [deId], references: [id], onDelete: Cascade)
+  
+  paraId      Int
+  para        Membro   @relation("MensagensRecebidas", fields: [paraId], references: [id], onDelete: Cascade)
+  
+  texto       String
+  lida        Boolean  @default(false)
+  criadoEm    DateTime @default(now())
+}
+
+model PedidoOracao {
+  id        Int      @id @default(autoincrement())
+  igrejaId  Int
+  igreja    Igreja   @relation(fields: [igrejaId], references: [id], onDelete: Cascade)
+  
+  name      String?
+  contact   String?
+  message   String
+  tipo      String   @default("PEDIDO")     // PEDIDO ou TESTEMUNHO
+  status    String   @default("PENDENTE")   // PENDENTE, ORADO, APROVADO
+  createdAt DateTime @default(now())
+}
+
+model MensagemGrupo {
+  id            Int      @id @default(autoincrement())
+  igrejaId      Int
+  igreja        Igreja   @relation(fields: [igrejaId], references: [id], onDelete: Cascade)
+  deptoId       Int?
+  depto         Departamento? @relation(fields: [deptoId], references: [id], onDelete: Cascade)
+  sectorId      Int?
+  sector        Sector?   @relation(fields: [sectorId], references: [id], onDelete: Cascade)
+  membroId      Int
+  membro        Membro   @relation(fields: [membroId], references: [id], onDelete: Cascade)
+  texto         String
+  isSilenciado  Boolean  @default(false)
+  criadoEm      DateTime @default(now())
+}
+
+model FotoAtividade {
+  id            Int      @id @default(autoincrement())
+  igrejaId      Int
+  igreja        Igreja   @relation(fields: [igrejaId], references: [id], onDelete: Cascade)
+  sectorId      Int
+  sector        Sector   @relation(fields: [sectorId], references: [id], onDelete: Cascade)
+  url           String
+  legenda       String?
+  criadoEm      DateTime @default(now())
+}
+
+// ==========================================
+// NOVO MODELO: MÍDIA (VÍDEOS E ÁUDIOS)
+// ==========================================
+model Midia {
+  id        Int      @id @default(autoincrement())
+  igrejaId  Int
+  igreja    Igreja   @relation(fields: [igrejaId], references: [id], onDelete: Cascade)
+  titulo    String
+  tipo      String   // "VIDEO" ou "AUDIO"
+  url       String   // Link do YouTube ou caminho do ficheiro
+  isArquivo Boolean  @default(false) // true se for ficheiro carregado, false se for link
+  criadoEm  DateTime @default(now())
+}

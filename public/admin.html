@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="pt-AO">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Master - Sistema de Igrejas</title>
+<style>
+:root{--navy:#020617;--navy2:#0f172a;--navy3:#1e293b;--gold:#facc15;--gold2:#eab308;--cyan:#22d3ee;--green:#10b981;--red:#ef4444;--text:#f1f5f9;--muted:#94a3b8;--border:#334155}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--navy);color:var(--text);display:flex;min-height:100vh}
+.sidebar{width:260px;background:var(--navy2);border-right:1px solid var(--border);padding:25px 0;display:flex;flex-direction:column;position:sticky;top:0;height:100vh}
+.brand{padding:0 25px 25px;border-bottom:1px solid var(--border);margin-bottom:20px;display:flex;align-items:center;gap:15px}
+.brand-icon{width:50px;height:50px;background:linear-gradient(135deg,var(--gold),var(--gold2));border-radius:12px;display:grid;place-items:center;font-size:24px;color:var(--navy);box-shadow:0 5px 15px rgba(250,204,21,0.3)}
+.brand-text h1{color:var(--gold);font-size:18px;font-weight:900;line-height:1.1}
+.brand-text p{color:var(--muted);font-size:10px;text-transform:uppercase;letter-spacing:1px;margin-top:3px}
+.nav-section{padding:0 15px;margin-bottom:25px}
+.nav-title{color:var(--muted);font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:1.5px;padding:0 10px;margin-bottom:10px}
+.nav-item{display:flex;align-items:center;gap:12px;padding:12px 15px;border-radius:10px;color:var(--muted);font-size:14px;font-weight:600;margin-bottom:5px;cursor:pointer;border:none;background:none;width:100%;text-align:left;transition:0.2s}
+.nav-item:hover{background:rgba(255,255,255,.05);color:var(--text)}
+.nav-item.active{background:linear-gradient(90deg,rgba(250,204,21,.15),transparent);color:var(--gold);border-left:3px solid var(--gold);padding-left:12px}
+.nav-item .icon{font-size:18px;width:20px;text-align:center}
+.sidebar-footer{margin-top:auto;padding:20px 25px;border-top:1px solid var(--border)}
+.user-info{display:flex;align-items:center;gap:10px;margin-bottom:15px}
+.avatar{width:40px;height:40px;border-radius:50%;background:var(--gold);color:var(--navy);display:grid;place-items:center;font-weight:900;font-size:18px}
+.user-details h4{font-size:13px;color:var(--text)}
+.user-details p{font-size:11px;color:var(--muted)}
+.btn-logout{width:100%;padding:10px;border-radius:8px;background:rgba(239,68,68,.1);color:var(--red);border:1px solid rgba(239,68,68,.3);font-weight:700;font-size:13px;cursor:pointer;transition:0.2s}
+.btn-logout:hover{background:rgba(239,68,68,.2)}
+.main{flex:1;padding:40px;overflow-y:auto}
+.topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:30px}
+.topbar h2{font-size:32px;font-weight:900}
+.topbar p{color:var(--muted);font-size:14px;margin-top:5px}
+.top-avatar{width:50px;height:50px;border-radius:50%;background:var(--gold);color:var(--navy);display:grid;place-items:center;font-weight:900;font-size:22px;box-shadow:0 5px 15px rgba(250,204,21,0.3)}
+.grid-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:20px;margin-bottom:30px}
+.stat-card{background:var(--navy2);border:1px solid var(--border);border-radius:16px;padding:25px;position:relative;overflow:hidden}
+.stat-card::before{content:'';position:absolute;top:0;left:0;width:4px;height:100%;background:var(--gold)}
+.stat-icon{font-size:24px;margin-bottom:15px;color:var(--muted)}
+.stat-value{font-size:36px;font-weight:900;color:var(--gold);line-height:1}
+.stat-label{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-top:8px;font-weight:700}
+.section{display:none;animation:fadeIn 0.3s ease}
+.section.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.content-card{background:var(--navy2);border:1px solid var(--border);border-radius:16px;padding:30px;margin-bottom: 20px;}
+.content-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}
+.content-header h3{font-size:20px;color:var(--gold);display:flex;align-items:center;gap:10px}
+.premium-form-box{border:1px solid rgba(250,204,21,0.3); background: linear-gradient(180deg, rgba(30,41,59,0.5), rgba(15,23,42,0.8)); border-radius: 16px; padding: 25px; margin-bottom: 30px; transition: 0.3s;}
+.premium-form-box h4{color: var(--gold); font-size: 18px; margin-bottom: 20px; display: flex; align-items: center; gap: 10px;}
+.form-grid{display: grid; grid-template-columns: 1fr 1fr; gap: 20px;}
+.field{margin-bottom:0px}
+.field label{display:block;font-size:12px;font-weight:800;color:var(--muted);margin-bottom:8px;text-transform:uppercase;letter-spacing:1px}
+.field input{width:100%;padding:14px;background:rgba(2,6,23,0.8);border:1px solid var(--border);border-radius:10px;color:white;font-size:15px;font-family:inherit;transition: 0.2s;}
+.field input:focus{outline:none;border-color:var(--gold);box-shadow:0 0 0 3px rgba(250,204,21,0.15)}
+.field input:disabled { opacity: 0.5; cursor: not-allowed; }
+.btn{padding:14px 24px;border-radius:10px;font-weight:800;font-size:14px;border:none;cursor:pointer;font-family:inherit;transition:0.2s; display: flex; align-items: center; justify-content: center; gap: 8px;}
+.btn-primary{background:linear-gradient(135deg,var(--gold),var(--gold2));color:var(--navy); width: 100%; margin-top: 20px;}
+.btn-primary:hover{transform: translateY(-2px); box-shadow: 0 5px 15px rgba(250,204,21,0.3);}
+.btn-cancelar{background: rgba(255,255,255,0.05); color: var(--text); width: 100%; margin-top: 10px; border: 1px solid var(--border);}
+.btn-cancelar:hover{background: rgba(255,255,255,0.1);}
+.btn-danger { background: rgba(239,68,68,0.1); color: var(--red); border: 1px solid rgba(239,68,68,0.3); padding: 6px 12px; font-size: 12px; border-radius: 8px; width: auto; margin: 0 0 0 5px; transition: 0.2s;}
+.btn-danger:hover { background: rgba(239,68,68,0.2); }
+.btn-outline { background: transparent; border: 1px solid var(--gold); color: var(--gold); padding: 6px 12px; font-size: 12px; border-radius: 8px; width: auto; margin: 0 0 0 5px;}
+.btn-outline:hover { background: rgba(250,204,21,0.1); }
+table{width:100%;border-collapse:collapse;margin-top:10px}
+th{text-align:left;padding:15px;color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:1px;border-bottom:1px solid var(--border)}
+td{padding:15px;border-bottom:1px solid rgba(255,255,255,0.05);font-size:14px}
+tr:hover td{background:rgba(255,255,255,0.02)}
+.badge{padding:5px 12px;border-radius:20px;font-size:11px;font-weight:800; display: inline-block;}
+.badge-gold{background:rgba(250,204,21,0.15);color:var(--gold)}
+.badge-green{background:rgba(16,185,129,0.15);color:var(--green)}
+.badge-blue{background:rgba(59,130,246,0.15);color:#60a5fa}
+.badge-red{background:rgba(239,68,68,0.15);color:var(--red)}
+.toast-container{position:fixed;top:20px;right:20px;z-index:999}
+.toast{background:var(--navy3);border-left:4px solid var(--green);padding:15px 20px;border-radius:8px;margin-bottom:10px;box-shadow:0 10px 30px rgba(0,0,0,.5);font-size:14px;animation:slideIn 0.3s; color: white;}
+.toast.error{border-left-color:var(--red)}
+@keyframes slideIn{from{transform:translateX(400px);opacity:0}to{transform:translateX(0);opacity:1}}
+.loader{text-align:center;padding:40px;color:var(--muted);font-style:italic}
+</style>
+</head>
+<body>
+<aside class="sidebar">
+  <div class="brand">
+    <div class="brand-icon">⛪</div>
+    <div class="brand-text"><h1>Admin Master</h1><p>Sistema de Igrejas</p></div>
+  </div>
+  <div class="nav-section">
+    <div class="nav-title">Gestão</div>
+    <button class="nav-item active" onclick="mudarAba('igrejas', this)"><span class="icon">🏛️</span> Igrejas</button>
+    <button class="nav-item" onclick="mudarAba('subadmins', this)"><span class="icon">🛡️</span> Subadmins</button>
+    <button class="nav-item" onclick="mudarAba('membros', this)"><span class="icon">👥</span> Membros</button>
+    <button class="nav-item" onclick="mudarAba('financeiro', this)"><span class="icon">💰</span> Financeiro</button>
+  </div>
+  <div class="nav-section">
+    <div class="nav-title">Sistema</div>
+    <button class="nav-item" onclick="mudarAba('config', this)"><span class="icon">⚙️</span> Configurações</button>
+  </div>
+  <div class="sidebar-footer">
+    <div class="user-info"><div class="avatar" id="sidebarAvatar">A</div><div class="user-details"><h4>Admin Master</h4><p>admin@master.com</p></div></div>
+    <button class="btn-logout" onclick="window.location.href='/'">Sair do Sistema</button>
+  </div>
+</aside>
+<main class="main">
+  <div class="topbar"><div><h2 id="pageTitle">Igrejas</h2><p id="pageSub">Gestão de todas as igrejas no sistema</p></div><div class="top-avatar">A</div></div>
+  <div class="grid-stats">
+    <div class="stat-card"><div class="stat-icon">🏛️</div><div class="stat-value" id="statIgrejas">0</div><div class="stat-label">Igrejas</div></div>
+    <div class="stat-card"><div class="stat-icon">👥</div><div class="stat-value" id="statMembros">0</div><div class="stat-label">Membros</div></div>
+    <div class="stat-card"><div class="stat-icon">📅</div><div class="stat-value" id="statEventos">0</div><div class="stat-label">Eventos</div></div>
+    <div class="stat-card"><div class="stat-icon">🏢</div><div class="stat-value" id="statDeptos">0</div><div class="stat-label">Departamentos</div></div>
+  </div>
+
+  <div id="section-igrejas" class="section active">
+    <div class="premium-form-box" id="formBox">
+      <h4 id="formTitulo">✨ Adicionar Nova Igreja</h4>
+      <form id="formSubadmin" onsubmit="salvarSubadmin(event)">
+        <div class="form-grid">
+          <div class="field"><label>Nome da Igreja *</label><input type="text" id="subNomeIgreja" required placeholder="Ex: IECA Pastorado da Betânia" oninput="gerarSlugAutomatico()"></div>
+          <div class="field"><label>Link (Slug) *</label><input type="text" id="subSlug" required placeholder="Ex: ieca-betania" oninput="limparSlug(this)"></div>
+          <div class="field"><label>Email de Acesso (Subadmin) *</label><input type="email" id="subEmail" required placeholder="admin@igreja.com"></div>
+          <div class="field"><label>Palavra-passe *</label><input type="text" id="subSenha" required value="123456" placeholder="Mínimo 6 caracteres"></div>
+        </div>
+        <button type="submit" class="btn btn-primary" id="btnSalvarSubadmin">🚀 Criar Igreja e Ativar Painel</button>
+        <button type="button" class="btn btn-cancelar" id="btnCancelarEdicao" style="display:none;" onclick="cancelarEdicao()">Cancelar Edição</button>
+      </form>
+    </div>
+    <div class="content-card">
+      <div class="content-header"><h3>🏛️ Todas as Igrejas</h3></div>
+      <div id="listaIgrejas" class="loader">A carregar...</div>
+    </div>
+  </div>
+  
+  <div id="section-subadmins" class="section">
+    <div class="content-card"><div class="content-header"><h3>🛡️ Contas de Subadmin Ativas</h3></div><div id="listaSubadmins" class="loader">A carregar...</div></div>
+  </div>
+  
+  <div id="section-membros" class="section">
+    <div class="content-card"><div class="content-header"><h3>👥 Todos os Membros</h3></div><div id="listaMembrosGlobal" class="loader">A carregar membros...</div></div>
+  </div>
+  
+  <div id="section-financeiro" class="section">
+    <div class="content-card">
+      <div class="content-header"><h3>💰 Visão Financeira Global</h3></div>
+      <div style="display:grid; grid-template-columns: 1fr 1fr; gap:20px; margin-bottom:30px;">
+        <div style="background:rgba(16,185,129,0.1); padding:20px; border-radius:12px; border:1px solid rgba(16,185,129,0.2);"><p style="color:var(--muted); font-size:12px; text-transform:uppercase;">Total Entradas</p><h2 style="color:var(--green); font-size:28px; margin-top:5px;" id="finTotalEntradas">0 Kz</h2></div>
+        <div style="background:rgba(239,68,68,0.1); padding:20px; border-radius:12px; border:1px solid rgba(239,68,68,0.2);"><p style="color:var(--muted); font-size:12px; text-transform:uppercase;">Total Saídas</p><h2 style="color:var(--red); font-size:28px; margin-top:5px;" id="finTotalSaidas">0 Kz</h2></div>
+        <div style="background:rgba(250,204,21,0.1); padding:20px; border-radius:12px; border:1px solid rgba(250,204,21,0.2); grid-column: 1 / -1;"><p style="color:var(--muted); font-size:12px; text-transform:uppercase;">Saldo Global</p><h2 style="color:var(--gold); font-size:32px; margin-top:5px;" id="finTotalSaldo">0 Kz</h2></div>
+      </div>
+      <h4 style="color:var(--text); margin-bottom:15px; font-size:16px;">Resumo por Igreja</h4>
+      <div id="tabelaFinanceiroGlobal" class="loader">A carregar finanças...</div>
+    </div>
+  </div>
+  
+  <div id="section-config" class="section">
+    <div class="content-card" style="max-width:600px">
+      <div class="content-header"><h3>⚙️ Configurações do Admin</h3></div>
+      <div id="msgAlertaConfig" style="display:none; padding:15px; border-radius:8px; margin-bottom:20px; font-size:14px;"></div>
+      <div class="field" style="margin-bottom:20px;"><label>Nome do Administrador</label><input type="text" id="cfgNome" value="Admin Master"></div>
+      <div class="field" style="margin-bottom:20px;"><label>Email de Acesso</label><input type="email" id="cfgEmail" value="admin@master.com"></div>
+      <div class="field" style="margin-bottom:20px;"><label>Nova Palavra-passe</label><input type="password" id="cfgSenha" placeholder="Deixe em branco para não alterar"></div>
+      <button class="btn btn-primary" style="width:auto;" onclick="salvarConfiguracoes()">💾 Guardar Alterações</button>
+    </div>
+  </div>
+</main>
+<div class="toast-container" id="toasts"></div>
+<script>
+const API = '/api';
+let subadminEditandoId = null;
+function toast(msg, type='success') {
+  const el = document.createElement('div');
+  el.className = 'toast ' + type;
+  el.textContent = msg;
+  document.getElementById('toasts').appendChild(el);
+  setTimeout(() => el.remove(), 4000);
+}
+function mudarAba(aba, btn) {
+  document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.getElementById('section-' + aba).classList.add('active');
+  const titles = {igrejas: ['Igrejas', 'Gestão de todas as igrejas no sistema'],subadmins: ['Subadmins', 'Gerir contas de acesso das igrejas'],membros: ['Membros', 'Todos os membros registados no sistema'],financeiro: ['Financeiro', 'Visão global das finanças de todas as igrejas'],config: ['Configurações', 'Gerir dados do administrador']};
+  document.getElementById('pageTitle').textContent = titles[aba][0];
+  document.getElementById('pageSub').textContent = titles[aba][1];
+  if (aba === 'igrejas') carregarIgrejas();
+  if (aba === 'subadmins') carregarSubadmins();
+  if (aba === 'membros') carregarMembrosGlobal();
+  if (aba === 'financeiro') carregarFinanceiroGlobal();
+}
+async function carregarStatsTopo() {
+  try {
+    const r = await fetch(API + '/igrejas');
+    const igrejas = await r.json();
+    let totalMembros = 0, totalEventos = 0, totalDeptos = 0;
+    igrejas.forEach(ig => {
+      totalMembros += (ig._count?.membros || 0);
+      totalEventos += (ig._count?.eventos || 0);
+      totalDeptos += (ig._count?.departamentos || 0);
+    });
+    document.getElementById('statIgrejas').textContent = igrejas.length;
+    document.getElementById('statMembros').textContent = totalMembros;
+    document.getElementById('statEventos').textContent = totalEventos;
+    document.getElementById('statDeptos').textContent = totalDeptos;
+  } catch (e) { console.error("Erro stats", e); }
+}
+async function carregarIgrejas() {
+  const div = document.getElementById('listaIgrejas');
+  div.innerHTML = 'A carregar...';
+  try {
+    const r = await fetch(API + '/igrejas');
+    const igrejas = await r.json();
+    if (!igrejas.length) return div.innerHTML = '<p style="color:var(--muted)">Nenhuma igreja registada.</p>';
+    div.innerHTML = `
+      <table>
+        <thead><tr><th>Nome da Igreja</th><th>Slug (Link)</th><th>Membros</th><th>Departamentos</th><th>Ações</th></tr></thead>
+        <tbody>
+          ${igrejas.map(ig => `
+            <tr>
+              <td><strong>${ig.nome}</strong></td>
+              <td style="font-family:monospace; color:var(--gold)">/${ig.slug}</td>
+              <td>${ig._count?.membros || 0}</td>
+              <td>${ig._count?.departamentos || 0}</td>
+              <td>
+                <a href="/igreja/${ig.slug}" target="_blank" class="btn btn-primary" style="padding:6px 12px; font-size:12px; text-decoration:none; width:auto; margin:0;">🌐 Abrir Site</a>
+                <button class="btn btn-outline" onclick="prepararEdicao(${ig.id}, '${ig.nome.replace(/'/g, "\\'")}', '${ig.slug}', '${ig.subadminEmail || ''}')">✏️ Editar</button>
+                <button class="btn btn-danger" onclick="eliminarIgreja(${ig.id}, '${ig.nome.replace(/'/g, "\\'")}')">🗑️ Apagar</button>
+              </td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+    `;
+  } catch (e) { div.innerHTML = '<p style="color:var(--red)">Erro ao carregar igrejas.</p>'; }
+}
+async function eliminarIgreja(id, nome) {
+  if (!confirm(`Apagar a igreja "${nome}"? Todos os dados serão perdidos!`)) return;
+  try {
+    const r = await fetch(API + '/igrejas/' + id, { method: 'DELETE' });
+    if (!r.ok) throw new Error('Erro ao apagar igreja');
+    toast('Igreja apagada com sucesso!', 'success');
+    carregarIgrejas();
+    carregarStatsTopo();
+  } catch (e) { toast(e.message, 'error'); }
+}
+async function carregarSubadmins() {
+  const div = document.getElementById('listaSubadmins');
+  div.innerHTML = '<div class="loader">A carregar contas de acesso...</div>';
+  try {
+    const r = await fetch(API + '/igrejas');
+    const igrejas = await r.json();
+    if (!igrejas.length) return div.innerHTML = '<p style="color:var(--muted)">Nenhuma igreja registada.</p>';
+    div.innerHTML = `
+      <table>
+        <thead><tr><th>Igreja</th><th>Email de Login</th><th>Link de Acesso</th><th>Estado</th><th>Ações</th></tr></thead>
+        <tbody>
+          ${igrejas.map(ig => {
+            const temAcesso = ig.subadminEmail ? true : false;
+            return `
+            <tr>
+              <td><strong>${ig.nome}</strong></td>
+              <td>${temAcesso ? ig.subadminEmail : '<span class="badge badge-red">Sem acesso</span>'}</td>
+              <td><a href="/igreja/${ig.slug}/admin" target="_blank" style="color:var(--gold); text-decoration:none;">Aceder ao Painel ➔</a></td>
+              <td><span class="badge ${temAcesso ? 'badge-green' : 'badge-red'}">${temAcesso ? 'Ativo' : 'Inativo'}</span></td>
+              <td>
+                <button class="btn btn-primary" style="padding:6px 12px; font-size:12px; width:auto; margin:0;" onclick="prepararEdicao(${ig.id}, '${ig.nome.replace(/'/g, "\\'")}', '${ig.slug}', '${ig.subadminEmail || ''}')">
+                  ✏️ ${temAcesso ? 'Editar Acesso' : 'Criar Acesso'}
+                </button>
+              </td>
+            </tr>
+            `;
+          }).join('')}
+        </tbody>
+      </table>
+    `;
+  } catch (e) { div.innerHTML = '<p style="color:var(--red)">Erro ao carregar subadmins.</p>'; }
+}
+function gerarSlugAutomatico() {
+  if (subadminEditandoId) return;
+  const nome = document.getElementById('subNomeIgreja').value;
+  const slugInput = document.getElementById('subSlug');
+  let slug = nome.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9\s-]/g, '').trim().replace(/\s+/g, '-').replace(/-+/g, '-');
+  slugInput.value = slug;
+}
+function limparSlug(input) {
+  let val = input.value;
+  if (val.includes('http') || val.includes('/')) {
+    const parts = val.split('/').filter(p => p);
+    const idx = parts.indexOf('igreja');
+    if (idx !== -1 && parts.length > idx + 1) { val = parts[idx + 1]; } else { val = parts[parts.length - 1]; }
+    val = val.replace('admin', '').replace(/-+/g, '-');
+    input.value = val.toLowerCase().replace(/[^a-z0-9-]/g, '');
+  }
+}
+function prepararEdicao(id, nome, slug, email) {
+  subadminEditandoId = id;
+  document.getElementById('subNomeIgreja').value = nome;
+  document.getElementById('subSlug').value = slug;
+  document.getElementById('subEmail').value = email || '';
+  document.getElementById('subSenha').value = '123456';
+  document.getElementById('formTitulo').innerHTML = '✏️ Editar Igreja / Acesso Subadmin';
+  document.getElementById('btnSalvarSubadmin').innerHTML = '💾 Guardar Alterações';
+  document.getElementById('btnCancelarEdicao').style.display = 'block';
+  const btnIgrejas = document.querySelector('.nav-item[onclick*="mudarAba(\'igrejas\'"]');
+  mudarAba('igrejas', btnIgrejas);
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+function cancelarEdicao() {
+  subadminEditandoId = null;
+  document.getElementById('formSubadmin').reset();
+  document.getElementById('subSenha').value = '123456';
+  document.getElementById('formTitulo').innerHTML = '✨ Adicionar Nova Igreja';
+  document.getElementById('btnSalvarSubadmin').innerHTML = '🚀 Criar Igreja e Ativar Painel';
+  document.getElementById('btnCancelarEdicao').style.display = 'none';
+}
+async function salvarSubadmin(e) {
+  e.preventDefault();
+  const btn = document.getElementById('btnSalvarSubadmin');
+  const txtOriginal = btn.innerHTML;
+  btn.innerHTML = '⏳ A processar...'; btn.disabled = true;
+  const nome = document.getElementById('subNomeIgreja').value;
+  let slug = document.getElementById('subSlug').value.toLowerCase().replace(/[^a-z0-9-]/g, '-');
+  const subadminEmail = document.getElementById('subEmail').value;
+  const subadminSenha = document.getElementById('subSenha').value;
+  if (!nome || !slug || !subadminEmail || !subadminSenha) {
+    toast('Preencha todos os campos corretamente.', 'error');
+    btn.innerHTML = txtOriginal; btn.disabled = false;
+    return;
+  }
+  const payload = { nome, slug, subadminEmail, subadminSenha };
+  try {
+    const url = subadminEditandoId ? `${API}/igrejas/${subadminEditandoId}` : `${API}/igrejas`;
+    const method = subadminEditandoId ? 'PUT' : 'POST';
+    const r = await fetch(url, { method: method, headers: {'Content-Type':'application/json'}, body: JSON.stringify(payload) });
+    if (!r.ok) {
+      const err = await r.json();
+      if (err.message && err.message.includes('Unique constraint')) {
+        throw new Error('Este link (slug) ou email já está a ser usado.');
+      }
+      throw new Error(err.message || 'Erro ao guardar conta');
+    }
+    toast(subadminEditandoId ? 'Igreja atualizada com sucesso!' : 'Igreja criada com sucesso!', 'success');
+    cancelarEdicao();
+    carregarIgrejas();
+    carregarStatsTopo();
+  } catch (err) {
+    toast(err.message, 'error');
+  } finally {
+    btn.innerHTML = txtOriginal; btn.disabled = false;
+  }
+}
+async function carregarMembrosGlobal() {
+  const div = document.getElementById('listaMembrosGlobal');
+  div.innerHTML = '<div class="loader">A compilar lista de membros...</div>';
+  try {
+    const rIgrejas = await fetch(API + '/igrejas');
+    const igrejas = await rIgrejas.json();
+    let todosMembros = [];
+    for (const ig of igrejas) {
+      const rMembros = await fetch(API + '/membros/igreja/' + ig.id);
+      const membros = await rMembros.json();
+      membros.forEach(m => { todosMembros.push({ ...m, igrejaNome: ig.nome }); });
+    }
+    if (!todosMembros.length) return div.innerHTML = '<p style="color:var(--muted)">Nenhum membro registado no sistema.</p>';
+    div.innerHTML = `
+      <table>
+        <thead><tr><th>Nome</th><th>Email</th><th>Telefone</th><th>Igreja</th><th>Cargo</th></tr></thead>
+        <tbody>
+          ${todosMembros.map(m => `
+            <tr>
+              <td><strong>${m.nome}</strong></td>
+              <td>${m.email}</td>
+              <td>${m.telefone || '-'}</td>
+              <td><span class="badge badge-gold">${m.igrejaNome}</span></td>
+              <td><span class="badge badge-blue">${m.cargo || 'Membro'}</span></td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+    `;
+  } catch (e) { div.innerHTML = '<p style="color:var(--red)">Erro ao compilar os membros.</p>'; }
+}
+async function carregarFinanceiroGlobal() {
+  const div = document.getElementById('tabelaFinanceiroGlobal');
+  div.innerHTML = '<div class="loader">A calcular finanças globais...</div>';
+  try {
+    const rIgrejas = await fetch(API + '/igrejas');
+    const igrejas = await rIgrejas.json();
+    let totalDizimos = 0, totalOfertas = 0, totalSaidas = 0, totalSaldo = 0, linhasTabela = '';
+    for (const ig of igrejas) {
+      const rStats = await fetch(API + '/ofertas/estatisticas/' + ig.id);
+      const stats = await rStats.json();
+      const entradas = (stats.totalDizimos || 0) + (stats.totalOfertas || 0);
+      const saidas = stats.totalSaidas || 0;
+      const saldo = stats.saldoReal || 0;
+      totalDizimos += (stats.totalDizimos || 0);
+      totalOfertas += (stats.totalOfertas || 0);
+      totalSaidas += saidas;
+      totalSaldo += saldo;
+      linhasTabela += `
+        <tr>
+          <td><strong>${ig.nome}</strong></td>
+          <td style="color:var(--green)">+${entradas.toLocaleString('pt-AO')} Kz</td>
+          <td style="color:var(--red)">-${saidas.toLocaleString('pt-AO')} Kz</td>
+          <td style="font-weight:900; color:var(--gold)">${saldo.toLocaleString('pt-AO')} Kz</td>
+        </tr>
+      `;
+    }
+    document.getElementById('finTotalEntradas').textContent = (totalDizimos + totalOfertas).toLocaleString('pt-AO') + ' Kz';
+    document.getElementById('finTotalSaidas').textContent = totalSaidas.toLocaleString('pt-AO') + ' Kz';
+    document.getElementById('finTotalSaldo').textContent = totalSaldo.toLocaleString('pt-AO') + ' Kz';
+    div.innerHTML = `
+      <table>
+        <thead><tr><th>Igreja</th><th>Entradas</th><th>Saídas</th><th>Saldo</th></tr></thead>
+        <tbody>${linhasTabela}</tbody>
+      </table>
+    `;
+  } catch (e) { div.innerHTML = '<p style="color:var(--red)">Erro ao calcular o financeiro.</p>'; }
+}
+function salvarConfiguracoes() {
+  const alerta = document.getElementById('msgAlertaConfig');
+  const nome = document.getElementById('cfgNome').value;
+  alerta.style.display = 'block';
+  alerta.style.background = 'rgba(16,185,129,0.15)';
+  alerta.style.color = 'var(--green)';
+  alerta.style.border = '1px solid rgba(16,185,129,0.3)';
+  alerta.innerHTML = `✅ Perfil do Administrador <strong>${nome}</strong> atualizado com sucesso (Simulado)!`;
+  setTimeout(() => alerta.style.display = 'none', 4000);
+}
+carregarStatsTopo();
+carregarIgrejas();
+</script>
+</body>
+</html>

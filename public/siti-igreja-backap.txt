@@ -1,0 +1,2343 @@
+<!DOCTYPE html>
+<html lang="pt-AO">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>A carregar...</title>
+<style>
+:root{--navy:#020617;--blue:#1e40af;--gold:#d4a017;--gold2:#facc15;--soft:#f1f5f9;--green:#059669;--red:#dc2626}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Arial,Helvetica,sans-serif;background:var(--soft);color:#0f172a;transition:background 0.5s;}
+button,input,select,textarea{font:inherit}button{cursor:pointer}
+.top{position:sticky;top:0;z-index:50;background:rgba(2,6,23,.96);color:#fff;border-bottom:1px solid rgba(212,160,23,.35);box-shadow:0 10px 30px rgba(0,0,0,.25)}
+.wrap{max-width:1200px;margin:auto;padding:0 18px}
+.head{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:12px 0}
+.brand{display:flex;gap:12px;align-items:center;text-align:left;background:none;border:0;color:white}
+.logo{width:74px;height:74px;border-radius:26px;background:linear-gradient(135deg,#fbbf24,#ea580c,#7f1d1d);display:grid;place-items:center;font-weight:900;font-size:24px;box-shadow:0 10px 35px rgba(0,0,0,.45);position:relative;overflow:hidden}
+.logo img{width:100%;height:100%;object-fit:cover}
+.logo span{position:relative;color:white;z-index:2}
+.brand h1{margin:0;background:linear-gradient(90deg,#fcd34d,#f59e0b,#fde68a);-webkit-background-clip:text;color:transparent;font-size:28px;font-weight:900}
+.brand p{margin:3px 0 0;font-size:11px;letter-spacing:.22em;color:#bfdbfe;text-transform:uppercase}
+.actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.btn{border:0;border-radius:18px;padding:12px 16px;font-weight:900}
+.gold{background:var(--gold);color:#020617}.gold:hover{background:var(--gold2)}
+.outline{background:transparent;color:var(--gold2);border:1px solid var(--gold)}.outline:hover{background:var(--gold);color:#020617}
+.red{background:var(--red);color:#fff}.blue{background:#2563eb;color:#fff}.green{background:var(--green);color:#fff}
+nav{border-top:1px solid rgba(212,160,23,.25);background:#03122a;overflow-x:auto;white-space:nowrap}
+nav .wrap{display:flex;gap:12px;justify-content:center;padding-top:8px;padding-bottom:8px}
+nav button{background:transparent;color:white;border:0;border-radius:10px;padding:10px 12px;font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.13em}
+nav button:hover{background:rgba(255,255,255,.1);color:var(--gold2)}
+
+/* HERO */
+.hero{position:relative;min-height:88vh;display:grid;place-items:center;text-align:center;color:white;overflow:hidden;background:#0f172a;}
+.hero-bg{position:absolute;inset:0;background-size:cover;background-position:center;opacity:0;transition:opacity 1.5s ease-in-out;z-index:0;}
+.hero-bg.active{opacity:1;}
+.hero-bg::after{content:'';position:absolute;inset:0;background:rgba(2,6,23,0.7);}
+.hero-content{position:relative;z-index:1;padding:70px 18px;width:100%;max-width:1000px;}
+.hero small{letter-spacing:.45em;color:var(--gold2);}
+.hero h2{font-size:clamp(38px, 7vw, 80px);line-height:1.05;margin:28px auto 18px;font-weight:900;}
+.hero h2 span{color:var(--gold2);}
+.hero p{font-size:18px;line-height:1.7;max-width:760px;margin:auto;color:#e2e8f0;}
+.hero .row{margin-top:35px;display:flex;gap:12px;justify-content:center;flex-wrap:wrap;}
+
+/* STATS */
+.stats-section { max-width: 1200px; margin: -50px auto 50px; padding: 0 18px; position: relative; z-index: 10; }
+.stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 24px; }
+.stat-card { background: #ffffff; border-radius: 24px; padding: 30px; display: flex; align-items: center; gap: 20px; box-shadow: 0 15px 35px rgba(0,0,0,.06); border: 1px solid rgba(0,0,0,.04); transition: transform 0.3s ease; }
+.stat-card:hover { transform: translateY(-8px); }
+.stat-icon-wrap { width: 60px; height: 60px; border-radius: 16px; display: grid; place-items: center; font-size: 28px; flex-shrink: 0; }
+.stat-icon-wrap.blue { background: rgba(37, 99, 235, 0.1); color: #2563eb; }
+.stat-icon-wrap.gold { background: rgba(212, 160, 23, 0.1); color: #d4a017; }
+.stat-icon-wrap.green { background: rgba(5, 150, 105, 0.1); color: #059669; }
+.stat-icon-wrap.purple { background: rgba(147, 51, 234, 0.1); color: #9333ea; }
+.stat-info { display: flex; flex-direction: column; }
+.stat-number { font-size: 36px; font-weight: 900; color: #020617; line-height: 1; }
+.stat-label { font-size: 12px; color: #64748b; text-transform: uppercase; letter-spacing: 1px; margin-top: 5px; font-weight: 700; }
+
+main{max-width:1200px;margin:auto;padding:38px 18px}
+section{scroll-margin-top:145px;margin-bottom:58px}
+.card{background:white;border-radius:28px;box-shadow:0 10px 26px rgba(15,23,42,.08);overflow:hidden}
+.pad{padding:28px}
+.darkcard{background:linear-gradient(90deg,#020617,#0f172a,#1e3a8a);color:white}
+.grid{display:grid;gap:18px}
+.grid2{grid-template-columns:repeat(auto-fit,minmax(280px,1fr))}
+.grid3{grid-template-columns:repeat(auto-fit,minmax(230px,1fr))}
+h3{font-size:32px;margin:6px 0 14px}
+h4{font-size:22px;margin:8px 0 12px}
+
+/* PASTOR */
+.pastor-section{background:#fff;border-radius:24px;overflow:hidden;box-shadow:0 10px 40px rgba(0,0,0,.08);margin-bottom:50px}
+.pastor-grid{display:grid;grid-template-columns:350px 1fr}
+@media(max-width:850px){.pastor-grid{grid-template-columns:1fr}}
+.pastor-img-wrap{background:linear-gradient(135deg,#0f172a,#1e40af);display:flex;align-items:center;justify-content:center;padding:40px}
+.pastor-img{width:250px;height:250px;border-radius:50%;object-fit:cover;border:6px solid #facc15;box-shadow:0 8px 30px rgba(250,204,21,.4)}
+.pastor-info{padding:40px}
+.pastor-cargo{color:#d7ad4b;font-weight:800;text-transform:uppercase;letter-spacing:2px;font-size:13px;margin-bottom:8px}
+.pastor-nome{font-size:34px;color:#071b36;margin-bottom:20px;line-height:1.1}
+.pastor-bio{color:#64748b;font-size:16px;line-height:1.7;margin-bottom:25px}
+.pastor-contacts{display:flex;flex-wrap:wrap;gap:15px;margin-bottom:25px}
+.pastor-contact{display:flex;align-items:center;gap:8px;background:#f1f5f9;padding:10px 16px;border-radius:10px;font-size:14px;color:#334155;font-weight:600}
+.pastor-versiculo{background:#fffbeb;border:1px solid #fde68a;padding:16px;border-radius:12px;color:#92400e;font-style:italic;font-size:15px;margin-bottom:20px}
+.pastor-conselho{background:linear-gradient(135deg,#071b36,#1e3a8a);color:#fff;padding:25px;border-radius:16px}
+.pastor-conselho h4{color:#facc15;font-size:13px;text-transform:uppercase;letter-spacing:2px;margin-bottom:10px}
+.pastor-conselho p{font-size:17px;line-height:1.6;font-style:italic}
+
+footer{background:#020617;border-top:3px solid var(--gold);padding:27px;text-align:center;color:#d8e6f3}
+footer strong{color:#f2d27c}
+
+/* MODAIS */
+.modal-overlay{position:fixed;inset:0;background:rgba(7,27,54,.85);backdrop-filter:blur(5px);z-index:1000;display:none;align-items:center;justify-content:center;padding:20px;overflow-y:auto}
+.modal{background:#fff;border-radius:20px;width:100%;max-width:700px;box-shadow:0 20px 60px rgba(0,0,0,.5);overflow:hidden;animation:slideUp 0.3s ease}
+@keyframes slideUp{from{transform:translateY(50px);opacity:0}to{transform:translateY(0);opacity:1}}
+.modal-header{background:linear-gradient(135deg,#071b36,#1e3a8a);color:#fff;padding:25px 30px;display:flex;justify-content:space-between;align-items:center}
+.modal-header h2{font-size:24px;color:#facc15}
+.modal-header p{font-size:13px;color:#bfdbfe;margin-top:5px}
+.close-btn{background:none;border:none;color:#fff;font-size:24px;cursor:pointer}
+.modal-body{padding:30px}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:15px}
+@media(max-width:600px){.form-grid{grid-template-columns:1fr}}
+.input-group{display:flex;flex-direction:column;gap:6px}
+.input-group label{font-size:12px;font-weight:700;color:#334155;text-transform:uppercase;letter-spacing:0.5px}
+.input-group input, .input-group select{width:100%;padding:14px;border:2px solid #e2e8f0;border-radius:10px;font-size:15px;font-family:inherit;transition:0.2s;background:#f8fafc}
+.input-group input:focus, .input-group select:focus{border-color:#d7ad4b;outline:none;background:#fff;box-shadow:0 0 0 4px rgba(215,173,75,.15)}
+.input-group.full{grid-column:1/-1}
+.file-upload{border:2px dashed #cbd5e1;border-radius:10px;padding:20px;text-align:center;cursor:pointer;background:#f8fafc;transition:0.2s}
+.file-upload:hover{border-color:#d7ad4b;background:#fffbeb}
+.file-upload input{display:none}
+.file-upload span{font-size:14px;color:#64748b;font-weight:600}
+.btn-submit{background:linear-gradient(135deg,#071b36,#1e40af);color:#fff;border:none;padding:16px;border-radius:10px;font-size:16px;font-weight:800;width:100%;margin-top:20px;cursor:pointer;transition:0.2s;display:flex;justify-content:center;align-items:center;gap:10px}
+.btn-submit:hover{transform:translateY(-2px);box-shadow:0 10px 20px rgba(7,27,54,.2)}
+.alert{padding:12px;border-radius:8px;font-size:14px;margin-bottom:15px;display:none}
+.alert.error{background:#fee2e2;color:#991b1b;display:block}
+.alert.success{background:#dcfce7;color:#166534;display:block}
+.link-esqueci{display:block;text-align:center;margin-top:15px;color:#64748b;font-size:14px;text-decoration:underline;cursor:pointer}
+.link-esqueci:hover{color:#d7ad4b}
+
+/* NOVO DESIGN DE DEPARTAMENTOS (CARROSSEL PREMIUM) */
+#departamentos { background: #fdfbf7; border-radius: 24px; padding: 40px 20px; box-shadow: inset 0 0 20px rgba(0,0,0,0.02); }
+.depto-header-title { text-align: center; margin-bottom: 30px; }
+.depto-header-title h3 { font-size: 38px; color: #071b36; margin: 0; }
+.depto-header-title h3 span { color: var(--gold); }
+.depto-header-title p { color: #64748b; font-size: 13px; letter-spacing: 2px; text-transform: uppercase; margin-top: 10px; font-weight: 700; }
+
+.carousel-wrapper { position: relative; display: flex; align-items: center; gap: 15px; max-width: 1100px; margin: auto; }
+.carousel-track { display: flex; gap: 20px; overflow-x: auto; scroll-behavior: smooth; padding: 10px 5px; flex: 1; scrollbar-width: none; }
+.carousel-track::-webkit-scrollbar { display: none; }
+.carousel-btn { background: #071b36; color: var(--gold); border: 2px solid var(--gold); width: 45px; height: 45px; border-radius: 50%; font-size: 20px; cursor: pointer; display: grid; place-items: center; transition: 0.3s; flex-shrink: 0; z-index: 2; }
+.carousel-btn:hover { background: var(--gold); color: #071b36; transform: scale(1.1); }
+
+.depto-card-premium { 
+  min-width: calc(33.333% - 14px); 
+  background: linear-gradient(180deg, #0f172a, #1e293b); 
+  border-radius: 20px; 
+  border: 1px solid rgba(212,160,23,.3); 
+  box-shadow: 0 10px 30px rgba(0,0,0,0.2); 
+  padding: 25px; 
+  display: flex; 
+  flex-direction: column; 
+  position: relative; 
+  overflow: hidden;
+}
+@media(max-width: 900px) { .depto-card-premium { min-width: calc(50% - 10px); } }
+@media(max-width: 600px) { .depto-card-premium { min-width: 100%; } }
+
+.depto-card-premium::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 5px; background: linear-gradient(90deg, var(--gold), #fde68a); }
+.depto-card-icon { width: 55px; height: 55px; background: rgba(250,204,21,.1); border: 1px solid var(--gold); border-radius: 50%; display: grid; place-items: center; font-size: 26px; margin-bottom: 15px; }
+.depto-card-title { color: white; font-size: 24px; margin-bottom: 5px; font-weight: 800; }
+.depto-card-desc { color: #94a3b8; font-size: 13px; margin-bottom: 20px; flex: 1; }
+
+.depto-lider-box { display: flex; align-items: center; gap: 12px; background: rgba(2,6,23,.6); border: 1px solid rgba(255,255,255,0.1); padding: 12px; border-radius: 12px; margin-bottom: 15px; }
+.depto-lider-foto { width: 45px; height: 45px; border-radius: 50%; object-fit: cover; border: 2px solid var(--gold); background: #fff; }
+.depto-lider-letra { width: 45px; height: 45px; border-radius: 50%; background: var(--gold); color: #071b36; display: grid; place-items: center; font-weight: 900; font-size: 20px; border: 2px solid #fff; }
+.depto-lider-texto span { display: block; color: #94a3b8; font-size: 10px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 2px; }
+.depto-lider-texto strong { color: var(--gold2); font-size: 15px; }
+
+.depto-stats { display: flex; align-items: center; gap: 8px; color: #cbd5e1; font-size: 13px; margin-bottom: 15px; font-weight: 600; }
+.depto-stats span { color: white; font-weight: 900; font-size: 16px; }
+
+.btn-depto-sectores { background: transparent; border: 1.5px solid var(--gold); color: var(--gold); padding: 12px; border-radius: 30px; font-weight: 700; width: 100%; display: flex; justify-content: space-between; align-items: center; transition: 0.3s; }
+.btn-depto-sectores:hover { background: var(--gold); color: #071b36; }
+
+/* MODAL SECTORES PREMIUM (ESCURO) */
+.modal-premium { background: #0f172a; border: 1px solid rgba(212,160,23,.4); }
+.modal-premium .modal-header { border-bottom: 1px solid rgba(212,160,23,.2); background: linear-gradient(180deg, #020617, #0f172a); }
+.modal-premium .modal-body { background: #0f172a; }
+.modal-premium .close-btn { color: var(--gold); }
+.modal-premium .btn-chat-geral { background: linear-gradient(135deg, var(--gold), #eab308); color: #020617; border: none; padding: 16px; border-radius: 12px; font-weight: 900; font-size: 16px; cursor: pointer; width: 100%; margin-bottom: 25px; display: flex; justify-content: center; align-items: center; gap: 10px; box-shadow: 0 5px 15px rgba(212,160,23,0.3); transition: 0.2s; }
+.modal-premium .btn-chat-geral:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(212,160,23,0.5); }
+.modal-premium .sector-list-title { color: #94a3b8; font-size: 12px; text-transform: uppercase; letter-spacing: 2px; text-align: center; margin-bottom: 15px; display: flex; align-items: center; gap: 10px; }
+.modal-premium .sector-list-title::before, .modal-premium .sector-list-title::after { content: ''; flex: 1; height: 1px; background: rgba(255,255,255,0.1); }
+.sector-card-premium { background: rgba(2,6,23,.6); border: 1px solid rgba(255,255,255,0.05); border-radius: 16px; padding: 15px; margin-bottom: 12px; display: flex; align-items: center; gap: 15px; flex-wrap: wrap; }
+.sector-card-premium img { width: 50px; height: 50px; border-radius: 50%; object-fit: cover; border: 2px solid var(--gold); }
+.sector-card-premium .letra { width: 50px; height: 50px; border-radius: 50%; background: #1e293b; color: var(--gold); display: grid; place-items: center; font-weight: bold; font-size: 18px; border: 2px solid var(--gold); }
+.sector-info { flex: 1; }
+.sector-info h4 { color: white; font-size: 18px; margin-bottom: 4px; }
+.sector-info p { color: #94a3b8; font-size: 12px; margin: 0; }
+.sector-actions { display: flex; gap: 8px; width: 100%; margin-top: 10px; }
+.btn-galeria-premium { flex: 1; background: transparent; border: 1px solid var(--gold); color: var(--gold); padding: 10px; border-radius: 8px; font-weight: bold; font-size: 12px; cursor: pointer; transition: 0.2s; display: flex; align-items: center; justify-content: center; gap: 5px; }
+.btn-galeria-premium:hover { background: rgba(212,160,23,0.1); }
+.btn-chat-premium { flex: 1; background: var(--gold); border: 1px solid var(--gold); color: #020617; padding: 10px; border-radius: 8px; font-weight: bold; font-size: 12px; cursor: pointer; transition: 0.2s; display: flex; align-items: center; justify-content: center; gap: 5px; }
+.btn-chat-premium:hover { background: var(--gold2); }
+
+/* EVENTOS */
+.evento-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; }
+.evento-card { background: #fff; border-radius: 20px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,.05); border-left: 5px solid var(--gold); cursor: pointer; transition: transform 0.2s; display: flex; flex-direction: column; }
+.evento-card:hover { transform: translateY(-5px); }
+.evento-data { background: #071b36; color: var(--gold2); padding: 15px; text-align: center; font-weight: 800; font-size: 18px; }
+.evento-corpo { padding: 20px; flex: 1; }
+.evento-corpo h4 { font-size: 20px; color: #071b36; margin-bottom: 8px; }
+.evento-corpo p { color: #64748b; font-size: 14px; line-height: 1.5; }
+.evento-local { font-size: 12px; color: #d7ad4b; font-weight: 700; margin-top: 10px; display: block; }
+
+/* AVISOS HORIZONTAIS */
+.avisos-container { display: flex; gap: 20px; overflow-x: auto; padding: 10px 0 20px; scroll-behavior: smooth; }
+.aviso-card { flex: 0 0 280px; background: #071b36; color: white; border-radius: 20px; padding: 25px; border-top: 5px solid var(--gold2); box-shadow: 0 6px 20px rgba(0,0,0,.15); cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; display: flex; flex-direction: column; justify-content: space-between; }
+.aviso-card:hover { transform: translateY(-6px); box-shadow: 0 12px 30px rgba(0,0,0,.25); }
+.aviso-card h4 { color: var(--gold2); font-size: 18px; margin-bottom: 10px; }
+.aviso-card p { color: #cbd5e1; font-size: 14px; line-height: 1.5; flex: 1; }
+.aviso-card .data { font-size: 11px; color: #94a3b8; margin-top: 15px; display: block; }
+.paginacao { display: flex; justify-content: center; align-items: center; gap: 10px; margin-top: 20px; flex-wrap: wrap; }
+.paginacao button { background: transparent; border: 1px solid var(--gold); color: var(--gold); border-radius: 8px; padding: 8px 14px; font-weight: 700; cursor: pointer; transition: 0.2s; }
+.paginacao button:hover:not(:disabled) { background: var(--gold); color: #020617; }
+.paginacao button:disabled { opacity: 0.4; cursor: not-allowed; }
+.paginacao button.active { background: var(--gold); color: #020617; }
+
+/* OFERTAS */
+.ofertas-layout { display: grid; grid-template-columns: 1fr 1.2fr 1fr; gap: 20px; }
+@media(max-width: 900px) { .ofertas-layout { grid-template-columns: 1fr; } }
+.oferta-card { background: #fff; padding: 25px; border-radius: 20px; box-shadow: 0 4px 20px rgba(0,0,0,.05); }
+.oferta-card h3 { font-size: 20px; color: #071b36; margin-bottom: 15px; border-bottom: 2px solid var(--gold); padding-bottom: 10px; }
+.dados-pagamento p { color: #475569; font-size: 14px; margin-bottom: 10px; }
+.dados-pagamento .conta { font-family: monospace; font-weight: 700; color: #0f172a; background: #f1f5f9; padding: 4px 8px; border-radius: 4px; }
+.alerta-aviso { background: #fef3c7; border: 1px solid #fde68a; padding: 15px; border-radius: 12px; margin-bottom: 20px; color: #92400e; font-size: 13px; }
+
+/* ÁREA DE MEMBRO */
+#areaMembro { display: none; max-width: 1200px; margin: 40px auto; padding: 0 18px; }
+.member-header { background: linear-gradient(135deg, #071b36, #1e40af); color: white; padding: 30px; border-radius: 20px; display: flex; align-items: center; gap: 20px; margin-bottom: 30px; flex-wrap: wrap; }
+.member-avatar { width: 80px; height: 80px; border-radius: 50%; border: 3px solid var(--gold2); object-fit: cover; background: #fff; }
+.member-info h2 { color: var(--gold2); font-size: 28px; }
+.member-info p { color: #bfdbfe; font-size: 14px; }
+.member-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+@media(max-width: 768px) { .member-grid { grid-template-columns: 1fr; } }
+.member-card { background: #fff; padding: 25px; border-radius: 20px; box-shadow: 0 4px 20px rgba(0,0,0,.05); }
+.member-card h3 { font-size: 20px; color: #071b36; margin-bottom: 15px; border-bottom: 2px solid var(--gold); padding-bottom: 10px; }
+.tag { display: inline-block; background: rgba(212,160,23,.15); color: #92400e; padding: 5px 12px; border-radius: 20px; font-size: 13px; font-weight: 700; margin: 4px; }
+
+/* BÍBLIA */
+.biblia-controls { display: flex; gap: 15px; margin-bottom: 20px; flex-wrap: wrap; }
+.biblia-controls select { flex: 1; min-width: 150px; }
+.biblia-leitura { background: #fdfbf7; border: 1px solid #e2e8f0; border-radius: 12px; padding: 30px; max-height: 60vh; overflow-y: auto; font-family: Georgia, serif; font-size: 18px; line-height: 1.8; color: #1e293b; }
+.versiculo-row { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; border-bottom: 1px dashed #cbd5e1; padding-bottom: 8px; }
+.versiculo-texto { flex: 1; margin-right: 10px; }
+.versiculo-num { font-weight: bold; color: var(--gold); font-size: 12px; vertical-align: super; margin-right: 4px; }
+.biblia-nav { display: flex; justify-content: space-between; margin-top: 20px; }
+.fav-btn { background: none; border: none; font-size: 20px; cursor: pointer; color: #cbd5e1; transition: 0.2s; }
+.fav-btn.active { color: #facc15; }
+
+/* GALERIA */
+.galeria-albuns { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; }
+.galeria-album { background: #fff; border-radius: 20px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,.05); cursor: pointer; transition: transform 0.2s; }
+.galeria-album:hover { transform: translateY(-5px); }
+.galeria-album-capa { width: 100%; height: 200px; object-fit: cover; background: #e2e8f0; }
+.galeria-album-info { padding: 20px; }
+.galeria-album-info h4 { font-size: 20px; color: #071b36; margin-bottom: 5px; }
+.galeria-album-info p { color: #64748b; font-size: 13px; }
+.galeria-fotos { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; }
+.galeria-foto { width: 100%; height: 150px; object-fit: cover; border-radius: 10px; cursor: pointer; transition: transform 0.2s; }
+.galeria-foto:hover { transform: scale(1.05); }
+
+/* LIGHTBOX */
+.lightbox { position: fixed; inset: 0; background: rgba(0,0,0,.95); z-index: 2000; display: none; align-items: center; justify-content: center; flex-direction: column; }
+.lightbox-img { max-width: 90vw; max-height: 85vh; object-fit: contain; border-radius: 8px; }
+.lightbox-close { position: absolute; top: 20px; right: 30px; color: #fff; font-size: 40px; background: none; border: none; cursor: pointer; }
+.lightbox-nav { position: absolute; top: 50%; transform: translateY(-50%); color: #fff; font-size: 50px; background: rgba(0,0,0,.5); border: none; cursor: pointer; padding: 10px 20px; border-radius: 10px; }
+.lightbox-prev { left: 20px; }
+.lightbox-next { right: 20px; }
+.lightbox-counter { position: absolute; bottom: 20px; color: #fff; font-size: 14px; background: rgba(0,0,0,.5); padding: 5px 15px; border-radius: 20px; }
+
+/* CHAT */
+.chat-container { display: flex; height: 500px; border-radius: 20px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,.1); background: #fff; }
+.chat-sidebar { width: 280px; border-right: 1px solid #e2e8f0; overflow-y: auto; background: #f8fafc; }
+.chat-contact { padding: 15px; cursor: pointer; border-bottom: 1px solid #e2e8f0; display: flex; align-items: center; gap: 12px; transition: 0.2s; }
+.chat-contact:hover { background: #e2e8f0; }
+.chat-contact.active { background: #fff; border-left: 4px solid var(--gold); }
+.chat-avatar { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; background: #cbd5e1; display: grid; place-items: center; font-weight: bold; color: #475569; }
+.chat-main { flex: 1; display: flex; flex-direction: column; background: #f1f5f9; }
+.chat-header { padding: 15px 20px; background: #fff; border-bottom: 1px solid #e2e8f0; display: flex; align-items: center; gap: 12px; }
+.chat-messages { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
+.chat-msg { max-width: 70%; padding: 10px 15px; border-radius: 15px; font-size: 14px; line-height: 1.4; position: relative; }
+.chat-msg.enviada { align-self: flex-end; background: #d1fae5; color: #065f46; border-bottom-right-radius: 2px; }
+.chat-msg.recebida { align-self: flex-start; background: #fff; color: #1e293b; border-bottom-left-radius: 2px; }
+.chat-input-area { padding: 15px 20px; background: #fff; border-top: 1px solid #e2e8f0; display: flex; gap: 10px; }
+.chat-input-area input { flex: 1; padding: 12px; border: 1px solid #e2e8f0; border-radius: 20px; outline: none; }
+.chat-input-area button { background: var(--gold); color: var(--navy); border: none; border-radius: 20px; padding: 10px 20px; font-weight: bold; cursor: pointer; }
+
+/* CHAT DE GRUPO */
+.grupo-container { display: flex; flex-direction: column; height: 400px; background: #f1f5f9; border-radius: 12px; overflow: hidden; }
+.grupo-mensagens { flex: 1; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
+.grupo-msg { max-width: 80%; padding: 8px 12px; border-radius: 12px; font-size: 14px; position: relative; }
+.grupo-msg.recebida { align-self: flex-start; background: #fff; color: #1e293b; border-bottom-left-radius: 2px; }
+.grupo-msg.enviada { align-self: flex-end; background: #dcfce7; color: #065f46; border-bottom-right-radius: 2px; }
+.grupo-msg .autor { font-size: 11px; font-weight: bold; color: #d7ad4b; display: block; margin-bottom: 4px; }
+.grupo-msg .hora { font-size: 10px; color: #94a3b8; display: block; text-align: right; margin-top: 4px; }
+
+/* GALERIA DE ATIVIDADES */
+.galeria-atividades-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; margin-top: 15px; }
+.galeria-atividade-item { position: relative; border-radius: 12px; overflow: hidden; aspect-ratio: 1 / 1; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.1); transition: transform 0.2s; }
+.galeria-atividade-item:hover { transform: scale(1.03); }
+.galeria-atividade-item img { width: 100%; height: 100%; object-fit: cover; }
+.galeria-atividade-legenda { position: absolute; bottom: 0; left: 0; right: 0; background: linear-gradient(transparent, rgba(0,0,0,0.8)); color: white; padding: 20px 10px 10px; font-size: 11px; font-weight: 600; }
+
+/* MÍDIA PREMIUM */
+#midia { background: #fdfbf7; border-radius: 24px; padding: 40px 20px; box-shadow: inset 0 0 20px rgba(0,0,0,0.02); }
+.live-banner { background: #dc2626; color: white; border-radius: 20px; padding: 20px; margin-bottom: 30px; text-align: center; box-shadow: 0 10px 30px rgba(220,38,38,0.3); animation: pulse-red 2s infinite; }
+@keyframes pulse-red { 0% { box-shadow: 0 0 0 0 rgba(220,38,38, 0.7); } 70% { box-shadow: 0 0 0 15px rgba(220,38,38, 0); } 100% { box-shadow: 0 0 0 0 rgba(220,38,38, 0); } }
+.live-banner h3 { color: white !important; margin-bottom: 15px; font-size: 24px; }
+.live-player-wrapper { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 12px; background: #000; }
+.live-player-wrapper iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0; }
+
+.midia-header-title { text-align: center; margin-bottom: 30px; }
+.midia-header-title h3 { font-size: 38px; color: #071b36; margin: 0; }
+.midia-header-title h3 span { color: var(--gold); }
+
+.midia-tabs { display: flex; justify-content: center; gap: 10px; margin-bottom: 20px; }
+.midia-tab-btn { background: transparent; border: 2px solid var(--gold); color: var(--gold); padding: 10px 30px; border-radius: 30px; font-weight: 800; font-size: 16px; cursor: pointer; transition: 0.3s; }
+.midia-tab-btn.active { background: var(--gold); color: #071b36; }
+
+.midia-search-wrapper { max-width: 600px; margin: 0 auto 30px; }
+.midia-search { width: 100%; padding: 15px 25px; border: 2px solid #e2e8f0; border-radius: 30px; font-size: 16px; outline: none; transition: 0.3s; }
+.midia-search:focus { border-color: var(--gold); box-shadow: 0 0 0 4px rgba(212,160,23,0.15); }
+
+.video-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 24px; }
+.video-card { background: #fff; border-radius: 20px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.05); cursor: pointer; transition: transform 0.2s; }
+.video-card:hover { transform: translateY(-5px); }
+.video-thumb-wrapper { position: relative; width: 100%; padding-bottom: 56.25%; background: #000; }
+.video-thumb-wrapper img { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; }
+.play-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.3); display: grid; place-items: center; opacity: 0; transition: 0.2s; }
+.video-card:hover .play-overlay { opacity: 1; }
+.play-icon { width: 60px; height: 60px; background: var(--gold); color: #071b36; border-radius: 50%; display: grid; place-items: center; font-size: 24px; font-weight: bold; padding-left: 5px; }
+.video-info { padding: 20px; }
+.video-info h4 { font-size: 18px; color: #071b36; margin-bottom: 5px; }
+.video-info p { font-size: 12px; color: #64748b; }
+
+.audio-list { display: flex; flex-direction: column; gap: 15px; }
+.audio-item { background: #fff; border-radius: 16px; padding: 20px; display: flex; align-items: center; gap: 15px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); border-left: 5px solid var(--gold); flex-wrap: wrap; }
+.audio-icon { font-size: 30px; color: var(--gold); }
+.audio-info { flex: 1; min-width: 200px; }
+.audio-info h4 { font-size: 18px; color: #071b36; margin-bottom: 5px; }
+.audio-info p { font-size: 12px; color: #64748b; }
+.audio-player-wrapper { flex: 2; min-width: 250px; }
+.audio-player-wrapper audio { width: 100%; outline: none; }
+
+.midia-paginacao { display: flex; justify-content: center; align-items: center; gap: 10px; margin-top: 30px; }
+.midia-paginacao button { background: #fff; border: 1px solid var(--gold); color: var(--gold); width: 40px; height: 40px; border-radius: 50%; font-weight: bold; cursor: pointer; transition: 0.2s; }
+.midia-paginacao button:hover:not(:disabled) { background: var(--gold); color: #fff; }
+.midia-paginacao button.active { background: var(--gold); color: #fff; }
+.midia-paginacao button:disabled { opacity: 0.4; cursor: not-allowed; }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap head">
+    <div class="brand">
+      <div class="logo" id="logo"><span>Α Ω</span></div>
+      <div>
+        <h1 id="igrejaNome">A carregar...</h1>
+        <p id="igrejaDesc">—</p>
+      </div>
+    </div>
+    <div class="actions">
+      <button class="btn gold" id="btnEntrar" onclick="abrirModalLogin()">🔐 Entrar</button>
+      <button class="btn outline" id="btnRegistar" onclick="abrirModalRegisto()">👤 Fazer Parte</button>
+      <button class="btn red" id="btnSair" style="display:none" onclick="sairMembro()">🚪 Sair</button>
+    </div>
+  </div>
+  <nav>
+    <div class="wrap">
+      <button onclick="scrollToId('inicio')">Início</button>
+      <button onclick="scrollToId('sobre')">Sobre</button>
+      <button onclick="scrollToId('pastor')">Pastor</button>
+      <button onclick="scrollToId('departamentos')">Departamentos</button>
+      <button onclick="scrollToId('agenda')">Agenda</button>
+      <button onclick="scrollToId('midia')">Mídia</button>
+      <button onclick="scrollToId('avisos')">Avisos</button>
+      <button onclick="scrollToId('ofertas')">Ofertas</button>
+      <button onclick="scrollToId('oracao')">Oração</button>
+      <button onclick="scrollToId('galeria')">Galeria</button>
+      <button onclick="scrollToId('chat')">Chat</button>
+    </div>
+  </nav>
+</header>
+
+<section id="inicio" class="hero">
+  <div id="heroBackgrounds"></div>
+  <div class="hero-content">
+    <small id="heroSmall">ASSEMBLEIA DE DEUS PENTECOSTAL</small>
+    <h2 id="heroTitulo">Onde a fé encontra <span id="heroDestaque">o coração</span></h2>
+    <p id="heroTexto">A carregar...</p>
+    <div class="row">
+      <button class="btn gold" onclick="scrollToId('agenda')">📅 Ver Programação</button>
+      <button class="btn gold" onclick="scrollToId('ofertas')">💰 Ofertas</button>
+      <button class="btn gold" onclick="abrirBiblia()">📖 Bíblia</button>
+    </div>
+  </div>
+</section>
+
+<div class="stats-section" id="statsSection">
+  <div class="stats-grid">
+    <div class="stat-card"><div class="stat-icon-wrap blue">👥</div><div class="stat-info"><div class="stat-number" id="totalMembros">0</div><div class="stat-label">Membros Ativos</div></div></div>
+    <div class="stat-card"><div class="stat-icon-wrap gold">🏢</div><div class="stat-info"><div class="stat-number" id="totalDeptos">0</div><div class="stat-label">Departamentos</div></div></div>
+    <div class="stat-card"><div class="stat-icon-wrap green">🎯</div><div class="stat-info"><div class="stat-number" id="totalSectores">0</div><div class="stat-label">Sectores</div></div></div>
+    <div class="stat-card"><div class="stat-icon-wrap purple">📅</div><div class="stat-info"><div class="stat-number" id="totalEventos">0</div><div class="stat-label">Eventos</div></div></div>
+  </div>
+</div>
+
+<div id="areaMembro">
+  <div class="member-header">
+    <img id="membroFoto" class="member-avatar" src="" alt="Foto" style="display:none">
+    <div class="member-info">
+      <h2 id="membroNome">Bem-vindo!</h2>
+      <p id="membroEmail"></p>
+    </div>
+    <button class="btn gold" style="margin-left:auto" onclick="abrirModalEditarPerfil()">✏️ Editar Perfil</button>
+  </div>
+  
+  <div class="member-grid" id="membroArea">
+    <div class="member-card">
+      <h3>📋 Os Meus Dados</h3>
+      <p><b>Nome:</b> <span id="infoNome"></span></p>
+      <p><b>Email:</b> <span id="infoEmail"></span></p>
+      <p><b>Telefone:</b> <span id="infoTelefone"></span></p>
+      <p><b>BI:</b> <span id="infoBi"></span></p>
+      <p><b>Endereço:</b> <span id="infoEndereco"></span></p>
+      <p><b>Igreja:</b> <span id="infoIgreja"></span></p>
+    </div>
+    
+    <div class="member-card">
+      <h3>⛪ Onde Sirvo</h3>
+      <p><b>Departamento:</b> <span id="infoDepto"></span></p>
+      <div id="infoSectores"></div>
+    </div>
+
+    <div class="member-card" style="grid-column: 1 / -1; border: 2px solid var(--gold);">
+      <h3 style="color:var(--gold2);">💰 Registar Dízimo</h3>
+      <p style="font-size:13px; color:#64748b; margin-bottom:15px;">O dízimo é um ato de fidelidade e compromisso do membro.</p>
+      <div id="msgAlertaDizimo" class="alert"></div>
+      <form onsubmit="submeterDizimo(event)">
+        <div class="form-grid">
+          <div class="input-group full"><label>Nome do Membro</label><input id="dNome" disabled style="background:#e2e8f0; font-weight:bold;"></div>
+          <div class="input-group"><label>Nº do BI</label><input id="dBi" disabled style="background:#e2e8f0;"></div>
+          <div class="input-group"><label>Telefone</label><input id="dTelefone" disabled style="background:#e2e8f0;"></div>
+          <div class="input-group"><label>Valor (Kz) *</label><input type="number" id="dValor" required min="1" placeholder="Ex: 5000"></div>
+          <div class="input-group"><label>Método *</label>
+            <select id="dMetodo" required>
+              <option value="">Selecione</option>
+              <option value="Transferência">Transferência Bancária</option>
+              <option value="Multicaixa">Multicaixa Express</option>
+              <option value="Unitel Money">Unitel Money</option>
+              <option value="PayPay">PayPay AO</option>
+              <option value="Dinheiro">Dinheiro</option>
+            </select>
+          </div>
+          <div class="input-group full"><label>Referência (Nº do talão)</label><input id="dReferencia" placeholder="Opcional"></div>
+        </div>
+        <button type="submit" class="btn-submit" id="btnEnviarDizimo" style="background:linear-gradient(135deg,#d4a017,#facc15); color:#020617;">💾 Registar Dízimo</button>
+      </form>
+    </div>
+
+    <div class="member-card">
+      <h3>✅ Direitos (Benefícios)</h3>
+      <ul style="list-style:none; padding:0; color:#64748b; line-height:2;">
+        <li>✔️ Receber acompanhamento pastoral e oração;</li>
+        <li>✔️ Participar nas atividades e eventos da igreja;</li>
+        <li>✔️ Ter acesso ao ensino bíblico e discipulado;</li>
+        <li>✔️ Usufruir dos serviços de ação social da igreja;</li>
+        <li>✔️ Ser ouvido pela liderança em assembleias.</li>
+      </ul>
+    </div>
+
+    <div class="member-card">
+      <h3>📜 Deveres</h3>
+      <ul style="list-style:none; padding:0; color:#64748b; line-height:2;">
+        <li>✔️ Participar ativamente na vida da igreja;</li>
+        <li>✔️ Contribuir com dízimos e ofertas conforme o coração;</li>
+        <li>✔️ Zelar pelo bom nome da igreja e da liderança;</li>
+        <li>✔️ Comparecer às reuniões e ensaios do seu sector;</li>
+        <li>✔️ Viver conforme os ensinamentos de Cristo.</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<main id="conteudoPrincipal">
+  <div style="text-align:center;padding:60px;color:#64748b;font-size:18px">A carregar conteúdo...</div>
+</main>
+
+<footer>
+  <strong id="footerNome">A carregar...</strong>
+  <p id="footerTexto">© Todos os direitos reservados</p>
+  <div id="footerContactos" style="margin-top: 15px; font-size: 13px; color: #94a3b8; display: flex; flex-wrap: wrap; justify-content: center; gap: 20px;"></div>
+</footer>
+
+<!-- MODAL DE REGISTO -->
+<div class="modal-overlay" id="modalRegisto">
+  <div class="modal">
+    <div class="modal-header">
+      <div><h2>Ficha de Membro</h2><p>Junte-se à família <span id="nomeIgrejaModal"></span></p></div>
+      <button class="close-btn" onclick="fecharModal('modalRegisto')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div id="msgAlertaRegisto" class="alert"></div>
+      <form id="formRegisto" onsubmit="submeterRegisto(event)">
+        <div class="form-grid">
+          <div class="input-group full">
+            <label>Foto de Perfil (Tipo Passe)</label>
+            <label class="file-upload" for="fotoInput">
+              <span id="fotoLabel">📸 Clique para carregar a sua foto</span>
+              <input type="file" id="fotoInput" accept="image/*" onchange="atualizarLabelFoto(this)">
+            </label>
+          </div>
+          <div class="input-group full"><label>Nome Completo *</label><input type="text" id="rNome" required></div>
+          <div class="input-group"><label>Email *</label><input type="email" id="rEmail" required></div>
+          <div class="input-group"><label>Palavra-passe *</label><input type="password" id="rSenha" required minlength="6"></div>
+          <div class="input-group"><label>Telefone *</label><input type="tel" id="rTelefone" required></div>
+          <div class="input-group"><label>Nº do BI</label><input type="text" id="rBi"></div>
+          <div class="input-group full"><label>Data de Nascimento</label><input type="date" id="rNascimento"></div>
+          <div class="input-group full"><label>Endereço</label><input type="text" id="rEndereco"></div>
+        </div>
+        <button type="submit" class="btn-submit" id="btnSubmeter">✅ Concluir Registo</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL DE LOGIN -->
+<div class="modal-overlay" id="modalLogin">
+  <div class="modal" style="max-width:400px">
+    <div class="modal-header">
+      <div><h2>Entrar</h2><p>Aceda à sua conta</p></div>
+      <button class="close-btn" onclick="fecharModal('modalLogin')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div id="msgAlertaLogin" class="alert"></div>
+      <form onsubmit="submeterLogin(event)">
+        <div class="input-group" style="margin-bottom:15px"><label>Email</label><input type="email" id="lEmail" required></div>
+        <div class="input-group" style="margin-bottom:15px"><label>Senha</label><input type="password" id="lSenha" required></div>
+        <button type="submit" class="btn-submit" id="btnLogin">🔐 Entrar</button>
+      </form>
+      <a class="link-esqueci" onclick="abrirModalRecuperar()">Esqueci-me da senha</a>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL DE RECUPERAÇÃO -->
+<div class="modal-overlay" id="modalRecuperar">
+  <div class="modal" style="max-width:450px">
+    <div class="modal-header">
+      <div><h2>Recuperar Senha</h2><p>Recupere o acesso à sua conta</p></div>
+      <button class="close-btn" onclick="fecharModal('modalRecuperar')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div id="msgAlertaRecuperar" class="alert"></div>
+      <div id="recuperarForm">
+        <p style="color:#64748b;font-size:14px;margin-bottom:15px;text-align:center;">Insira o seu email e telefone para gerar um código.</p>
+        <div class="input-group" style="margin-bottom:15px"><label>Email</label><input type="email" id="recEmail" required></div>
+        <div class="input-group" style="margin-bottom:15px"><label>Telefone</label><input type="tel" id="recTelefone" required></div>
+        <button class="btn-submit" onclick="pedirCodigo()" id="btnRecuperar">📩 Gerar Código</button>
+      </div>
+      <div id="codigoForm" style="display:none;margin-top:20px">
+        <div class="input-group" style="margin-bottom:15px"><label>Código (6 dígitos)</label><input type="text" id="recCodigo" maxlength="6"></div>
+        <div class="input-group" style="margin-bottom:15px"><label>Nova Senha</label><input type="password" id="recNovaSenha" minlength="6"></div>
+        <button class="btn-submit" onclick="redefinirComCodigo()">✅ Redefinir Senha</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL DETALHE EVENTO -->
+<div class="modal-overlay" id="modalEventoDetalhe">
+  <div class="modal" style="max-width:500px">
+    <div class="modal-header">
+      <div><h2 id="detTitle">Evento</h2><p id="detData"></p></div>
+      <button class="close-btn" onclick="fecharModal('modalEventoDetalhe')">✕</button>
+    </div>
+    <div class="modal-body">
+      <img id="detImagem" src="" alt="" style="width:100%;border-radius:10px;margin-bottom:15px;display:none">
+      <p id="detLocal" style="font-weight:700;color:#d7ad4b;margin-bottom:10px;"></p>
+      <p id="detDesc" style="color:#334155;line-height:1.6"></p>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL DETALHE AVISO -->
+<div class="modal-overlay" id="modalAvisoDetalhe">
+  <div class="modal" style="max-width:600px">
+    <div class="modal-header">
+      <div><h2 id="avisoDetTitle">Aviso</h2><p id="avisoDetData"></p></div>
+      <button class="close-btn" onclick="fecharModal('modalAvisoDetalhe')">✕</button>
+    </div>
+    <div class="modal-body">
+      <p id="avisoDetTexto" style="color:#334155;line-height:1.7;font-size:15px;"></p>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL COMPROVATIVO PDF -->
+<div class="modal-overlay" id="modalComprovativo">
+  <div class="modal" style="max-width:500px; text-align:center;">
+    <div class="modal-header" style="justify-content:center; flex-direction:column; align-items:center;">
+      <h2>✅ Oferta Validada</h2>
+      <p>O seu comprovativo oficial está pronto.</p>
+    </div>
+    <div class="modal-body">
+      <p style="font-size:16px; color:#334155; margin-bottom:20px;">Obrigado pela sua fidelidade. Pode descarregar o comprovativo em PDF com o logotipo da igreja.</p>
+      <button class="btn btn-submit" onclick="gerarPDFComprovativo()" style="background:var(--green);">📄 Descarregar Comprovativo (PDF)</button>
+      <button class="btn btn-outline" onclick="fecharModal('modalComprovativo')" style="margin-top:10px; width:100%;">Fechar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL DA BÍBLIA -->
+<div class="modal-overlay" id="modalBiblia">
+  <div class="modal" style="max-width:800px; background:#fff;">
+    <div class="modal-header">
+      <div><h2 id="bibliaTitulo">📖 Bíblia Sagrada</h2><p id="bibliaRef">Selecione um livro e capítulo</p></div>
+      <button class="close-btn" onclick="fecharModal('modalBiblia')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="biblia-controls">
+        <select id="bibliaLivro" onchange="carregarCapitulosBiblia()">
+          <option value="">A carregar livros...</option>
+        </select>
+        <select id="bibliaCapitulo" onchange="buscarVersiculosBiblia()">
+          <option value="">Capítulo...</option>
+        </select>
+      </div>
+      <div id="bibliaLeitura" class="biblia-leitura">
+        <p style="text-align:center; color:#64748b; font-style:italic;">Selecione o Livro e o Capítulo para começar a leitura.</p>
+      </div>
+      <div class="biblia-nav">
+        <button class="btn btn-outline" onclick="navegarBiblia(-1)" style="color:#020617; border-color:#020617;">⬅ Anterior</button>
+        <button class="btn btn-outline" onclick="navegarBiblia(1)" style="color:#020617; border-color:#020617;">Próximo ➡</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- LIGHTBOX DA GALERIA -->
+<div class="lightbox" id="lightbox">
+  <button class="lightbox-close" onclick="fecharLightbox()">✕</button>
+  <button class="lightbox-nav lightbox-prev" onclick="navegarLightbox(-1)">‹</button>
+  <img class="lightbox-img" id="lightboxImg" src="" alt="">
+  <button class="lightbox-nav lightbox-next" onclick="navegarLightbox(1)">›</button>
+  <span class="lightbox-counter" id="lightboxCounter"></span>
+</div>
+
+<!-- MODAL EDITAR PERFIL -->
+<div class="modal-overlay" id="modalEditarPerfil">
+  <div class="modal">
+    <div class="modal-header">
+      <div><h2>✏️ Editar Perfil</h2><p>Atualize os seus dados</p></div>
+      <button class="close-btn" onclick="fecharModal('modalEditarPerfil')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div id="msgAlertaPerfil" class="alert"></div>
+      <form onsubmit="salvarPerfil(event)">
+        <div class="form-grid">
+          <div class="input-group full">
+            <label>Foto de Perfil</label>
+            <input type="file" id="epFoto" accept="image/*">
+          </div>
+          <div class="input-group full"><label>Nome Completo *</label><input type="text" id="epNome" required></div>
+          <div class="input-group"><label>Telefone *</label><input type="tel" id="epTelefone" required></div>
+          <div class="input-group"><label>Nº do BI</label><input type="text" id="epBi"></div>
+          <div class="input-group full"><label>Endereço</label><input type="text" id="epEndereco"></div>
+        </div>
+        <button type="submit" class="btn-submit" id="btnSalvarPerfil">💾 Guardar Alterações</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL DE SECTORES (Escolher Chat ou Galeria) -->
+<div class="modal-overlay" id="modalSectores">
+  <div class="modal modal-premium" style="max-width:600px;">
+    <div class="modal-header">
+      <div><h2 id="sectoresDeptoNome">Sectores</h2><p>Escolha um sector ou o chat geral</p></div>
+      <button class="close-btn" onclick="fecharModal('modalSectores')">✕</button>
+    </div>
+    <div class="modal-body">
+      
+      <div id="liderDeptoModal" style="display:none; margin-bottom:20px; padding:15px; background:rgba(2,6,23,.6); border-radius:12px; border:1px solid rgba(212,160,23,.3); align-items:center; gap:15px;">
+        <div style="font-size:11px; font-weight:700; color:#94a3b8; text-transform:uppercase; letter-spacing:1px;">Líder do Departamento:</div>
+        <div id="liderDeptoInfo" style="display:flex; align-items:center; gap:10px;"></div>
+      </div>
+
+      <button class="btn-chat-geral" id="btnChatGeralDepto" onclick="abrirChatGrupo('depto', 0, '')">
+        💬 Chat Geral do Departamento
+      </button>
+
+      <div class="sector-list-title">Sectores</div>
+
+      <div id="listaSectoresModal" class="sector-modal-list"></div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL DE CHAT DO GRUPO (Serve para Depto e Sector) -->
+<div class="modal-overlay" id="modalChatGrupo">
+  <div class="modal" style="max-width:600px;">
+    <div class="modal-header">
+      <div><h2 id="chatGrupoTitulo">Chat do Grupo</h2><p>Apenas membros autorizados</p></div>
+      <button class="close-btn" onclick="fecharModal('modalChatGrupo'); clearInterval(intervalChatGrupo);">✕</button>
+    </div>
+    <div class="modal-body" style="padding:0;">
+      <div class="grupo-container">
+        <div class="grupo-mensagens" id="chatGrupoMensagens"></div>
+      </div>
+      <div class="chat-input-area" style="background:#fff; border-radius: 0 0 20px 20px;">
+        <input type="text" id="inputMsgGrupo" placeholder="Escreva no grupo..." onkeypress="if(event.key==='Enter') enviarMensagemGrupo()">
+        <button onclick="enviarMensagemGrupo()">Enviar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL DA GALERIA DE ATIVIDADES -->
+<div class="modal-overlay" id="modalGaleriaAtividade">
+  <div class="modal" style="max-width:700px;">
+    <div class="modal-header">
+      <div><h2 id="galeriaSectorTitulo">📸 Galeria</h2><p>Fotos das atividades do sector</p></div>
+      <button class="close-btn" onclick="fecharModal('modalGaleriaAtividade')">✕</button>
+    </div>
+    <div class="modal-body">
+      
+      <div id="areaUploadFoto" style="display:none; background:#f8fafc; padding:15px; border-radius:12px; margin-bottom:20px; border:1px dashed #cbd5e1;">
+        <h4 style="font-size:14px; margin-bottom:10px; color:#071b36;">➕ Adicionar Nova Foto</h4>
+        <div class="form-grid">
+          <div class="input-group full">
+            <input type="file" id="fotoAtividadeInput" accept="image/*" style="padding:10px; background:#fff;">
+          </div>
+          <div class="input-group full">
+            <input type="text" id="legendaAtividadeInput" placeholder="Legenda (ex: Ensaio de Sábado)" style="padding:10px;">
+          </div>
+        </div>
+        <button class="btn gold" style="width:100%; margin-top:10px; padding:10px;" onclick="uploadFotoAtividade()">Publicar Foto</button>
+      </div>
+
+      <div id="galeriaAtividadesContainer" class="galeria-atividades-grid">
+        <p style="text-align:center; color:#64748b; grid-column: 1 / -1;">A carregar fotos...</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const pathParts = window.location.pathname.split('/');
+const slug = pathParts[pathParts.length - 1];
+let igrejaIdAtual = null;
+let membroLogado = null;
+
+let paginaAvisos = 1;
+let totalPaginasAvisos = 1;
+
+// Variáveis para a Bíblia
+let favoritosBiblia = JSON.parse(localStorage.getItem('favoritos_biblia')) || [];
+
+// Variáveis para o Lightbox da Galeria
+let fotosLightbox = [];
+let indexLightbox = 0;
+
+// Variáveis para o Chat de Grupo
+let chatAtual = { tipo: null, id: null, nome: null };
+let intervalChatGrupo = null;
+
+// Variáveis para Mídia
+let midiaListaGlobal = [];
+let paginaMidia = 1;
+const midiaPorPagina = 6;
+let filtroMidia = '';
+let abaMidiaAtual = 'VIDEO';
+
+function scrollToId(id) { document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" }); }
+
+async function carregarAvisos() {
+  const container = document.getElementById('avisosContainer');
+  const paginacao = document.getElementById('paginacaoAvisos');
+  if (!container) return;
+
+  try {
+    const r = await fetch(`/api/avisos/igreja/${igrejaIdAtual}?page=${paginaAvisos}&limit=4`);
+    const dados = await r.json();
+    totalPaginasAvisos = dados.totalPaginas || 1;
+
+    if (!dados.avisos || dados.avisos.length === 0) {
+      container.innerHTML = '<p style="text-align:center;color:#64748b;width:100%">Sem avisos de momento.</p>';
+      paginacao.innerHTML = '';
+      return;
+    }
+
+    container.innerHTML = dados.avisos.map(a => {
+      const data = new Date(a.criadoEm).toLocaleDateString('pt-PT');
+      const resumo = a.texto.length > 100 ? a.texto.substring(0, 100) + '...' : a.texto;
+      const tituloEscapado = a.titulo.replace(/'/g, "\\'").replace(/"/g, '&quot;');
+      const textoEscapado = a.texto.replace(/'/g, "\\'").replace(/\n/g, ' ').replace(/"/g, '&quot;');
+      return `
+        <div class="aviso-card" onclick="abrirDetalheAviso('${tituloEscapado}', '${textoEscapado}', '${data}')">
+          <div>
+            <h4>📢 ${a.titulo}</h4>
+            <p>${resumo}</p>
+          </div>
+          <span class="data">Publicado em ${data}</span>
+        </div>
+      `;
+    }).join('');
+
+    let botoes = `<button onclick="mudarPaginaAvisos(${paginaAvisos - 1})" ${paginaAvisos === 1 ? 'disabled' : ''}>« Anterior</button>`;
+    for (let i = 1; i <= totalPaginasAvisos; i++) {
+      botoes += `<button class="${i === paginaAvisos ? 'active' : ''}" onclick="mudarPaginaAvisos(${i})">${i}</button>`;
+    }
+    botoes += `<button onclick="mudarPaginaAvisos(${paginaAvisos + 1})" ${paginaAvisos === totalPaginasAvisos ? 'disabled' : ''}>Seguinte »</button>`;
+    paginacao.innerHTML = botoes;
+  } catch (e) {
+    container.innerHTML = '<p style="text-align:center;color:#dc2626;width:100%">Erro ao carregar avisos.</p>';
+  }
+}
+
+function mudarPaginaAvisos(novaPagina) {
+  if (novaPagina < 1 || novaPagina > totalPaginasAvisos) return;
+  paginaAvisos = novaPagina;
+  carregarAvisos();
+}
+
+function abrirDetalheAviso(titulo, texto, data) {
+  document.getElementById('avisoDetTitle').textContent = titulo;
+  document.getElementById('avisoDetTexto').textContent = texto;
+  document.getElementById('avisoDetData').textContent = 'Publicado em ' + data;
+  document.getElementById('modalAvisoDetalhe').style.display = 'flex';
+}
+
+// ===== OFERTAS E DÍZIMOS =====
+async function carregarContasSite() {
+  const div = document.getElementById('dadosPagamento');
+  if (!div) return;
+  try {
+    const r = await fetch('/api/contas/igreja/' + igrejaIdAtual);
+    const lista = await r.json();
+    if (!lista.length) {
+      div.innerHTML = '<p style="color:#dc2626;">Ainda não foram configurados dados de pagamento. Contacte a secretaria.</p>';
+      return;
+    }
+    div.innerHTML = lista.map(c => `
+      <p><strong>${c.banco} (${c.tipo})</strong><br><span class="conta">${c.numero}</span><br><small>${c.titular || ''}</small></p>
+    `).join('<hr style="margin:10px 0; border:0; border-top:1px solid #e2e8f0;">');
+  } catch (e) { div.innerHTML = '<p style="color:#dc2626;">Erro ao carregar dados bancários.</p>'; }
+}
+
+async function submeterOferta(e) {
+  e.preventDefault();
+  const btn = document.getElementById('btnEnviarOferta');
+  const alerta = document.getElementById('msgAlertaOferta');
+  btn.innerHTML = "⏳ A processar..."; btn.disabled = true; alerta.className = "alert";
+
+  const nome = document.getElementById('oNome').value;
+  const telefone = document.getElementById('oTelefone').value;
+  const valor = document.getElementById('oValor').value;
+  const finalidade = document.getElementById('oFinalidade').value;
+  const metodo = document.getElementById('oMetodo').value;
+  const referencia = document.getElementById('oReferencia').value;
+
+  if (!finalidade) return alerta.className = "alert error", alerta.textContent = "❌ Escolha a finalidade";
+
+  try {
+    const r = await fetch('/api/ofertas/igreja/' + igrejaIdAtual, {
+      method: 'POST', headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ nomeDoador: nome, telefone, valor, finalidade, metodo, referencia })
+    });
+    if (!r.ok) throw new Error('Erro ao registar');
+    const d = await r.json();
+    
+    alerta.className = "alert success";
+    alerta.innerHTML = `✅ Oferta registada!<br>O seu código de rastreio é: <strong>${d.oferta.codigo}</strong>`;
+    alerta.innerHTML += `<br><small>Por favor, faça a transferência para a conta acima e guarde este código.</small>`;
+    document.getElementById('formOferta').reset();
+  } catch (err) {
+    alerta.className = "alert error"; alerta.textContent = "❌ " + err.message;
+  } finally {
+    btn.innerHTML = "Enviar para validação"; btn.disabled = false;
+  }
+}
+
+async function submeterDizimo(e) {
+  e.preventDefault();
+  const btn = document.getElementById('btnEnviarDizimo');
+  const alerta = document.getElementById('msgAlertaDizimo');
+  btn.innerHTML = "⏳ A processar..."; btn.disabled = true; alerta.className = "alert";
+
+  const valor = document.getElementById('dValor').value;
+  const metodo = document.getElementById('dMetodo').value;
+  const referencia = document.getElementById('dReferencia').value;
+
+  try {
+    const r = await fetch('/api/ofertas/igreja/' + igrejaIdAtual, {
+      method: 'POST', headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({
+        membroId: membroLogado.id,
+        nomeDoador: membroLogado.nome,
+        bi: membroLogado.bi,
+        telefone: membroLogado.telefone,
+        finalidade: 'Dízimo',
+        valor, metodo, referencia
+      })
+    });
+    if (!r.ok) throw new Error('Erro ao registar dízimo');
+    const d = await r.json();
+    
+    alerta.className = "alert success";
+    alerta.innerHTML = `✅ Dízimo registado!<br>Código de rastreio: <strong>${d.oferta.codigo}</strong>`;
+    document.getElementById('dValor').value = '';
+    document.getElementById('dReferencia').value = '';
+  } catch (err) {
+    alerta.className = "alert error"; alerta.textContent = "❌ " + err.message;
+  } finally {
+    btn.innerHTML = "💾 Registar Dízimo"; btn.disabled = false;
+  }
+}
+
+async function consultarOferta() {
+  const codigo = document.getElementById('consultarCodigo').value.trim();
+  const divResultado = document.getElementById('resultadoConsulta');
+  if (!codigo) return divResultado.innerHTML = '<p style="color:#dc2626; font-size:13px;">Insira o código.</p>';
+  
+  try {
+    const r = await fetch(`/api/ofertas/consultar/${igrejaIdAtual}/${codigo}`);
+    const d = await r.json();
+    if (!r.ok) throw new Error(d.message || 'Oferta não encontrada');
+    
+    let statusColor = d.status === 'VALIDADO' ? 'var(--green)' : (d.status === 'AGUARDANDO_PASTOR' ? 'var(--gold)' : 'var(--red)');
+    let statusTxt = d.status === 'VALIDADO' ? '✅ Validado' : (d.status === 'AGUARDANDO_PASTOR' ? '⏳ Aguarda Pastor' : (d.status === 'NEGADO' ? '❌ Negado' : '🕒 Pendente'));
+
+    divResultado.innerHTML = `
+      <div style="background:#f8fafc; border:1px solid #e2e8f0; padding:15px; border-radius:10px; margin-top:15px;">
+        <p style="font-size:13px;"><b>Código:</b> ${d.codigo}</p>
+        <p style="font-size:13px;"><b>Valor:</b> ${d.valor} Kz</p>
+        <p style="font-size:13px;"><b>Finalidade:</b> ${d.finalidade}</p>
+        <p style="font-size:13px; color:${statusColor};"><b>Estado:</b> ${statusTxt}</p>
+        ${d.status === 'VALIDADO' ? `<button class="btn btn-submit" style="background:var(--green); margin-top:10px;" onclick="abrirModalComprovativo('${d.codigo}', '${d.valor}', '${d.finalidade}')">📄 Ver Comprovativo</button>` : ''}
+      </div>
+    `;
+  } catch (err) {
+    divResultado.innerHTML = `<p style="color:#dc2626; font-size:13px;">❌ ${err.message}</p>`;
+  }
+}
+
+let dadosComprovativo = {};
+function abrirModalComprovativo(codigo, valor, finalidade) {
+  dadosComprovativo = { codigo, valor, finalidade };
+  document.getElementById('modalComprovativo').style.display = 'flex';
+}
+
+function gerarPDFComprovativo() {
+  alert(`A gerar PDF Oficial...\n\nCódigo: ${dadosComprovativo.codigo}\nValor: ${dadosComprovativo.valor} Kz\nFinalidade: ${dadosComprovativo.finalidade}\n\n(Em produção, o backend envia o ficheiro PDF formatado).`);
+}
+
+// ===== BÍBLIA =====
+const LIVROS_BIBLIA = [
+  "Génesis", "Êxodo", "Levítico", "Números", "Deuteronómio", "Josué", "Juízes", "Rute", "1 Samuel", "2 Samuel", "1 Reis", "2 Reis", "1 Crónicas", "2 Crónicas", "Esdras", "Neemias", "Ester", "Jó", "Salmos", "Provérbios", "Eclesiastes", "Cantares", "Isaías", "Jeremias", "Lamentações", "Ezequiel", "Daniel", "Oseias", "Joel", "Amós", "Obadias", "Jonas", "Miqueias", "Naum", "Habacuque", "Sofonias", "Ageu", "Zacarias", "Malaquias",
+  "Mateus", "Marcos", "Lucas", "João", "Atos", "Romanos", "1 Coríntios", "2 Coríntios", "Gálatas", "Efésios", "Filipenses", "Colossenses", "1 Tessalonicenses", "2 Tessalonicenses", "1 Timóteo", "2 Timóteo", "Tito", "Filemom", "Hebreus", "Tiago", "1 Pedro", "2 Pedro", "1 João", "2 João", "3 João", "Judas", "Apocalipse"
+];
+
+function abrirBiblia() {
+  const select = document.getElementById('bibliaLivro');
+  if (select.options.length <= 1) {
+    select.innerHTML = '<option value="">Selecione o Livro</option>' + LIVROS_BIBLIA.map(l => `<option value="${l}">${l}</option>`).join('');
+  }
+  document.getElementById('bibliaLeitura').innerHTML = '<p style="text-align:center; color:#64748b; font-style:italic;">Selecione o Livro e o Capítulo para começar a leitura.</p>';
+  document.getElementById('bibliaCapitulo').innerHTML = '<option value="">Capítulo...</option>';
+  document.getElementById('modalBiblia').style.display = 'flex';
+}
+
+function carregarCapitulosBiblia() {
+  const livro = document.getElementById('bibliaLivro').value;
+  const selectCap = document.getElementById('bibliaCapitulo');
+  if (!livro) return selectCap.innerHTML = '<option value="">Capítulo...</option>';
+  
+  let numCapitulos = 50;
+  if (livro === "Salmos") numCapitulos = 150;
+  if (livro === "Génesis") numCapitulos = 50;
+  if (livro === "Mateus") numCapitulos = 28;
+  if (livro === "João") numCapitulos = 21;
+  if (livro === "Apocalipse") numCapitulos = 22;
+
+  let options = '<option value="">Selecione o Capítulo</option>';
+  for (let i = 1; i <= numCapitulos; i++) {
+    options += `<option value="${i}">Capítulo ${i}</option>`;
+  }
+  selectCap.innerHTML = options;
+}
+
+async function buscarVersiculosBiblia() {
+  const livro = document.getElementById('bibliaLivro').value;
+  const capitulo = document.getElementById('bibliaCapitulo').value;
+  const divLeitura = document.getElementById('bibliaLeitura');
+  
+  if (!livro || !capitulo) return;
+
+  divLeitura.innerHTML = '<p style="text-align:center;">A carregar a Palavra...</p>';
+  document.getElementById('bibliaRef').textContent = `${livro} ${capitulo}`;
+
+  try {
+    const livroFormatado = livro.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/ /g, "+");
+    const url = `https://bible-api.com/${livroFormatado}+${capitulo}?translation=almeida`;
+    const r = await fetch(url);
+    const d = await r.json();
+    
+    if (d.error) throw new Error("Capítulo não encontrado na API.");
+
+    divLeitura.innerHTML = d.verses.map(v => {
+      const isFav = favoritosBiblia.some(f => f.texto === v.text);
+      return `
+      <div class="versiculo-row">
+        <div class="versiculo-texto"><span class="versiculo-num">${v.verse}</span> ${v.text}</div>
+        <button class="fav-btn ${isFav ? 'active' : ''}" onclick="toggleFavoritoBiblia(event, '${livro}', '${capitulo}', '${v.verse}', \`${v.text.replace(/`/g, '\\`')}\`)">⭐</button>
+      </div>
+    `;
+    }).join('');
+  } catch (e) {
+    divLeitura.innerHTML = `<p style="text-align:center; color:#dc2626;">Não foi possível carregar o texto. Verifique a ligação à internet.</p>`;
+  }
+}
+
+function toggleFavoritoBiblia(e, livro, capitulo, versiculo, texto) {
+  e.stopPropagation();
+  const ref = `${livro} ${capitulo}:${versiculo}`;
+  const index = favoritosBiblia.findIndex(f => f.texto === texto);
+  
+  if (index > -1) {
+    favoritosBiblia.splice(index, 1);
+  } else {
+    favoritosBiblia.push({ ref, texto });
+  }
+  localStorage.setItem('favoritos_biblia', JSON.stringify(favoritosBiblia));
+  e.target.classList.toggle('active');
+}
+
+function navegarBiblia(dir) {
+  const selectCap = document.getElementById('bibliaCapitulo');
+  let atual = Number(selectCap.value);
+  if (!atual) return;
+  
+  const proximo = atual + dir;
+  if (proximo >= 1 && proximo <= selectCap.options.length - 1) {
+    selectCap.value = proximo;
+    buscarVersiculosBiblia();
+  }
+}
+
+// ===== GALERIA =====
+async function carregarGaleria() {
+  const div = document.getElementById('galeriaContainer');
+  if (!div) return;
+  try {
+    const r = await fetch('/api/galeria/albuns/igreja/' + igrejaIdAtual);
+    const lista = await r.json();
+    if (!lista.length) {
+      div.innerHTML = '<p style="text-align:center;color:#64748b">Nenhum álbum criado.</p>';
+      return;
+    }
+    div.innerHTML = `<div class="galeria-albuns">` + lista.map(a => `
+      <div class="galeria-album" onclick="abrirAlbumSite(${a.id})">
+        ${a.capaUrl ? `<img src="${a.capaUrl}" class="galeria-album-capa">` : `<div class="galeria-album-capa" style="display:grid;place-items:center;font-size:40px">🖼️</div>`}
+        <div class="galeria-album-info">
+          <h4>${a.nome}</h4>
+          <p>${a.descricao || ''} • ${a._count.fotos} fotos</p>
+        </div>
+      </div>
+    `).join('') + `</div>`;
+  } catch (e) {
+    div.innerHTML = '<p style="text-align:center;color:#dc2626">Erro ao carregar a galeria.</p>';
+  }
+}
+
+async function abrirAlbumSite(albumId) {
+  const div = document.getElementById('galeriaContainer');
+  div.innerHTML = '<p style="text-align:center;color:#64748b">A carregar fotos...</p>';
+  
+  try {
+    const r = await fetch('/api/galeria/albuns/' + albumId);
+    const album = await r.json();
+    
+    if (!album.fotos || !album.fotos.length) {
+      div.innerHTML = `<h3 style="text-align:center;color:#071b36;margin-bottom:20px">${album.nome}</h3><p style="text-align:center;color:#64748b">Nenhuma foto neste álbum.</p><button class="btn btn-outline" onclick="carregarGaleria()" style="margin:20px auto;display:block;color:#020617;border-color:#020617">⬅ Voltar aos Álbuns</button>`;
+      return;
+    }
+
+    fotosLightbox = album.fotos.map(f => f.url);
+
+    div.innerHTML = `
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+        <h3 style="color:#071b36">${album.nome}</h3>
+        <button class="btn btn-outline" onclick="carregarGaleria()" style="color:#020617;border-color:#020617">⬅ Voltar</button>
+      </div>
+      <div class="galeria-fotos">
+        ${album.fotos.map((f, idx) => `
+          <img src="${f.url}" class="galeria-foto" onclick="abrirLightbox(${idx})">
+        `).join('')}
+      </div>
+    `;
+  } catch (e) {
+    div.innerHTML = '<p style="text-align:center;color:#dc2626">Erro ao carregar fotos.</p>';
+  }
+}
+
+function abrirLightbox(index) {
+  indexLightbox = index;
+  document.getElementById('lightboxImg').src = fotosLightbox[indexLightbox];
+  document.getElementById('lightboxCounter').textContent = `${indexLightbox + 1} / ${fotosLightbox.length}`;
+  document.getElementById('lightbox').style.display = 'flex';
+}
+
+function fecharLightbox() {
+  document.getElementById('lightbox').style.display = 'none';
+}
+
+function navegarLightbox(dir) {
+  indexLightbox += dir;
+  if (indexLightbox < 0) indexLightbox = fotosLightbox.length - 1;
+  if (indexLightbox >= fotosLightbox.length) indexLightbox = 0;
+  
+  document.getElementById('lightboxImg').src = fotosLightbox[indexLightbox];
+  document.getElementById('lightboxCounter').textContent = `${indexLightbox + 1} / ${fotosLightbox.length}`;
+}
+
+// ===== CHAT PRIVADO =====
+let contactosChat = [];
+let contactoAtual = null;
+let intervalChat = null;
+
+async function iniciarChat() {
+  if (!membroLogado) {
+    document.getElementById('chatArea').innerHTML = '<p style="text-align:center;color:#64748b">Faça login para conversar com a liderança.</p>';
+    return;
+  }
+
+  const div = document.getElementById('chatArea');
+  div.innerHTML = `
+    <div class="chat-container">
+      <div class="chat-sidebar" id="chatSidebar">
+        <p style="padding:15px;text-align:center;color:#64748b">A carregar contactos...</p>
+      </div>
+      <div class="chat-main">
+        <div class="chat-header" id="chatHeader">
+          <span>Selecione um contacto para começar</span>
+        </div>
+        <div class="chat-messages" id="chatMessages"></div>
+        <div class="chat-input-area" id="chatInputArea" style="display:none">
+          <input type="text" id="chatInput" placeholder="Escreva uma mensagem..." onkeypress="if(event.key==='Enter') enviarMensagemChat()">
+          <button onclick="enviarMensagemChat()">Enviar</button>
+        </div>
+      </div>
+    </div>
+  `;
+
+  try {
+    const r = await fetch('/api/chat/contactos/' + igrejaIdAtual + '?meuId=' + membroLogado.id);
+    contactosChat = await r.json();
+    renderizarContactosChat();
+  } catch (e) { document.getElementById('chatSidebar').innerHTML = '<p style="padding:15px;color:#dc2626">Erro ao carregar contactos.</p>'; }
+}
+
+function renderizarContactosChat() {
+  const div = document.getElementById('chatSidebar');
+  if (!contactosChat.length) return div.innerHTML = '<p style="padding:15px;color:#64748b">Nenhum contacto disponível.</p>';
+  
+  div.innerHTML = contactosChat.map(c => `
+    <div class="chat-contact ${contactoAtual && contactoAtual.id === c.id ? 'active' : ''}" onclick="abrirConversa(${c.id}, '${c.nome.replace(/'/g,"\\'")}', '${c.foto || ''}')">
+      ${c.foto ? `<img src="${c.foto}" class="chat-avatar">` : `<div class="chat-avatar">${c.nome.charAt(0)}</div>`}
+      <div>
+        <strong>${c.nome}</strong>
+        <p style="font-size:12px;color:#64748b">${c.cargo || 'Membro'}</p>
+      </div>
+    </div>
+  `).join('');
+}
+
+async function abrirConversa(id, nome, foto) {
+  contactoAtual = { id, nome, foto };
+  renderizarContactosChat();
+  
+  document.getElementById('chatHeader').innerHTML = `
+    ${foto ? `<img src="${foto}" class="chat-avatar" style="width:32px;height:32px">` : `<div class="chat-avatar" style="width:32px;height:32px;font-size:14px">${nome.charAt(0)}</div>`}
+    <strong>${nome}</strong>
+  `;
+  document.getElementById('chatInputArea').style.display = 'flex';
+  document.getElementById('chatInput').focus();
+
+  await carregarMensagensChat();
+  
+  if (intervalChat) clearInterval(intervalChat);
+  intervalChat = setInterval(carregarMensagensChat, 3000);
+}
+
+async function carregarMensagensChat() {
+  if (!contactoAtual) return;
+  try {
+    const r = await fetch(`/api/chat/mensagens?deId=${membroLogado.id}&paraId=${contactoAtual.id}`);
+    const lista = await r.json();
+    
+    const div = document.getElementById('chatMessages');
+    div.innerHTML = lista.map(m => {
+      const enviada = m.deId === membroLogado.id;
+      const hora = new Date(m.criadoEm).toLocaleTimeString('pt-PT', { hour: '2-digit', minute: '2-digit' });
+      return `
+        <div class="chat-msg ${enviada ? 'enviada' : 'recebida'}">
+          ${m.texto}
+          <span style="font-size:10px; opacity:0.6; display:block; text-align:right; margin-top:4px">${hora}</span>
+        </div>
+      `;
+    }).join('');
+    div.scrollTop = div.scrollHeight;
+  } catch (e) { console.error(e); }
+}
+
+async function enviarMensagemChat() {
+  const input = document.getElementById('chatInput');
+  const texto = input.value.trim();
+  if (!texto || !contactoAtual) return;
+  
+  input.value = '';
+  try {
+    await fetch('/api/chat/igreja/' + igrejaIdAtual, {
+      method: 'POST', headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ deId: membroLogado.id, paraId: contactoAtual.id, texto })
+    });
+    await carregarMensagensChat();
+  } catch (e) { alert('Erro ao enviar mensagem'); }
+}
+
+// ===== ORAÇÃO E TESTEMUNHOS =====
+function mudarAbaOracao(tipo) {
+  document.getElementById('tipoOracao').value = tipo;
+  const btnP = document.getElementById('btnTabPedido');
+  const btnT = document.getElementById('btnTabTestemunho');
+  const label = document.getElementById('labelOracao');
+  const btnEnviar = document.getElementById('btnEnviarOracao');
+
+  if (tipo === 'PEDIDO') {
+    btnP.className = 'btn gold'; btnP.style = 'flex:1';
+    btnT.className = 'btn outline'; btnT.style = 'flex:1;color:#071b36;border-color:#071b36';
+    label.textContent = 'O seu Pedido *';
+    btnEnviar.innerHTML = '🙏 ENVIAR PEDIDO';
+  } else {
+    btnT.className = 'btn gold'; btnT.style = 'flex:1';
+    btnP.className = 'btn outline'; btnP.style = 'flex:1;color:#071b36;border-color:#071b36';
+    label.textContent = 'O seu Testemunho *';
+    btnEnviar.innerHTML = '✨ ENVIAR TESTEMUNHO';
+  }
+}
+
+async function submeterOracao(e) {
+  e.preventDefault();
+  const btn = document.getElementById('btnEnviarOracao');
+  const alerta = document.getElementById('msgAlertaOracao');
+  btn.innerHTML = "⏳ A enviar..."; btn.disabled = true; alerta.className = "alert";
+
+  const tipo = document.getElementById('tipoOracao').value;
+  const name = document.getElementById('orNome').value;
+  const contact = document.getElementById('orContacto').value;
+  const message = document.getElementById('orMensagem').value;
+
+  try {
+    const r = await fetch('/api/oracao/igreja/' + igrejaIdAtual, {
+      method: 'POST', headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ name, contact, message, tipo })
+    });
+    if (!r.ok) throw new Error('Erro ao enviar');
+    
+    alerta.className = "alert success";
+    alerta.textContent = tipo === 'PEDIDO' ? "✅ Pedido recebido! A liderança estará a orar por si." : "✅ Testemunho enviado! Aguarda aprovação do Pastor.";
+    document.getElementById('orMensagem').value = '';
+  } catch (err) {
+    alerta.className = "alert error"; alerta.textContent = "❌ " + err.message;
+  } finally {
+    btn.innerHTML = tipo === 'PEDIDO' ? '🙏 ENVIAR PEDIDO' : '✨ ENVIAR TESTEMUNHO';
+    btn.disabled = false;
+  }
+}
+
+async function carregarTestemunhos() {
+  const mural = document.getElementById('muralTestemunhos');
+  const lista = document.getElementById('listaTestemunhos');
+  if (!mural || !lista) return;
+
+  try {
+    const r = await fetch('/api/oracao/igreja/' + igrejaIdAtual + '/public');
+    const dados = await r.json();
+    
+    if (dados.length === 0) {
+      mural.style.display = 'none';
+      return;
+    }
+
+    mural.style.display = 'block';
+    lista.innerHTML = dados.map(t => {
+      const data = new Date(t.createdAt).toLocaleDateString('pt-PT');
+      return `
+        <div style="background:#fff;border-left:4px solid var(--gold);padding:15px;border-radius:8px;box-shadow:0 2px 10px rgba(0,0,0,.05)">
+          <p style="color:#334155;font-size:15px;font-style:italic;margin-bottom:10px">"${t.message}"</p>
+          <small style="color:#64748b;font-weight:bold">— ${t.name || 'Anónimo'}, ${data}</small>
+        </div>
+      `;
+    }).join('');
+  } catch (e) { console.error(e); }
+}
+
+// ===== LÓGICA DE MÍDIA (VÍDEOS/ÁUDIOS/LIVE) =====
+const getYouTubeId = (url) => {
+  const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+  const match = url.match(regExp);
+  return (match && match[2].length === 11) ? match[2] : null;
+};
+
+async function carregarLive() {
+  const container = document.getElementById('liveBanner');
+  if (!container) return;
+
+  try {
+    const r = await fetch('/api/igrejas/' + igrejaIdAtual);
+    const ig = await r.json();
+
+    if (ig.liveAtiva && ig.liveUrl) {
+      const videoId = getYouTubeId(ig.liveUrl);
+      if (videoId) {
+        container.style.display = 'block';
+        container.innerHTML = `
+          <h3>🔴 AO VIVO AGORA</h3>
+          <div class="live-player-wrapper">
+            <iframe src="https://www.youtube.com/embed/${videoId}?autoplay=1" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+          </div>
+        `;
+      } else {
+        container.style.display = 'none';
+      }
+    } else {
+      container.style.display = 'none';
+    }
+  } catch (e) { console.error(e); }
+}
+
+async function carregarMidia() {
+  const track = document.getElementById('midiaContainer');
+  if (!track) return;
+  track.innerHTML = '<p style="text-align:center; width:100%; color:#64748b;">A carregar mídia...</p>';
+
+  try {
+    const r = await fetch('/api/midia/igreja/' + igrejaIdAtual);
+    midiaListaGlobal = await r.json();
+    renderizarMidia();
+  } catch (e) {
+    track.innerHTML = '<p style="text-align:center; width:100%; color:var(--red);">Erro ao carregar mídia.</p>';
+  }
+}
+
+function mudarAbaMidia(tipo) {
+  abaMidiaAtual = tipo;
+  filtroMidia = '';
+  document.getElementById('inputBuscaMidia').value = '';
+  paginaMidia = 1;
+
+  const btnV = document.getElementById('btnTabVideos');
+  const btnA = document.getElementById('btnTabAudios');
+
+  if (tipo === 'VIDEO') {
+    btnV.className = 'midia-tab-btn active';
+    btnA.className = 'midia-tab-btn';
+  } else {
+    btnA.className = 'midia-tab-btn active';
+    btnV.className = 'midia-tab-btn';
+  }
+  renderizarMidia();
+}
+
+function renderizarMidia() {
+  const container = document.getElementById('midiaContainer');
+  const paginacao = document.getElementById('paginacaoMidia');
+  if (!container) return;
+
+  const filtrados = midiaListaGlobal.filter(m => 
+    m.tipo === abaMidiaAtual && m.titulo.toLowerCase().includes(filtroMidia.toLowerCase())
+  );
+
+  const totalPaginas = Math.ceil(filtrados.length / midiaPorPagina) || 1;
+  if (paginaMidia > totalPaginas) paginaMidia = totalPaginas;
+
+  const inicio = (paginaMidia - 1) * midiaPorPagina;
+  const fim = inicio + midiaPorPagina;
+  const paginados = filtrados.slice(inicio, fim);
+
+  if (paginados.length === 0) {
+    container.innerHTML = '<p style="text-align:center; width:100%; color:#64748b;">Nenhuma mídia encontrada.</p>';
+    paginacao.innerHTML = '';
+    return;
+  }
+
+  if (abaMidiaAtual === 'VIDEO') {
+    container.className = 'video-grid';
+    container.innerHTML = paginados.map(m => {
+      const videoId = getYouTubeId(m.url);
+      let thumb = '';
+      let clickAction = '';
+
+      if (videoId) {
+        thumb = `https://img.youtube.com/vi/${videoId}/mqdefault.jpg`;
+        clickAction = `window.open('https://www.youtube.com/watch?v=${videoId}', '_blank')`;
+      } else {
+        const svgString = `<svg xmlns="http://www.w3.org/2000/svg" width="300" height="169" viewBox="0 0 300 169"><rect width="100%" height="100%" fill="#020617"/><circle cx="150" cy="84" r="38" fill="#facc15"/><polygon points="140,66 140,102 168,84" fill="#020617"/><text x="50%" y="145" fill="#facc15" font-family="Arial" font-size="12" font-weight="bold" text-anchor="middle">🎬 VÍDEO LOCAL</text></svg>`;
+        thumb = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svgString)}`;
+        clickAction = `window.open('${m.url}', '_blank')`;
+      }
+
+      const data = new Date(m.criadoEm).toLocaleDateString('pt-PT');
+
+      return `
+        <div class="video-card" onclick="${clickAction}">
+          <div class="video-thumb-wrapper">
+            <img src="${thumb}" alt="${m.titulo}">
+            <div class="play-overlay"><div class="play-icon">▶</div></div>
+          </div>
+          <div class="video-info">
+            <h4>${m.titulo}</h4>
+            <p>Publicado em ${data}</p>
+          </div>
+        </div>
+      `;
+    }).join('');
+  } else {
+    container.className = 'audio-list';
+    container.innerHTML = paginados.map(m => {
+      const data = new Date(m.criadoEm).toLocaleDateString('pt-PT');
+      
+      let playerHtml = m.isArquivo 
+        ? `<audio controls preload="metadata" style="width:100%; height:44px; border-radius:22px; outline:none; filter:invert(0.92) hue-rotate(180deg);"><source src="${m.url}" type="audio/mpeg"></audio>`
+        : `<a href="${m.url}" target="_blank" class="btn gold" style="padding:10px 20px; border-radius:22px; text-decoration:none; display:inline-block; font-size:13px;">▶ Ouvir Externo</a>`;
+
+      return `
+        <div class="audio-item">
+          <div class="audio-icon">🎧</div>
+          <div class="audio-info">
+            <h4>${m.titulo}</h4>
+            <p>Publicado em ${data}</p>
+          </div>
+          <div class="audio-player-wrapper">
+            ${playerHtml}
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  let botoes = '';
+  if (totalPaginas > 1) {
+    botoes += `<button onclick="mudarPaginaMidia(${paginaMidia - 1})" ${paginaMidia === 1 ? 'disabled' : ''}>«</button>`;
+    for (let i = 1; i <= totalPaginas; i++) {
+      botoes += `<button class="${i === paginaMidia ? 'active' : ''}" onclick="mudarPaginaMidia(${i})">${i}</button>`;
+    }
+    botoes += `<button onclick="mudarPaginaMidia(${paginaMidia + 1})" ${paginaMidia === totalPaginas ? 'disabled' : ''}>»</button>`;
+  }
+  paginacao.innerHTML = botoes;
+}
+
+function mudarPaginaMidia(novaPagina) {
+  paginaMidia = novaPagina;
+  renderizarMidia();
+  document.getElementById('midia').scrollIntoView({ behavior: 'smooth' });
+}
+
+function pesquisarMidia(valor) {
+  filtroMidia = valor;
+  paginaMidia = 1;
+  renderizarMidia();
+}
+
+// ===== CARREGAR GERAL =====
+async function carregar() {
+  try {
+    const r = await fetch('/api/igrejas');
+    const lista = await r.json();
+    const igreja = lista.find(i => i.slug === slug);
+
+    if (!igreja) return document.getElementById('conteudoPrincipal').innerHTML = '<div style="text-align:center;color:red">Igreja não encontrada</div>';
+
+    igrejaIdAtual = igreja.id;
+
+    if (igreja.corFundo) document.body.style.background = igreja.corFundo;
+
+    if (igreja.corBarraTopo) {
+      document.querySelector('.top').style.background = igreja.corBarraTopo;
+    }
+
+    document.title = igreja.nome;
+    document.getElementById('igrejaNome').textContent = igreja.nome;
+    document.getElementById('igrejaDesc').textContent = igreja.descricao || 'Uma igreja que une a família';
+    document.getElementById('nomeIgrejaModal').textContent = igreja.nome;
+
+    document.getElementById('totalMembros').textContent = igreja._count?.membros || 0;
+    document.getElementById('totalDeptos').textContent = igreja._count?.departamentos || 0;
+    document.getElementById('totalSectores').textContent = igreja._count?.sectores || 0;
+    document.getElementById('totalEventos').textContent = igreja._count?.eventos || 0;
+
+    const logo = document.getElementById('logo');
+    if (igreja.logoUrl) {
+      logo.innerHTML = '<img src="' + igreja.logoUrl + '" style="width:100%;height:100%;object-fit:cover;border-radius:20px">';
+      logo.style.background = 'none';
+    } else if (igreja.icone && igreja.icone.startsWith('/logos/')) {
+      logo.innerHTML = '<img src="' + igreja.icone + '" style="width:100%;height:100%;object-fit:cover;border-radius:20px">';
+      logo.style.background = 'none';
+    } else {
+      logo.innerHTML = '<span>Α Ω</span>';
+    }
+
+    document.getElementById('heroSmall').textContent = igreja.heroSmall || 'ASSEMBLEIA DE DEUS PENTECOSTAL';
+    document.getElementById('heroTitulo').innerHTML = `${igreja.heroTitulo || 'Onde a fé encontra'} <span id="heroDestaque">${igreja.heroDestaque || 'o coração'}</span>`;
+    document.getElementById('heroTexto').textContent = igreja.slogan || 'Uma igreja que une a família';
+
+    const heroContainer = document.getElementById('heroBackgrounds');
+    if (igreja.imagensHero) {
+      try {
+        const imagens = JSON.parse(igreja.imagensHero);
+        if (imagens.length > 0) {
+          heroContainer.innerHTML = imagens.map((url, i) => `
+            <div class="hero-bg ${i === 0 ? 'active' : ''}" style="background-image: url('${url}');"></div>
+          `).join('');
+          let currentIndex = 0;
+          const backgrounds = document.querySelectorAll('.hero-bg');
+          if (backgrounds.length > 1) {
+            setInterval(() => {
+              backgrounds[currentIndex].classList.remove('active');
+              currentIndex = (currentIndex + 1) % backgrounds.length;
+              backgrounds[currentIndex].classList.add('active');
+            }, 5000);
+          }
+        }
+      } catch(e) {}
+    }
+
+    let htmlPastores = '';
+    try {
+      const rP = await fetch('/api/pastores/igreja/' + igreja.id);
+      const pastores = await rP.json();
+      if (pastores.length > 0) {
+        htmlPastores = pastores.map(p => `
+          <section id="pastor">
+            <h3 style="text-align:center;color:#071b36;margin-bottom:20px">O nosso <span style="color:#d7ad4b">Pastor</span></h3>
+            <div class="pastor-section">
+              <div class="pastor-grid">
+                <div class="pastor-img-wrap">
+                  ${p.foto ? `<img src="${p.foto}" class="pastor-img" alt="${p.nome}">` : `<div class="pastor-img" style="display:grid;place-items:center;font-size:80px">👤</div>`}
+                </div>
+                <div class="pastor-info">
+                  <div class="pastor-cargo">${p.cargo || 'Pastor'}</div>
+                  <h2 class="pastor-nome">${p.nome}</h2>
+                  <p class="pastor-bio">${p.bio || 'Servo dedicado à obra de Deus.'}</p>
+                  <div class="pastor-contacts">
+                    ${p.telefone ? `<div class="pastor-contact">📞 ${p.telefone}</div>` : ''}
+                    ${p.email ? `<div class="pastor-contact">✉️ ${p.email}</div>` : ''}
+                  </div>
+                  ${p.versiculo ? `<div class="pastor-versiculo">"${p.versiculo}"</div>` : ''}
+                  ${p.conselho ? `<div class="pastor-conselho"><h4>Conselho da Semana</h4><p>"${p.conselho}"</p></div>` : ''}
+                </div>
+              </div>
+            </div>
+          </section>
+        `).join('');
+      }
+    } catch(e) {}
+
+    let htmlDepartamentos = '';
+    try {
+      const rD = await fetch('/api/departamentos/igreja/' + igreja.id);
+      const deptos = await rD.json();
+      if (deptos.length > 0) {
+        const cardsHtml = deptos.map(d => {
+          let sectoresHtml = '';
+          if (d.sectores && d.sectores.length > 0) {
+            sectoresHtml = d.sectores.map(s => `
+              <div class="sector-item">
+                <span>${s.nome} (${s._count?.membros || 0} membros)</span>
+                ${s.lider ? `<span class="sector-lider">👤 ${s.lider.nome}</span>` : ''}
+              </div>
+            `).join('');
+          } else {
+            sectoresHtml = '<p style="color:#94a3b8;font-size:12px">Nenhum sector criado.</p>';
+          }
+
+          let liderDeptoHtml = '';
+          if (d.lider) {
+            liderDeptoHtml = `
+              <div class="depto-lider-box">
+                ${d.lider.foto ? `<img src="${d.lider.foto}" class="depto-lider-foto">` : `<div class="depto-lider-letra">${d.lider.nome.charAt(0)}</div>`}
+                <div class="depto-lider-texto">
+                  <span>Líder do Depto</span>
+                  <strong>${d.lider.nome}</strong>
+                </div>
+              </div>
+            `;
+          }
+
+          return `
+            <div class="depto-card-premium">
+              <div class="depto-card-icon">${d.icone || '🏛️'}</div>
+              <h4 class="depto-card-title">${d.nome}</h4>
+              <p class="depto-card-desc">${d.descricao || 'Departamento da nossa igreja.'}</p>
+              
+              ${liderDeptoHtml}
+              
+              <div class="depto-stats">
+                👥 Setores: <span>${d._count?.sectores || 0}</span>
+              </div>
+              
+              <button class="btn-depto-sectores" onclick="abrirModalSectores(${d.id}, '${d.nome.replace(/'/g,"\\'")}')">
+                <span>Ver Sectores</span>
+                <span>➔</span>
+              </button>
+            </div>
+          `;
+        }).join('');
+
+        htmlDepartamentos = `
+          <div class="depto-header-title">
+            <h3>Os nossos <span>Departamentos</span></h3>
+            <p>Juntos servindo a Deus e ao próximo</p>
+          </div>
+          <div class="carousel-wrapper">
+            <button class="carousel-btn" onclick="scrollCarousel(-1)">❮</button>
+            <div class="carousel-track" id="carouselDeptos">${cardsHtml}</div>
+            <button class="carousel-btn" onclick="scrollCarousel(1)">❯</button>
+          </div>
+        `;
+      } else {
+        htmlDepartamentos = '<p style="text-align:center;color:#64748b">Nenhum departamento registado.</p>';
+      }
+    } catch(e) {
+      htmlDepartamentos = '<p style="text-align:center;color:#64748b">Erro ao carregar departamentos.</p>';
+    }
+
+    let htmlEventos = '';
+    try {
+      const rEv = await fetch('/api/eventos/igreja/' + igreja.id);
+      const eventos = await rEv.json();
+      if (eventos.length > 0) {
+        htmlEventos = eventos.map(e => {
+          const d = new Date(e.startsAt);
+          const dataFormatada = d.toLocaleDateString('pt-PT', { day: '2-digit', month: 'short', year: 'numeric' });
+          const horaFormatada = d.toLocaleTimeString('pt-PT', { hour: '2-digit', minute: '2-digit' });
+          return `
+            <div class="evento-card" onclick="abrirDetalheEvento(${e.id}, '${e.title.replace(/'/g,"\\'")}', '${dataFormatada} ${horaFormatada}', '${(e.local||'').replace(/'/g,"\\'")}', '${(e.description||'').replace(/'/g,"\\'")}', '${e.imagem||''}')">
+              <div class="evento-data">${dataFormatada} · ${horaFormatada}</div>
+              <div class="evento-corpo">
+                <h4>${e.title}</h4>
+                <p>${e.description ? e.description.substring(0, 100) + '...' : 'Clique para ver detalhes.'}</p>
+                ${e.local ? `<span class="evento-local">📍 ${e.local}</span>` : ''}
+              </div>
+            </div>
+          `;
+        }).join('');
+      } else {
+        htmlEventos = '<p style="text-align:center;color:#64748b">Nenhum evento agendado.</p>';
+      }
+    } catch(e) {}
+
+    let htmlOfertas = `
+      <section id="ofertas">
+        <h3 style="text-align:center;color:#071b36;margin-bottom:30px">Ofertas e <span style="color:#d7ad4b">Contribuições</span></h3>
+        <div class="alerta-aviso">⚠️ <b>Importante:</b> O envio do formulário não confirma o recebimento do dinheiro. A oferta fica pendente até a tesouraria verificar a transação.</div>
+        
+        <div class="ofertas-layout">
+          <div class="oferta-card dados-pagamento">
+            <h3>Dados Oficiais de Pagamento</h3>
+            <p style="font-size:12px; color:#64748b; margin-bottom:15px;">Utilize apenas os dados confirmados pela igreja.</p>
+            <div id="dadosPagamento"><p>A carregar dados...</p></div>
+          </div>
+
+          <div class="oferta-card">
+            <h3>Registar Oferta</h3>
+            <div id="msgAlertaOferta" class="alert"></div>
+            <form id="formOferta" onsubmit="submeterOferta(event)">
+              <div class="form-grid">
+                <div class="input-group"><label>Nome</label><input id="oNome" placeholder="Opcional"></div>
+                <div class="input-group"><label>Telefone</label><input id="oTelefone" placeholder="Opcional"></div>
+                <div class="input-group"><label>Valor (Kz) *</label><input type="number" id="oValor" required min="1" placeholder="Ex: 5000"></div>
+                <div class="input-group"><label>Finalidade *</label>
+                  <select id="oFinalidade" required>
+                    <option value="">Selecione</option>
+                    <option value="Oferta">Oferta</option>
+                    <option value="Missões">Missões</option>
+                    <option value="Construção">Construção</option>
+                    <option value="Ação Social">Ação Social</option>
+                  </select>
+                </div>
+                <div class="input-group"><label>Método *</label>
+                  <select id="oMetodo" required>
+                    <option value="">Selecione</option>
+                    <option value="Transferência">Transferência Bancária</option>
+                    <option value="Multicaixa">Multicaixa Express</option>
+                    <option value="Unitel Money">Unitel Money</option>
+                    <option value="PayPay">PayPay AO</option>
+                  </select>
+                </div>
+                <div class="input-group"><label>Referência</label><input id="oReferencia" placeholder="Ex: Nº do talão"></div>
+              </div>
+              <button type="submit" class="btn-submit" id="btnEnviarOferta" style="background:var(--gold); color:#020617;">Enviar para validação</button>
+            </form>
+          </div>
+
+          <div class="oferta-card">
+            <h3>Acompanhar Oferta</h3>
+            <div class="input-group" style="margin-bottom:15px;">
+              <label>Código da oferta</label>
+              <input id="consultarCodigo" placeholder="Código recebido ao registar">
+            </div>
+            <button class="btn btn-submit" onclick="consultarOferta()" style="background:#0284c7; margin-top:0;">Consultar estado</button>
+            <div id="resultadoConsulta"></div>
+          </div>
+        </div>
+      </section>
+    `;
+
+    document.getElementById('conteudoPrincipal').innerHTML = `
+      <!-- 1. SOBRE -->
+      <section id="sobre" class="card darkcard">
+        <div class="pad">
+          <h3>Sobre a Igreja</h3>
+          <p style="margin-bottom: 20px; line-height: 1.6;">${igreja.sobre || 'Uma comunidade viva, edificada em Cristo.'}</p>
+          
+          <div style="display:flex; flex-wrap:wrap; gap:20px; background:rgba(0,0,0,0.2); padding:20px; border-radius:12px; border:1px solid rgba(255,255,255,0.1);">
+            ${igreja.endereco ? `<div style="display:flex; align-items:center; gap:8px; color:#bfdbfe; font-size:14px;"><span style="font-size:18px;">📍</span> ${igreja.endereco}</div>` : ''}
+            ${igreja.telefone ? `<div style="display:flex; align-items:center; gap:8px; color:#bfdbfe; font-size:14px;"><span style="font-size:18px;">📞</span> ${igreja.telefone}</div>` : ''}
+            ${igreja.email ? `<div style="display:flex; align-items:center; gap:8px; color:#bfdbfe; font-size:14px;"><span style="font-size:18px;">✉️</span> ${igreja.email}</div>` : ''}
+          </div>
+        </div>
+      </section>
+
+      <!-- 2. PASTOR -->
+      ${htmlPastores}
+
+      <!-- 3. DEPARTAMENTOS -->
+      <section id="departamentos">
+        ${htmlDepartamentos}
+      </section>
+
+      <!-- 4. AGENDA -->
+      <section id="agenda">
+        <h3 style="text-align:center;color:#071b36;margin-bottom:30px">Agenda e <span style="color:#d7ad4b">Eventos</span></h3>
+        <div class="evento-grid">${htmlEventos}</div>
+      </section>
+
+      <!-- 5. MÍDIA -->
+      <section id="midia">
+        <div class="midia-header-title">
+          <h3>🎬 <span>Mídia</span> da Igreja</h3>
+        </div>
+        <div id="liveBanner" class="live-banner" style="display:none;"></div>
+        <div class="midia-tabs">
+          <button id="btnTabVideos" class="midia-tab-btn active" onclick="mudarAbaMidia('VIDEO')">🎬 Vídeos</button>
+          <button id="btnTabAudios" class="midia-tab-btn" onclick="mudarAbaMidia('AUDIO')">🎧 Áudios</button>
+        </div>
+        <div class="midia-search-wrapper">
+          <input type="text" id="inputBuscaMidia" class="midia-search" placeholder="🔍 Pesquisar mídia por título..." oninput="pesquisarMidia(this.value)">
+        </div>
+        <div id="midiaContainer" class="video-grid"></div>
+        <div id="paginacaoMidia" class="midia-paginacao"></div>
+      </section>
+
+      <!-- 6. AVISOS -->
+      <section id="avisos">
+        <h3 style="text-align:center;color:#071b36;margin-bottom:30px">Avisos <span style="color:#d7ad4b">da Igreja</span></h3>
+        <div id="avisosContainer" class="avisos-container"></div>
+        <div id="paginacaoAvisos" class="paginacao"></div>
+      </section>
+
+      <!-- 7. OFERTAS -->
+      ${htmlOfertas}
+      
+      <!-- 8. ORAÇÃO -->
+      <section id="oracao" class="card pad">
+        <h3 style="text-align:center;color:#071b36">Pedidos de Oração e <span style="color:var(--gold)">Testemunhos</span></h3>
+        <p style="text-align:center;color:#64748b;margin-bottom:25px;font-style:italic">"A oração do justo é poderosa e eficaz." (Tiago 5:16)</p>
+        <div style="max-width:600px;margin:0 auto;background:#f8fafc;padding:25px;border-radius:15px;border:1px solid #e2e8f0">
+          <div style="display:flex;gap:10px;margin-bottom:20px">
+            <button id="btnTabPedido" class="btn gold" style="flex:1" onclick="mudarAbaOracao('PEDIDO')">🙏 Pedido</button>
+            <button id="btnTabTestemunho" class="btn outline" style="flex:1;color:#071b36;border-color:#071b36" onclick="mudarAbaOracao('TESTEMUNHO')">✨ Testemunho</button>
+          </div>
+          <div id="msgAlertaOracao" class="alert"></div>
+          <form onsubmit="submeterOracao(event)">
+            <input type="hidden" id="tipoOracao" value="PEDIDO">
+            <div class="input-group full" style="margin-bottom:15px"><label>Nome (Opcional)</label><input id="orNome" placeholder="O seu nome"></div>
+            <div class="input-group full" style="margin-bottom:15px"><label>Contacto (Opcional)</label><input id="orContacto" placeholder="Telefone ou email"></div>
+            <div class="input-group full" style="margin-bottom:15px"><label id="labelOracao">O seu Pedido *</label><textarea id="orMensagem" required placeholder="Escreva aqui..." style="min-height:100px"></textarea></div>
+            <button type="submit" class="btn-submit" id="btnEnviarOracao" style="background:var(--gold);color:#020617">🙏 ENVIAR PEDIDO</button>
+          </form>
+        </div>
+        <div id="muralTestemunhos" style="margin-top:40px;display:none">
+          <h4 style="text-align:center;color:var(--gold);margin-bottom:20px">✨ Mural de Testemunhos</h4>
+          <div id="listaTestemunhos" style="display:grid;gap:15px"></div>
+        </div>
+      </section>
+      
+      <!-- 9. GALERIA -->
+      <section id="galeria">
+        <h3 style="text-align:center;color:#071b36;margin-bottom:30px">Galeria <span style="color:#d7ad4b">de Fotos</span></h3>
+        <div id="galeriaContainer"></div>
+      </section>
+      
+      <!-- 10. CHAT -->
+      <section id="chat">
+        <h3 style="text-align:center;color:#071b36;margin-bottom:30px">Chat <span style="color:#d7ad4b">da Igreja</span></h3>
+        <div id="chatArea">
+          <p style="text-align:center;color:#64748b">Faça login para conversar com a liderança.</p>
+        </div>
+      </section>
+    `;
+
+    document.getElementById('footerNome').textContent = igreja.nome;
+    document.getElementById('footerTexto').innerHTML = `© ${new Date().getFullYear()} ${igreja.nome}`;
+    
+    const footerContactos = document.getElementById('footerContactos');
+    let contatosHtml = '';
+    if (igreja.endereco) contatosHtml += `<span>📍 ${igreja.endereco}</span>`;
+    if (igreja.telefone) contatosHtml += `<span>📞 ${igreja.telefone}</span>`;
+    if (igreja.email) contatosHtml += `<span>✉️ ${igreja.email}</span>`;
+    footerContactos.innerHTML = contatosHtml;
+
+    carregarAvisos();
+    carregarContasSite();
+    carregarGaleria();
+    carregarTestemunhos(); 
+    
+    // Iniciar Módulo de Mídia
+    carregarLive();
+    carregarMidia();
+
+    const membroGuardado = localStorage.getItem('membro_' + igreja.id);
+    if (membroGuardado) {
+      membroLogado = JSON.parse(membroGuardado);
+      mostrarAreaMembro();
+    }
+    
+    iniciarChat();
+
+  } catch (e) {
+    document.getElementById('conteudoPrincipal').innerHTML = '<div style="text-align:center;color:red">Erro: ' + e.message + '</div>';
+  }
+}
+
+function scrollCarousel(direction) {
+  const track = document.getElementById('carouselDeptos');
+  if (!track) return;
+  const scrollAmount = track.clientWidth;
+  track.scrollBy({ left: direction * scrollAmount, behavior: 'smooth' });
+}
+
+// ===== EDITAR PERFIL =====
+function abrirModalEditarPerfil() {
+  if (!membroLogado) return;
+  document.getElementById('epNome').value = membroLogado.nome || '';
+  document.getElementById('epTelefone').value = membroLogado.telefone || '';
+  document.getElementById('epBi').value = membroLogado.bi || '';
+  document.getElementById('epEndereco').value = membroLogado.endereco || '';
+  document.getElementById('msgAlertaPerfil').className = 'alert';
+  document.getElementById('epFoto').value = ''; 
+  document.getElementById('modalEditarPerfil').style.display = 'flex';
+}
+
+async function salvarPerfil(e) {
+  e.preventDefault();
+  const btn = document.getElementById('btnSalvarPerfil');
+  const alerta = document.getElementById('msgAlertaPerfil');
+  btn.innerHTML = "⏳ A guardar..."; btn.disabled = true;
+
+  const nome = document.getElementById('epNome').value;
+  const telefone = document.getElementById('epTelefone').value;
+  const bi = document.getElementById('epBi').value;
+  const endereco = document.getElementById('epEndereco').value;
+
+  try {
+    const r = await fetch('/api/membros/' + membroLogado.id + '/perfil', {
+      method: 'PUT', headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ nome, telefone, bi, endereco })
+    });
+    if (!r.ok) throw new Error('Erro ao atualizar dados');
+
+    const fotoInput = document.getElementById('epFoto');
+    let membroComFoto = null;
+    
+    if (fotoInput.files && fotoInput.files[0]) {
+      const fd = new FormData();
+      fd.append('foto', fotoInput.files[0]);
+      const rF = await fetch('/api/membros/' + membroLogado.id + '/foto', { 
+        method: 'POST', 
+        body: fd 
+      });
+      if (!rF.ok) throw new Error('Erro ao atualizar foto');
+      membroComFoto = await rF.json(); 
+    }
+
+    membroLogado.nome = nome;
+    membroLogado.telefone = telefone;
+    membroLogado.bi = bi;
+    membroLogado.endereco = endereco;
+    
+    if (membroComFoto && membroComFoto.foto) {
+      membroLogado.foto = membroComFoto.foto; 
+    }
+    
+    localStorage.setItem('membro_' + igrejaIdAtual, JSON.stringify(membroLogado));
+    
+    alerta.className = "alert success"; 
+    alerta.textContent = "✅ Perfil atualizado!";
+    
+    setTimeout(() => {
+      fecharModal('modalEditarPerfil');
+      location.reload(); 
+    }, 1500);
+
+  } catch (err) {
+    alerta.className = "alert error"; 
+    alerta.textContent = "❌ " + err.message;
+    btn.innerHTML = "💾 Guardar Alterações"; 
+    btn.disabled = false;
+  }
+}
+
+function abrirDetalheEvento(id, title, data, local, desc, imagem) {
+  document.getElementById('detTitle').textContent = title;
+  document.getElementById('detData').textContent = data;
+  document.getElementById('detLocal').textContent = local ? '📍 ' + local : '';
+  document.getElementById('detDesc').textContent = desc || 'Sem descrição.';
+  const img = document.getElementById('detImagem');
+  if (imagem) { img.src = imagem; img.style.display = 'block'; } else { img.style.display = 'none'; }
+  document.getElementById('modalEventoDetalhe').style.display = 'flex';
+}
+
+function abrirModalRegisto() { document.getElementById('modalRegisto').style.display = 'flex'; }
+function abrirModalLogin() { document.getElementById('modalLogin').style.display = 'flex'; }
+function abrirModalRecuperar() {
+  fecharModal('modalLogin');
+  document.getElementById('recuperarForm').style.display = 'block';
+  document.getElementById('codigoForm').style.display = 'none';
+  document.getElementById('msgAlertaRecuperar').className = 'alert';
+  document.getElementById('recEmail').value = '';
+  document.getElementById('recTelefone').value = '';
+  document.getElementById('modalRecuperar').style.display = 'flex';
+}
+function fecharModal(id) { document.getElementById(id).style.display = 'none'; }
+
+function atualizarLabelFoto(input) {
+  if (input.files && input.files[0]) {
+    document.getElementById('fotoLabel').textContent = "✅ Foto selecionada: " + input.files[0].name;
+    document.getElementById('fotoLabel').style.color = "#166534";
+  }
+}
+
+async function submeterRegisto(e) {
+  e.preventDefault();
+  const btn = document.getElementById('btnSubmeter');
+  const alerta = document.getElementById('msgAlertaRegisto');
+  btn.innerHTML = "⏳ A registar..."; btn.disabled = true; alerta.className = "alert";
+
+  const formData = new FormData();
+  formData.append('nome', document.getElementById('rNome').value);
+  formData.append('email', document.getElementById('rEmail').value);
+  formData.append('password', document.getElementById('rSenha').value);
+  formData.append('telefone', document.getElementById('rTelefone').value);
+  formData.append('bi', document.getElementById('rBi').value);
+  formData.append('endereco', document.getElementById('rEndereco').value);
+  formData.append('dataNascimento', document.getElementById('rNascimento').value);
+  const foto = document.getElementById('fotoInput').files[0];
+  if (foto) formData.append('foto', foto);
+
+  try {
+    const r = await fetch('/api/membros/igreja/' + igrejaIdAtual + '/registo', { method: 'POST', body: formData });
+    const textoResposta = await r.text();
+    let dados;
+    try { dados = JSON.parse(textoResposta); } catch (err) { throw new Error("Erro no servidor."); }
+    if (!r.ok) throw new Error(dados.message || 'Erro ao registar');
+
+    alerta.className = "alert success"; alerta.textContent = "✅ Registo concluído! Bem-vindo à família.";
+    setTimeout(() => {
+      fecharModal('modalRegisto'); document.getElementById('formRegisto').reset();
+      document.getElementById('fotoLabel').textContent = "📸 Clique para carregar a sua foto";
+      document.getElementById('fotoLabel').style.color = "#64748b";
+      alerta.className = "alert"; btn.innerHTML = "✅ Concluir Registo"; btn.disabled = false;
+      abrirModalLogin();
+    }, 2000);
+  } catch (err) {
+    alerta.className = "alert error"; alerta.textContent = "❌ " + err.message;
+    btn.innerHTML = "✅ Concluir Registo"; btn.disabled = false;
+  }
+}
+
+async function submeterLogin(e) {
+  e.preventDefault();
+  const btn = document.getElementById('btnLogin');
+  const alerta = document.getElementById('msgAlertaLogin');
+  btn.innerHTML = "⏳ A entrar..."; btn.disabled = true; alerta.className = "alert";
+
+  const email = document.getElementById('lEmail').value;
+  const senha = document.getElementById('lSenha').value;
+
+  try {
+    const r = await fetch('/api/membros/login', {
+      method: 'POST', headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ email, senha })
+    });
+    const dados = await r.json();
+    if (!r.ok) throw new Error(dados.message || 'Erro ao entrar');
+
+    membroLogado = dados.membro;
+    localStorage.setItem('membro_' + igrejaIdAtual, JSON.stringify(membroLogado));
+    fecharModal('modalLogin');
+    document.getElementById('lSenha').value = '';
+    mostrarAreaMembro();
+    iniciarChat();
+  } catch (err) {
+    alerta.className = "alert error"; alerta.textContent = "❌ " + err.message;
+  } finally {
+    btn.innerHTML = "🔐 Entrar"; btn.disabled = false;
+  }
+}
+
+function mostrarAreaMembro() {
+  document.getElementById('btnEntrar').style.display = 'none';
+  document.getElementById('btnRegistar').style.display = 'none';
+  document.getElementById('btnSair').style.display = 'inline-block';
+  document.getElementById('areaMembro').style.display = 'block';
+
+  document.getElementById('membroNome').textContent = "Olá, " + membroLogado.nome.split(' ')[0];
+  document.getElementById('membroEmail').textContent = membroLogado.email;
+
+  const fotoEl = document.getElementById('membroFoto');
+  if (membroLogado.foto && membroLogado.foto !== 'null') {
+    fotoEl.src = membroLogado.foto;
+    fotoEl.style.display = 'block';
+  } else {
+    fotoEl.style.display = 'none';
+  }
+
+  document.getElementById('infoNome').textContent = membroLogado.nome;
+  document.getElementById('infoEmail').textContent = membroLogado.email;
+  document.getElementById('infoTelefone').textContent = membroLogado.telefone || '-';
+  document.getElementById('infoBi').textContent = membroLogado.bi || '-';
+  document.getElementById('infoEndereco').textContent = membroLogado.endereco || '-';
+  document.getElementById('infoIgreja').textContent = membroLogado.igreja ? membroLogado.igreja.nome : '-';
+
+  document.getElementById('infoDepto').textContent = membroLogado.departamento ? membroLogado.departamento.nome : 'Ainda não alocado';
+
+  let sectoresHtml = '';
+  if (membroLogado.sectores && membroLogado.sectores.length > 0) {
+    sectoresHtml = membroLogado.sectores.map(s => `<span class="tag">${s.nome}</span>`).join('');
+  } else {
+    sectoresHtml = '<p style="color:#64748b;font-size:13px">Ainda não pertence a nenhum sector.</p>';
+  }
+  document.getElementById('infoSectores').innerHTML = sectoresHtml;
+
+  document.getElementById('dNome').value = membroLogado.nome;
+  document.getElementById('dBi').value = membroLogado.bi || 'Não registado';
+  document.getElementById('dTelefone').value = membroLogado.telefone || 'Não registado';
+
+  scrollToId('areaMembro');
+}
+
+function sairMembro() {
+  localStorage.removeItem('membro_' + igrejaIdAtual);
+  membroLogado = null;
+  document.getElementById('btnEntrar').style.display = 'inline-block';
+  document.getElementById('btnRegistar').style.display = 'inline-block';
+  document.getElementById('btnSair').style.display = 'none';
+  document.getElementById('areaMembro').style.display = 'none';
+  document.getElementById('chatArea').innerHTML = '<p style="text-align:center;color:#64748b">Faça login para conversar com a liderança.</p>';
+  if (intervalChat) clearInterval(intervalChat);
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+async function pedirCodigo() {
+  const email = document.getElementById('recEmail').value.trim();
+  const telefone = document.getElementById('recTelefone').value.trim();
+  const alerta = document.getElementById('msgAlertaRecuperar');
+  const btn = document.getElementById('btnRecuperar');
+
+  if (!email || !telefone) {
+    alerta.className = "alert error"; alerta.textContent = "❌ Preencha o email e o telefone.";
+    return;
+  }
+
+  btn.innerHTML = "⏳ A verificar..."; btn.disabled = true; alerta.className = "alert";
+
+  try {
+    const r = await fetch('/api/membros/verificar-telefone', {
+      method: 'POST', headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ email, telefone })
+    });
+    const dados = await r.json();
+    if (!r.ok) throw new Error(dados.message || 'Erro ao verificar');
+
+    alerta.className = "alert success"; alerta.textContent = "✅ Código gerado! Verifique abaixo.";
+    document.getElementById('recuperarForm').style.display = 'none';
+    document.getElementById('codigoForm').style.display = 'block';
+
+    const r2 = await fetch('/api/membros/ver-codigo', {
+      method: 'POST', headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ email, telefone })
+    });
+    const dados2 = await r2.json();
+    if (dados2.codigo) {
+      alerta.textContent = `✅ O seu código é: ${dados2.codigo}`;
+    }
+  } catch (err) {
+    alerta.className = "alert error"; alerta.textContent = "❌ " + err.message;
+  } finally {
+    btn.innerHTML = "📩 Gerar Código"; btn.disabled = false;
+  }
+}
+
+async function redefinirComCodigo() {
+  const email = document.getElementById('recEmail').value.trim();
+  const codigo = document.getElementById('recCodigo').value.trim();
+  const novaSenha = document.getElementById('recNovaSenha').value;
+  const alerta = document.getElementById('msgAlertaRecuperar');
+
+  if (!codigo || !novaSenha || novaSenha.length < 6) {
+    alerta.className = "alert error"; alerta.textContent = "❌ Preencha o código e uma nova senha (mín. 6 caracteres).";
+    return;
+  }
+
+  try {
+    const r = await fetch('/api/membros/redefinir-senha', {
+      method: 'POST', headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ email, codigo, novaSenha })
+    });
+    const dados = await r.json();
+    if (!r.ok) throw new Error(dados.message || 'Erro ao redefinir');
+
+    alerta.className = "alert success"; alerta.textContent = "✅ Senha redefinida com sucesso! Já pode entrar.";
+    setTimeout(() => {
+      fecharModal('modalRecuperar');
+      abrirModalLogin();
+    }, 2000);
+  } catch (err) {
+    alerta.className = "alert error"; alerta.textContent = "❌ " + err.message;
+  }
+}
+
+// ===== FUNÇÕES DO CHAT DE GRUPO E GALERIA =====
+let deptoAtual = { id: null, nome: null };
+
+async function abrirModalSectores(deptoId, deptoNome) {
+  deptoAtual = { id: deptoId, nome: deptoNome };
+  document.getElementById('sectoresDeptoNome').textContent = deptoNome;
+  document.getElementById('modalSectores').style.display = 'flex';
+  
+  const btnGeral = document.getElementById('btnChatGeralDepto');
+  btnGeral.innerHTML = `💬 Chat Geral do ${deptoNome}`;
+  btnGeral.onclick = () => abrirChatGrupo('depto', deptoId, deptoNome);
+
+  const div = document.getElementById('listaSectoresModal');
+  div.innerHTML = '<p style="text-align:center;color:#94a3b8;">A carregar sectores...</p>';
+  
+  const divLider = document.getElementById('liderDeptoModal');
+  const divLiderInfo = document.getElementById('liderDeptoInfo');
+  divLider.style.display = 'none';
+
+  try {
+    const r = await fetch(`/api/departamentos/${deptoId}`);
+    const depto = await r.json();
+    
+    if (depto.lider) {
+      divLider.style.display = 'flex';
+      divLiderInfo.innerHTML = `
+        ${depto.lider.foto ? `<img src="${depto.lider.foto}" style="width:45px;height:45px;border-radius:50%;object-fit:cover;border:2px solid #facc15;">` : `<div style="width:45px;height:45px;border-radius:50%;background:#1e293b;color:#facc15;display:grid;place-items:center;font-weight:bold;border:2px solid #facc15;font-size:18px;">${depto.lider.nome.charAt(0)}</div>`}
+        <strong style="color:#facc15; font-size:16px;">${depto.lider.nome}</strong>
+      `;
+    }
+
+    if (!depto.sectores || depto.sectores.length === 0) {
+      div.innerHTML = '<p style="text-align:center; color:#94a3b8;">Nenhum sector criado neste departamento.</p>';
+      return;
+    }
+
+    div.innerHTML = depto.sectores.map(s => `
+      <div class="sector-card-premium">
+        ${s.lider && s.lider.foto ? `<img src="${s.lider.foto}">` : `<div class="letra">${s.lider ? s.lider.nome.charAt(0) : '?'}</div>`}
+        <div class="sector-info">
+          <h4>📍 ${s.nome}</h4>
+          <p>Líder: ${s.lider ? s.lider.nome : 'A definir'} | ${s._count?.membros || 0} Membros</p>
+        </div>
+        <div class="sector-actions">
+          <button class="btn-galeria-premium" onclick="abrirGaleriaAtividade(${s.id}, '${s.nome}')">📸 Galeria</button>
+          <button class="btn-chat-premium" onclick="abrirChatGrupo('sector', ${s.id}, '${s.nome}')">💬 Chat</button>
+        </div>
+      </div>
+    `).join('');
+  } catch (e) {
+    div.innerHTML = '<p style="color:#dc2626; text-align:center;">Erro ao carregar sectores.</p>';
+  }
+}
+
+async function abrirChatGrupo(tipo, id, nome) {
+  if (!membroLogado) return alert("Faça login para aceder ao chat do grupo.");
+  
+  fecharModal('modalSectores');
+  chatAtual = { tipo, id, nome };
+  
+  const modalChat = document.getElementById('modalChatGrupo');
+  modalChat.style.display = 'flex';
+  document.getElementById('chatGrupoTitulo').textContent = `💬 Chat: ${nome}`;
+  
+  await carregarMensagensGrupo();
+  
+  if (intervalChatGrupo) clearInterval(intervalChatGrupo);
+  intervalChatGrupo = setInterval(carregarMensagensGrupo, 3000);
+}
+
+async function carregarMensagensGrupo() {
+  if (!chatAtual.tipo) return;
+  const div = document.getElementById('chatGrupoMensagens');
+  
+  try {
+    const url = chatAtual.tipo === 'depto' 
+      ? `/api/grupos/mensagens/depto/${chatAtual.id}` 
+      : `/api/grupos/mensagens/sector/${chatAtual.id}`;
+      
+    const r = await fetch(url);
+    const msgs = await r.json();
+    
+    if (!Array.isArray(msgs)) {
+       div.innerHTML = `<p style="text-align:center; color:#dc2626; font-size:13px;">${msgs.message || 'Erro ao carregar mensagens.'}</p>`;
+       return;
+    }
+
+    div.innerHTML = msgs.map(m => {
+      const isMeu = m.membroId === membroLogado.id;
+      const hora = new Date(m.criadoEm).toLocaleTimeString('pt-PT', { hour: '2-digit', minute: '2-digit' });
+      return `
+        <div class="grupo-msg ${isMeu ? 'enviada' : 'recebida'}">
+          ${!isMeu ? `<span class="autor">${m.membro.nome}</span>` : ''}
+          ${m.texto}
+          <span class="hora">${hora}</span>
+        </div>
+      `;
+    }).join('');
+    div.scrollTop = div.scrollHeight;
+  } catch (e) { console.error(e); }
+}
+
+async function enviarMensagemGrupo() {
+  const input = document.getElementById('inputMsgGrupo');
+  const texto = input.value.trim();
+  if (!texto || !chatAtual.tipo) return;
+  
+  input.value = '';
+  try {
+    const url = chatAtual.tipo === 'depto' 
+      ? `/api/grupos/mensagens/depto/${chatAtual.id}` 
+      : `/api/grupos/mensagens/sector/${chatAtual.id}`;
+
+    const r = await fetch(url, {
+      method: 'POST', headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ membroId: membroLogado.id, texto })
+    });
+    
+    if (!r.ok) {
+      const err = await r.json();
+      throw new Error(err.message);
+    }
+    await carregarMensagensGrupo();
+  } catch (e) { alert("Erro: " + e.message); }
+}
+
+// ===== GALERIA DE ATIVIDADES =====
+let sectorGaleriaAtual = null;
+
+async function abrirGaleriaAtividade(sectorId, nomeSector) {
+  fecharModal('modalSectores');
+  sectorGaleriaAtual = sectorId;
+  
+  document.getElementById('galeriaSectorTitulo').textContent = `📸 Galeria: ${nomeSector}`;
+  document.getElementById('modalGaleriaAtividade').style.display = 'flex';
+  
+  const areaUpload = document.getElementById('areaUploadFoto');
+  const isLider = membroLogado && membroLogado.lideraSetores && membroLogado.lideraSetores.some(s => s.id === Number(sectorId));
+  
+  if (isLider) {
+    areaUpload.style.display = 'block'; 
+  } else {
+    areaUpload.style.display = 'none'; 
+  }
+
+  await carregarFotosAtividade();
+}
+
+async function carregarFotosAtividade() {
+  const container = document.getElementById('galeriaAtividadesContainer');
+  container.innerHTML = '<p style="text-align:center; color:#64748b; grid-column: 1 / -1;">A carregar fotos...</p>';
+  
+  try {
+    const r = await fetch(`/api/grupos/galeria/${sectorGaleriaAtual}`);
+    const fotos = await r.json();
+    
+    if (!Array.isArray(fotos)) {
+      container.innerHTML = `<p style="text-align:center; color:#dc2626; grid-column: 1 / -1;">${fotos.message || 'Erro ao carregar fotos.'}</p>`;
+      return;
+    }
+
+    if (fotos.length === 0) {
+      container.innerHTML = '<p style="text-align:center; color:#64748b; grid-column: 1 / -1;">Nenhuma foto publicada ainda.</p>';
+      return;
+    }
+
+    container.innerHTML = fotos.map(f => `
+      <div class="galeria-atividade-item" onclick="window.open('${f.url}', '_blank')">
+        <img src="${f.url}" alt="${f.legenda || 'Foto'}">
+        ${f.legenda ? `<div class="galeria-atividade-legenda">${f.legenda}</div>` : ''}
+      </div>
+    `).join('');
+  } catch (e) {
+    container.innerHTML = '<p style="text-align:center; color:#dc2626; grid-column: 1 / -1;">Erro de ligação.</p>';
+  }
+}
+
+async function uploadFotoAtividade() {
+  const fileInput = document.getElementById('fotoAtividadeInput');
+  const legendaInput = document.getElementById('legendaAtividadeInput');
+  
+  if (!fileInput.files || !fileInput.files[0]) {
+    return alert("Por favor, selecione uma foto primeiro.");
+  }
+
+  const formData = new FormData();
+  formData.append('foto', fileInput.files[0]);
+  formData.append('legenda', legendaInput.value);
+  formData.append('igrejaId', igrejaIdAtual);
+
+  try {
+    const r = await fetch(`/api/grupos/galeria/${sectorGaleriaAtual}`, {
+      method: 'POST',
+      body: formData
+    });
+    
+    if (!r.ok) throw new Error("Erro ao fazer upload da foto.");
+    
+    fileInput.value = '';
+    legendaInput.value = '';
+    await carregarFotosAtividade();
+    alert("✅ Foto publicada com sucesso!");
+  } catch (err) {
+    alert("❌ " + err.message);
+  }
+}
+
+carregar();
+</script>
+</body>
+</html>

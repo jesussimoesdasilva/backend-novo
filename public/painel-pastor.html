@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="pt-AO">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Painel do Pastor</title>
+<style>
+:root{--navy:#020617;--navy2:#0f172a;--navy3:#1e293b;--gold:#facc15;--gold2:#eab308;--cyan:#22d3ee;--green:#10b981;--red:#ef4444;--text:#f1f5f9;--muted:#94a3b8;--border:#334155}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--navy);color:var(--text)}
+.login-screen{min-height:100vh;display:grid;place-items:center;padding:20px;background:radial-gradient(ellipse at top,rgba(59,130,246,.15),transparent 50%),var(--navy)}
+.login-card{background:rgba(30,41,59,.9);border:1px solid var(--border);border-radius:20px;padding:40px;max-width:420px;width:100%}
+.login-logo{width:70px;height:70px;margin:0 auto 20px;border-radius:16px;background:linear-gradient(135deg,var(--gold),var(--gold2));display:grid;place-items:center;font-size:32px;overflow:hidden}
+.login-logo img{width:100%;height:100%;object-fit:cover}
+.login-card h2{text-align:center;color:var(--gold);font-size:24px;margin-bottom:8px}
+.login-card p{text-align:center;color:var(--muted);font-size:14px;margin-bottom:30px}
+.login-field{margin-bottom:16px}
+.login-field label{display:block;color:var(--text);font-size:13px;font-weight:600;margin-bottom:6px}
+.login-field input{width:100%;padding:13px 16px;border:1px solid var(--border);border-radius:10px;background:rgba(2,6,23,.6);color:var(--text);font-size:14px}
+.login-field input:focus{outline:none;border-color:var(--gold)}
+.btn-login{width:100%;padding:14px;border:none;border-radius:10px;background:linear-gradient(135deg,var(--gold),var(--gold2));color:var(--navy);font-weight:700;font-size:15px;cursor:pointer;margin-top:10px}
+.painel{display:none;min-height:100vh}
+.painel.show{display:flex}
+.sidebar{width:260px;background:rgba(15,23,42,.8);border-right:1px solid var(--border);padding:25px 0;display:flex;flex-direction:column;position:sticky;top:0;height:100vh;overflow-y:auto}
+.brand{padding:0 25px 20px;border-bottom:1px solid var(--border);margin-bottom:15px}
+.brand-icon{width:48px;height:48px;background:linear-gradient(135deg,var(--gold),var(--gold2));border-radius:12px;display:grid;place-items:center;font-size:24px;margin-bottom:12px;overflow:hidden}
+.brand-icon img{width:100%;height:100%;object-fit:cover}
+.brand h1{color:var(--gold);font-size:16px;font-weight:800;line-height:1.3}
+.brand p{color:var(--muted);font-size:11px;margin-top:3px}
+.nav-section{padding:0 15px;margin-bottom:15px}
+.nav-title{color:var(--muted);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;padding:0 10px;margin-bottom:8px}
+.nav-item{display:flex;align-items:center;gap:12px;padding:11px 14px;border-radius:10px;color:var(--muted);font-size:14px;font-weight:500;margin-bottom:3px;cursor:pointer;border:none;background:none;width:100%;text-align:left}
+.nav-item:hover{background:rgba(255,255,255,.05);color:var(--text)}
+.nav-item.active{background:linear-gradient(90deg,rgba(250,204,21,.15),transparent);color:var(--gold);border-left:3px solid var(--gold);padding-left:11px}
+.nav-item .icon{font-size:17px;width:20px;text-align:center}
+.sidebar-footer{margin-top:auto;padding:15px 25px;border-top:1px solid var(--border)}
+.sidebar-footer button{width:100%;padding:10px;border-radius:8px;background:rgba(239,68,68,.15);color:var(--red);border:1px solid rgba(239,68,68,.3);font-weight:600;font-size:13px;cursor:pointer}
+.main{flex:1;padding:30px 40px;min-width:0}
+.topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:25px;flex-wrap:wrap;gap:15px}
+.topbar h2{font-size:26px;font-weight:800}
+.topbar p{color:var(--muted);font-size:14px;margin-top:4px}
+.card{background:rgba(30,41,59,.6);border:1px solid var(--border);border-radius:16px;padding:24px;margin-bottom:20px}
+.card h3{color:var(--gold);font-size:18px;margin-bottom:16px}
+.field{margin-bottom:14px}
+.field label{display:block;color:var(--text);font-size:13px;font-weight:600;margin-bottom:6px}
+input,textarea,select{width:100%;padding:12px 14px;border:1px solid var(--border);border-radius:10px;background:rgba(2,6,23,.6);color:var(--text);font-size:14px;font-family:inherit}
+input:focus,textarea:focus,select:focus{outline:none;border-color:var(--gold)}
+textarea{min-height:100px;resize:vertical}
+.btn{padding:11px 20px;border-radius:10px;font-weight:700;font-size:14px;border:none;cursor:pointer;font-family:inherit}
+.btn-primary{background:linear-gradient(135deg,var(--gold),var(--gold2));color:var(--navy)}
+.btn-success{background:var(--green);color:#fff}
+.btn-danger{background:rgba(239,68,68,.15);color:var(--red);border:1px solid rgba(239,68,68,.3);padding:7px 12px;font-size:12px;border-radius:8px}
+.btn-outline{background:transparent;border:1px solid var(--gold);color:var(--gold);padding:7px 12px;font-size:12px;border-radius:8px}
+.section{display:none}
+.section.active{display:block}
+.empty{padding:40px;text-align:center;color:var(--muted);font-style:italic}
+.toast-container{position:fixed;top:20px;right:20px;z-index:999}
+.toast{background:var(--navy3);border-left:4px solid var(--green);padding:14px 18px;border-radius:8px;margin-bottom:10px;box-shadow:0 8px 30px rgba(0,0,0,.5);font-size:14px;max-width:350px;animation:slideIn .3s}
+.toast.error{border-left-color:var(--red)}
+@keyframes slideIn{from{transform:translateX(400px);opacity:0}to{transform:translateX(0);opacity:1}}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:15px}
+.grid-4{display:grid;grid-template-columns:repeat(4, 1fr);gap:15px;margin-bottom:20px}
+@media(max-width:900px){.grid-4{grid-template-columns:1fr 1fr}}
+.depto-item{background:rgba(2,6,23,.6);border-radius:12px;padding:16px;margin-bottom:12px;border-left:4px solid var(--gold)}
+table{width:100%;border-collapse:collapse;margin-top:10px}
+th,td{padding:12px;text-align:left;border-bottom:1px solid var(--border)}
+th{color:var(--gold);font-size:12px;text-transform:uppercase}
+
+/* --- ESTILOS PREMIUM PARA IMPRESSÃO (RELATÓRIOS) --- */
+@media print {
+  @page { margin: 10mm; size: A4 portrait; }
+  body { background: #ffffff !important; color: #000000 !important; font-family: 'Segoe UI', Arial, sans-serif; }
+  .sidebar, .topbar, .btn, .toast-container, nav, .nav-item, button, .card h3, .no-print { display: none !important; }
+  .painel { display: block !important; min-height: auto !important; }
+  .main { padding: 0 !important; margin: 0 !important; width: 100% !important; }
+  .section { display: none !important; }
+  .section.active { display: block !important; }
+  
+  /* Remove sombras e fundos escuros no print */
+  .card, #conteudoRelatorio > div { 
+    background: #ffffff !important; 
+    border: none !important; 
+    box-shadow: none !important; 
+    padding: 0 !important; 
+    margin: 0 !important; 
+    border-radius: 0 !important;
+  }
+
+  /* Cabeçalho do Relatório */
+  .print-header { display: block !important; text-align: center; margin-bottom: 30px; border-bottom: 3px solid #020617; padding-bottom: 15px; }
+  .print-header h1 { font-size: 24px; color: #020617; margin: 0 0 5px 0; text-transform: uppercase; letter-spacing: 2px; }
+  .print-header p { font-size: 14px; color: #64748b; margin: 0; font-weight: bold; }
+  .print-date { text-align: right; font-size: 12px; color: #64748b; margin-top: 10px; }
+}
+.print-header { display: none; }
+</style>
+</head>
+<body>
+
+<div class="login-screen" id="loginScreen">
+  <div class="login-card">
+    <div class="login-logo" id="loginLogo">⛪</div>
+    <h2 id="loginNome">A carregar...</h2>
+    <p>Painel do Pastor</p>
+    <form onsubmit="fazerLogin(event)">
+      <div class="login-field"><label>Email do Pastor</label><input type="email" id="loginEmail" required></div>
+      <div class="login-field"><label>Senha</label><input type="password" id="loginSenha" required></div>
+      <button type="submit" class="btn-login">🔐 Entrar</button>
+      <div class="login-error" id="loginError" style="color:red; margin-top:10px; font-size:13px; display:none;"></div>
+    </form>
+  </div>
+</div>
+
+<div class="painel" id="painel">
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-icon" id="brandIcon">⛪</div>
+      <h1 id="brandNome">Igreja</h1>
+      <p>Painel do Pastor</p>
+    </div>
+    <div class="nav-section">
+      <div class="nav-title">Gestão</div>
+      <button class="nav-item active" onclick="section('perfil',this)"><span class="icon">👤</span> O Meu Perfil</button>
+      <button class="nav-item" onclick="section('tesouraria',this)"><span class="icon">💰</span> Tesouraria</button>
+      <button class="nav-item" onclick="section('relatorios',this)"><span class="icon">📊</span> Relatórios</button>
+      <button class="nav-item" onclick="section('oracao',this)"><span class="icon">🙏</span> Oração & Testemunhos</button>
+    </div>
+    <div class="sidebar-footer"><button onclick="logout()">🚪 Sair</button></div>
+  </aside>
+  
+  <main class="main">
+    <div class="topbar">
+      <div><h2 id="pageTitle">O Meu Perfil</h2><p id="pageSub">Editar dados pastorais</p></div>
+    </div>
+
+    <!-- PERFIL -->
+    <div id="section-perfil" class="section active">
+      <div class="card">
+        <h3>👤 Dados do Pastor</h3>
+        <div class="grid-2">
+          <div class="field"><label>Nome</label><input id="pNome" readonly></div>
+          <div class="field"><label>Cargo</label><input id="pCargo" readonly></div>
+          <div class="field"><label>Telefone</label><input id="pTelefone" readonly></div>
+          <div class="field"><label>Email</label><input id="pEmail" readonly></div>
+        </div>
+        <div class="field"><label>Biografia</label><textarea id="pBio" readonly></textarea></div>
+        <div class="field"><label>Versículo Favorito</label><input id="pVersiculo" readonly></div>
+        <div class="field"><label>Conselho da Semana</label><textarea id="pConselho" readonly></textarea></div>
+      </div>
+    </div>
+
+    <!-- TESOURARIA -->
+    <div id="section-tesouraria" class="section">
+      
+      <div class="grid-4">
+        <div class="card" style="text-align:center; padding:15px; border-left:4px solid var(--green); margin-bottom:0;">
+          <h4 style="color:var(--muted); font-size:11px; text-transform:uppercase;">Dízimos</h4>
+          <p style="font-size:20px; font-weight:800; color:var(--green)" id="dashDizimos">0 Kz</p>
+        </div>
+        <div class="card" style="text-align:center; padding:15px; border-left:4px solid var(--gold); margin-bottom:0;">
+          <h4 style="color:var(--muted); font-size:11px; text-transform:uppercase;">Ofertas</h4>
+          <p style="font-size:20px; font-weight:800; color:var(--gold)" id="dashOfertas">0 Kz</p>
+        </div>
+        <div class="card" style="text-align:center; padding:15px; border-left:4px solid var(--red); margin-bottom:0;">
+          <h4 style="color:var(--muted); font-size:11px; text-transform:uppercase;">Saídas</h4>
+          <p style="font-size:20px; font-weight:800; color:var(--red)" id="dashSaidas">0 Kz</p>
+        </div>
+        <div class="card" style="text-align:center; padding:15px; border-left:4px solid var(--cyan); margin-bottom:0;">
+          <h4 style="color:var(--muted); font-size:11px; text-transform:uppercase;">Saldo</h4>
+          <p style="font-size:20px; font-weight:800; color:var(--cyan)" id="dashSaldo">0 Kz</p>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>📉 Registar Nova Despesa (Saída)</h3>
+        <div class="grid-2">
+          <div class="field"><label>Descrição *</label><input id="dsDescricao" placeholder="Ex: Conta da Luz"></div>
+          <div class="field"><label>Valor (Kz) *</label><input type="number" id="dsValor" placeholder="Ex: 15000"></div>
+        </div>
+        <button class="btn btn-danger" onclick="adicionarDespesa()" style="margin-top:15px; width:100%; background:var(--red); color:#fff;">💾 Registar Saída</button>
+      </div>
+
+      <div class="card">
+        <h3>💰 Validação de Dízimos Pendentes</h3>
+        <div id="listaDizimos" class="empty">A carregar...</div>
+      </div>
+    </div>
+
+    <!-- RELATÓRIOS -->
+    <div id="section-relatorios" class="section">
+      <div class="card no-print">
+        <h3>📊 Central de Relatórios</h3>
+        <p style="color:var(--muted); font-size:13px; margin-bottom:20px;">Visão geral das finanças da igreja.</p>
+        
+        <div class="grid-4">
+          <div style="border:1px solid #ccc; padding:20px; border-radius:12px; text-align:center; background:rgba(255,255,255,0.05)">
+            <h4 style="color:#059669">Dízimos</h4>
+            <p style="font-size:24px; font-weight:800; color:#fff;" id="relDizimos">0 Kz</p>
+          </div>
+          <div style="border:1px solid #ccc; padding:20px; border-radius:12px; text-align:center; background:rgba(255,255,255,0.05)">
+            <h4 style="color:#d4a017">Ofertas</h4>
+            <p style="font-size:24px; font-weight:800; color:#fff;" id="relOfertas">0 Kz</p>
+          </div>
+          <div style="border:1px solid #ccc; padding:20px; border-radius:12px; text-align:center; background:rgba(255,255,255,0.05)">
+            <h4 style="color:#dc2626">Despesas</h4>
+            <p style="font-size:24px; font-weight:800; color:#fff;" id="relSaidas">0 Kz</p>
+          </div>
+          <div style="border:1px solid #ccc; padding:20px; border-radius:12px; text-align:center; background:rgba(34,211,238,0.1)">
+            <h4 style="color:#0284c7">SALDO REAL</h4>
+            <p style="font-size:24px; font-weight:800; color:#fff;" id="relSaldo">0 Kz</p>
+          </div>
+        </div>
+        <button class="btn btn-primary" style="margin-top:20px; width:100%;" onclick="gerarRelatorioDetalhado()">📄 Gerar Extrato Completo (PDF)</button>
+      </div>
+
+      <div class="card" id="areaRelatorio" style="display:none; background:transparent; border:none; box-shadow:none; padding:0;">
+        <div id="conteudoRelatorio"></div>
+      </div>
+    </div>
+
+    <!-- ORAÇÃO E TESTEMUNHOS -->
+    <div id="section-oracao" class="section">
+      <div class="card">
+        <h3>🙏 Gestão de Oração & Testemunhos</h3>
+        
+        <div style="display:flex;gap:10px;margin-bottom:20px">
+          <button class="btn btn-primary" style="flex:1" onclick="mudarAbaAdmin('PEDIDO')" id="btnAdminPedido">Pedidos de Oração</button>
+          <button class="btn btn-outline" style="flex:1;color:var(--text);border-color:var(--text)" onclick="mudarAbaAdmin('TESTEMUNHO')" id="btnAdminTestemunho">Testemunhos Pendentes</button>
+        </div>
+
+        <div id="listaOracaoAdmin" class="empty">A carregar...</div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<div class="toast-container" id="toasts"></div>
+
+<script>
+const API = '/api';
+const pathParts = window.location.pathname.split('/');
+const slug = pathParts[pathParts.length - 2];
+let igrejaAtual = null;
+
+function toast(msg, type='success') {
+  const el = document.createElement('div');
+  el.className = 'toast ' + type;
+  el.textContent = msg;
+  document.getElementById('toasts').appendChild(el);
+  setTimeout(() => el.remove(), 4000);
+}
+
+async function initLogin() {
+  try {
+    const r = await fetch(API + '/igrejas');
+    const lista = await r.json();
+    const ig = lista.find(i => i.slug === slug);
+    if (!ig) return document.getElementById('loginNome').textContent = 'Igreja não encontrada';
+    
+    document.getElementById('loginNome').textContent = ig.nome;
+    if (ig.icone && ig.icone.startsWith('/logos/')) {
+      document.getElementById('loginLogo').innerHTML = `<img src="${ig.icone}">`;
+    } else {
+      document.getElementById('loginLogo').textContent = ig.icone || '⛪';
+    }
+    const saved = localStorage.getItem('pastor_' + slug);
+    if (saved) {
+      igrejaAtual = JSON.parse(saved);
+      mostrarPainel();
+    }
+  } catch (e) { console.error(e); }
+}
+
+async function fazerLogin(e) {
+  e.preventDefault();
+  const email = document.getElementById('loginEmail').value.trim();
+  const senha = document.getElementById('loginSenha').value;
+  const err = document.getElementById('loginError');
+  err.style.display = 'none';
+  
+  try {
+    const r = await fetch(API + '/pastores/login', {
+      method: 'POST', headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ email, senha })
+    });
+    const d = await r.json();
+    if (!r.ok) throw new Error(d.message || 'Erro no login');
+    
+    igrejaAtual = d.pastor; 
+    localStorage.setItem('pastor_' + slug, JSON.stringify(d));
+    mostrarPainel();
+  } catch (e) {
+    err.textContent = '❌ ' + e.message;
+    err.style.display = 'block';
+  }
+}
+
+function mostrarPainel() {
+  document.getElementById('loginScreen').style.display = 'none';
+  document.getElementById('painel').classList.add('show');
+  document.getElementById('brandNome').textContent = igrejaAtual.nomeIgreja || 'Painel';
+  document.getElementById('pNome').value = igrejaAtual.nome || '';
+  document.getElementById('pCargo').value = igrejaAtual.cargo || '';
+  document.getElementById('pEmail').value = igrejaAtual.email || '';
+  document.getElementById('pTelefone').value = igrejaAtual.telefone || '';
+  document.getElementById('pBio').value = igrejaAtual.bio || '';
+  document.getElementById('pVersiculo').value = igrejaAtual.versiculo || '';
+  document.getElementById('pConselho').value = igrejaAtual.conselho || '';
+}
+
+function section(name, btn) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+  document.getElementById('section-' + name).classList.add('active');
+  btn.classList.add('active');
+  
+  const titles = {
+    perfil:['O Meu Perfil','Editar dados pastorais'],
+    tesouraria:['Tesouraria','Validar dízimos e registar saídas'],
+    relatorios:['Relatórios','Visão Global Financeira'],
+    oracao:['Oração & Testemunhos','Gerir pedidos e testemunhos']
+  };
+  document.getElementById('pageTitle').textContent = titles[name][0];
+  document.getElementById('pageSub').textContent = titles[name][1];
+
+  if (name === 'tesouraria') { carregarEstatisticas(); carregarDizimos(); }
+  if (name === 'relatorios') { carregarRelatorios(); document.getElementById('areaRelatorio').style.display = 'none'; }
+  if (name === 'oracao') carregarOracaoAdmin();
+}
+
+function logout() {
+  localStorage.removeItem('pastor_' + slug);
+  igrejaAtual = null;
+  document.getElementById('painel').classList.remove('show');
+  document.getElementById('loginScreen').style.display = 'grid';
+}
+
+async function carregarEstatisticas() {
+  try {
+    const igrejaId = igrejaAtual.igrejaId || igrejaAtual.id;
+    const r = await fetch(API + '/ofertas/estatisticas/' + igrejaId);
+    const d = await r.json();
+    
+    document.getElementById('dashDizimos').textContent = (d.totalDizimos || 0).toLocaleString('pt-AO') + ' Kz';
+    document.getElementById('dashOfertas').textContent = (d.totalOfertas || 0).toLocaleString('pt-AO') + ' Kz';
+    document.getElementById('dashSaidas').textContent = (d.totalSaidas || 0).toLocaleString('pt-AO') + ' Kz';
+    document.getElementById('dashSaldo').textContent = (d.saldoReal || 0).toLocaleString('pt-AO') + ' Kz';
+  } catch (e) { console.error(e); }
+}
+
+async function carregarRelatorios() {
+  try {
+    const igrejaId = igrejaAtual.igrejaId || igrejaAtual.id;
+    const r = await fetch(API + '/ofertas/estatisticas/' + igrejaId);
+    const d = await r.json();
+    
+    document.getElementById('relDizimos').textContent = (d.totalDizimos || 0).toLocaleString('pt-AO') + ' Kz';
+    document.getElementById('relOfertas').textContent = (d.totalOfertas || 0).toLocaleString('pt-AO') + ' Kz';
+    document.getElementById('relSaidas').textContent = (d.totalSaidas || 0).toLocaleString('pt-AO') + ' Kz';
+    document.getElementById('relSaldo').textContent = (d.saldoReal || 0).toLocaleString('pt-AO') + ' Kz';
+  } catch (e) { console.error(e); }
+}
+
+// ===== GERAR RELATÓRIO PREMIUM COM DETALHES =====
+async function gerarRelatorioDetalhado() {
+  const div = document.getElementById('areaRelatorio');
+  const content = document.getElementById('conteudoRelatorio');
+  div.style.display = 'block';
+  content.innerHTML = '<div class="empty">A preparar o extrato...</div>';
+
+  try {
+    const igrejaId = igrejaAtual.igrejaId || igrejaAtual.id;
+    
+    // Vai buscar as estatísticas, as transações E o nome oficial da igreja
+    const [resStats, resTransacoes, resIgreja] = await Promise.all([
+      fetch(API + '/ofertas/estatisticas/' + igrejaId),
+      fetch(API + '/ofertas/igreja/' + igrejaId),
+      fetch(API + '/igrejas/' + igrejaId)
+    ]);
+
+    const stats = await resStats.json();
+    const transacoes = await resTransacoes.json();
+    const igrejaDados = await resIgreja.json();
+
+    const validadas = transacoes.filter(t => t.status === 'VALIDADO');
+
+    const headerImpressao = `
+      <div class="print-header">
+        <h1>${igrejaDados.nome}</h1>
+        <p>Extrato Financeiro Oficial</p>
+        <div class="print-date">Emitido em: ${new Date().toLocaleDateString('pt-PT')} às ${new Date().toLocaleTimeString('pt-PT')}</div>
+      </div>
+    `;
+
+    const html = `
+      <div style="background: #ffffff; color: #000000; padding: 40px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); margin-top: 20px;">
+        ${headerImpressao}
+        
+        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 15px; margin-bottom: 40px;">
+          <div style="border: 1px solid #cbd5e1; border-radius: 12px; padding: 20px; text-align: center; background: #f8fafc;">
+            <h4 style="font-size: 12px; color: #64748b; text-transform: uppercase; margin: 0 0 10px 0;">Dízimos</h4>
+            <p style="font-size: 22px; font-weight: 900; color: #020617; margin: 0;">${(stats.totalDizimos || 0).toLocaleString('pt-AO')} Kz</p>
+          </div>
+          <div style="border: 1px solid #cbd5e1; border-radius: 12px; padding: 20px; text-align: center; background: #f8fafc;">
+            <h4 style="font-size: 12px; color: #64748b; text-transform: uppercase; margin: 0 0 10px 0;">Ofertas</h4>
+            <p style="font-size: 22px; font-weight: 900; color: #020617; margin: 0;">${(stats.totalOfertas || 0).toLocaleString('pt-AO')} Kz</p>
+          </div>
+          <div style="border: 1px solid #cbd5e1; border-radius: 12px; padding: 20px; text-align: center; background: #f8fafc;">
+            <h4 style="font-size: 12px; color: #64748b; text-transform: uppercase; margin: 0 0 10px 0;">Saídas</h4>
+            <p style="font-size: 22px; font-weight: 900; color: #dc2626; margin: 0;">-${(stats.totalSaidas || 0).toLocaleString('pt-AO')} Kz</p>
+          </div>
+          <div style="border: 1px solid #020617; border-radius: 12px; padding: 20px; text-align: center; background: #020617; color: white;">
+            <h4 style="font-size: 12px; color: #facc15; text-transform: uppercase; margin: 0 0 10px 0;">SALDO REAL</h4>
+            <p style="font-size: 22px; font-weight: 900; color: #ffffff; margin: 0;">${(stats.saldoReal || 0).toLocaleString('pt-AO')} Kz</p>
+          </div>
+        </div>
+
+        <h3 style="text-align:center; margin-bottom:20px; color:#020617; font-size:18px; text-transform: uppercase;">Detalhes das Transações</h3>
+        
+        <table style="width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 14px; color: #000;">
+          <thead>
+            <tr>
+              <th style="background: #020617; color: #ffffff; padding: 12px; text-align: left; font-size: 12px; text-transform: uppercase;">Data</th>
+              <th style="background: #020617; color: #ffffff; padding: 12px; text-align: left; font-size: 12px; text-transform: uppercase;">Descrição / Doador</th>
+              <th style="background: #020617; color: #ffffff; padding: 12px; text-align: left; font-size: 12px; text-transform: uppercase;">Finalidade</th>
+              <th style="background: #020617; color: #ffffff; padding: 12px; text-align: right; font-size: 12px; text-transform: uppercase;">Valor (Kz)</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${validadas.length === 0 ? '<tr><td colspan="4" style="text-align:center; padding: 20px;">Nenhuma transação registada.</td></tr>' : ''}
+            ${validadas.map(t => {
+              const data = new Date(t.criadoEm).toLocaleDateString('pt-PT');
+              const isSaida = t.finalidade === 'SAIDA';
+              const desc = t.membro ? t.membro.nome : (t.nomeDoador || 'Anónimo');
+              
+              return `
+                <tr style="border-bottom: 1px solid #e2e8f0;">
+                  <td style="padding: 12px;">${data}</td>
+                  <td style="padding: 12px;">${desc}</td>
+                  <td style="padding: 12px;">${t.finalidade}</td>
+                  <td style="padding: 12px; text-align: right; color: ${isSaida ? '#dc2626' : '#059669'}; font-weight: bold;">
+                    ${isSaida ? '-' : '+'} ${t.valor.toLocaleString('pt-AO')}
+                  </td>
+                </tr>
+              `;
+            }).join('')}
+          </tbody>
+        </table>
+        
+        <button class="btn btn-primary no-print" style="margin-top:30px; width:100%;" onclick="window.print()">🖨️ Imprimir / Exportar PDF</button>
+      </div>
+    `;
+
+    content.innerHTML = html;
+    div.scrollIntoView({ behavior: 'smooth' });
+
+  } catch (e) {
+    content.innerHTML = `<div class="empty" style="color:red">Erro ao gerar relatório: ${e.message}</div>`;
+  }
+}
+
+async function carregarDizimos() {
+  const div = document.getElementById('listaDizimos');
+  try {
+    const igrejaId = igrejaAtual.igrejaId || igrejaAtual.id;
+    const r = await fetch(API + '/ofertas/igreja/' + igrejaId);
+    const lista = await r.json();
+    
+    const pendentes = lista.filter(o => o.status === 'AGUARDANDO_PASTOR');
+    if (!pendentes.length) {
+      div.innerHTML = '<div class="empty">Nenhum dízimo pendente de validação.</div>';
+      return;
+    }
+    
+    div.innerHTML = pendentes.map(o => `
+      <div class="depto-item" style="display:flex;justify-content:space-between;align-items:center">
+        <div>
+          <strong style="color:var(--gold)">${o.membro ? o.membro.nome : (o.nomeDoador || 'Anónimo')}</strong>
+          <p style="color:var(--muted);font-size:12px">Dízimo: ${o.valor.toLocaleString('pt-AO')} Kz</p>
+        </div>
+        <button class="btn btn-success" onclick="validarDizimo(${o.id})">✅ Validar</button>
+      </div>
+    `).join('');
+  } catch (e) { div.innerHTML = '<div class="empty" style="color:red">Erro ao carregar.</div>'; }
+}
+
+async function validarDizimo(id) {
+  if (!confirm('Confirma que o dinheiro já entrou na conta?')) return;
+  try {
+    await fetch(API + '/ofertas/' + id + '/validar', { method: 'PUT' });
+    toast('Dízimo validado!', 'success');
+    carregarDizimos();
+    carregarEstatisticas();
+  } catch (e) { toast('Erro ao validar', 'error'); }
+}
+
+async function adicionarDespesa() {
+  const descricao = document.getElementById('dsDescricao').value.trim();
+  const valor = document.getElementById('dsValor').value;
+  if (!descricao || !valor) return toast('Preenche a descrição e o valor', 'error');
+  
+  try {
+    const igrejaId = igrejaAtual.igrejaId || igrejaAtual.id;
+    const r = await fetch(API + '/ofertas/igreja/' + igrejaId, {
+      method: 'POST', headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ 
+        descricao: descricao, 
+        nomeDoador: descricao, 
+        valor: Number(valor), 
+        finalidade: 'SAIDA' 
+      })
+    });
+    
+    if (!r.ok) {
+      const erro = await r.json();
+      throw new Error(erro.message || 'Erro ao guardar no servidor');
+    }
+
+    toast('Despesa registada com sucesso!', 'success');
+    document.getElementById('dsDescricao').value = '';
+    document.getElementById('dsValor').value = '';
+    carregarEstatisticas();
+  } catch (e) { 
+    toast(e.message, 'error'); 
+  }
+}
+
+// ORAÇÃO
+let abaOracaoAtual = 'PEDIDO';
+
+function mudarAbaAdmin(tipo) {
+  abaOracaoAtual = tipo;
+  const btnP = document.getElementById('btnAdminPedido');
+  const btnT = document.getElementById('btnAdminTestemunho');
+  
+  if (tipo === 'PEDIDO') {
+    btnP.className = 'btn btn-primary'; btnP.style = 'flex:1';
+    btnT.className = 'btn btn-outline'; btnT.style = 'flex:1;color:var(--text);border-color:var(--text)';
+  } else {
+    btnT.className = 'btn btn-primary'; btnT.style = 'flex:1';
+    btnP.className = 'btn btn-outline'; btnP.style = 'flex:1;color:var(--text);border-color:var(--text)';
+  }
+  carregarOracaoAdmin();
+}
+
+async function carregarOracaoAdmin() {
+  const div = document.getElementById('listaOracaoAdmin');
+  if (!div) return;
+  div.innerHTML = 'A carregar...';
+
+  try {
+    const igrejaId = igrejaAtual.igrejaId || igrejaAtual.id; 
+    const r = await fetch(API + '/oracao/igreja/' + igrejaId + '?tipo=' + abaOracaoAtual);
+    const lista = await r.json();
+
+    if (!lista || lista.length === 0) {
+      div.innerHTML = '<div class="empty">Nenhum registo encontrado.</div>';
+      return;
+    }
+
+    div.innerHTML = lista.map(item => {
+      const data = new Date(item.createdAt).toLocaleDateString('pt-PT');
+      let botoes = '';
+      
+      if (abaOracaoAtual === 'PEDIDO' && item.status === 'PENDENTE') {
+        botoes = `<button class="btn btn-success" style="padding:5px 10px;font-size:12px" onclick="mudarStatusOracao(${item.id}, 'ORADO')">🟢 Marcar como Orado</button>`;
+      } else if (abaOracaoAtual === 'TESTEMUNHO' && item.status === 'PENDENTE') {
+        botoes = `<button class="btn btn-success" style="padding:5px 10px;font-size:12px" onclick="mudarStatusOracao(${item.id}, 'APROVADO')">✅ Aprovar e Publicar</button>`;
+      } else if (item.status === 'ORADO' || item.status === 'APROVADO') {
+        botoes = `<span style="color:var(--green);font-weight:bold;font-size:12px">✔ ${item.status}</span>`;
+      }
+
+      return `
+        <div class="depto-item" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;border-left-color:${item.status === 'PENDENTE' ? 'var(--gold)' : 'var(--green)'}">
+          <div style="flex:1">
+            <strong style="color:var(--gold);font-size:14px">${item.name || 'Anónimo'} ${item.contact ? `(${item.contact})` : ''}</strong>
+            <p style="color:var(--text);font-size:14px;margin:5px 0">"${item.message}"</p>
+            <small style="color:var(--muted)">${data}</small>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:5px;margin-left:15px">
+            ${botoes}
+            <button class="btn btn-danger" style="padding:5px 10px;font-size:12px" onclick="apagarOracao(${item.id})">🗑️ Apagar</button>
+          </div>
+        </div>
+      `;
+    }).join('');
+  } catch (e) { div.innerHTML = '<div class="empty" style="color:red">Erro ao carregar.</div>'; }
+}
+
+async function mudarStatusOracao(id, status) {
+  try {
+    const r = await fetch(API + '/oracao/' + id + '/status', {
+      method: 'PUT', headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ status })
+    });
+    if (!r.ok) throw new Error();
+    toast('Estado atualizado!', 'success');
+    carregarOracaoAdmin();
+  } catch (e) { toast('Erro ao atualizar', 'error'); }
+}
+
+async function apagarOracao(id) {
+  if (!confirm('Apagar este registo permanentemente?')) return;
+  try {
+    await fetch(API + '/oracao/' + id, { method: 'DELETE' });
+    toast('Apagado', 'success');
+    carregarOracaoAdmin();
+  } catch (e) { toast('Erro ao apagar', 'error'); }
+}
+
+initLogin();
+</script>
+</body>
+</html>
