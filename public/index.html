@@ -1,54 +1,173 @@
-<!doctype html>
-<html lang="pt-AO">
+<!DOCTYPE html>
+<html lang="pt">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>ADP Plenitude de Deus | Centro Jeová Shalom</title>
-<style>
-:root{--navy:#071b36;--blue:#087eae;--cyan:#15b8d4;--gold:#d7ad4b;--paper:#f4f7fb;--ink:#17243a;--muted:#68758a;--line:#e3e9f1;--red:#bd3444;--green:#18865b}
-*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;font-family:Arial,Helvetica,sans-serif;background:var(--paper);color:var(--ink)}button,input,select,textarea{font:inherit}button{cursor:pointer}
-header{position:sticky;top:0;z-index:10;background:#071b36f7;color:white;border-bottom:2px solid var(--gold)}.top{max-width:1200px;margin:auto;padding:12px 18px;display:flex;align-items:center;gap:15px;flex-wrap:wrap}.brand{display:flex;gap:11px;align-items:center;flex:1;min-width:240px}.logo{width:47px;height:47px;border:2px solid var(--gold);border-radius:50%;display:grid;place-items:center;color:var(--gold);font-size:27px}.brand strong{letter-spacing:.7px}.brand small{display:block;color:#c6d5e7;margin-top:4px;font-size:11px}.nav{display:flex;gap:5px;flex-wrap:wrap;justify-content:flex-end}.nav a,.nav button{color:white;text-decoration:none;border:0;background:transparent;padding:10px;border-radius:7px;font-size:13px}.nav a:hover,.nav button:hover{background:#ffffff1b;color:#ffdc81}.nav button{border:1px solid var(--gold)}.status{font-size:12px;white-space:nowrap}.hero{background:radial-gradient(circle at 80% 15%,#0c7ba1,#0b3158 38%,#06172e 82%);color:white;text-align:center;padding:70px 20px;border-bottom:4px solid var(--gold)}.hero small{color:#f2d27c;letter-spacing:3px;text-transform:uppercase}.hero h1{font-size:clamp(32px,5vw,58px);max-width:850px;margin:17px auto 12px}.hero p{max-width:700px;margin:0 auto 25px;line-height:1.7;color:#d8e6f3}.btn{border:0;border-radius:8px;padding:12px 16px;font-weight:bold;background:var(--blue);color:white}.gold{background:linear-gradient(135deg,#f0d58a,#c99b31);color:#17243a}.outline{border:1px solid #ffffff88;background:transparent}.actions{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}.actions a{text-decoration:none}.statusline{font-size:13px;color:var(--muted);margin-top:12px;line-height:1.5}.ok{color:var(--green)}.err{color:var(--red)}
-main{max-width:1200px;margin:auto;padding:32px 18px 65px}.section{margin-bottom:38px;scroll-margin-top:105px}.head{display:flex;justify-content:space-between;align-items:end;gap:15px;margin-bottom:18px}.head h2{margin:0;color:var(--navy);font-size:25px}.head p{margin:7px 0 0;color:var(--muted)}.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:15px}.card{background:white;border:1px solid var(--line);border-radius:14px;padding:20px;box-shadow:0 6px 22px #11254408}.card h3{margin:0 0 9px;color:var(--navy)}.card p{color:var(--muted);line-height:1.55}.icon{font-size:25px;margin-bottom:12px}.notice{padding:14px 16px;background:#fff7df;border:1px solid #f1d98e;border-radius:10px;color:#6b5012;line-height:1.5;margin-bottom:15px}.form{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.field{display:flex;flex-direction:column;gap:6px}.field.full{grid-column:1/-1}.field label{font-size:13px;font-weight:bold;color:#34445d}.field input,.field select{padding:12px;border:1px solid #cfd8e4;border-radius:8px;width:100%}.muted{font-size:13px;color:var(--muted);line-height:1.5}.panel{display:grid;grid-template-columns:210px 1fr;gap:15px}.panelnav{display:flex;flex-direction:column;gap:6px}.panelnav button{text-align:left;border:0;background:#f3f6fa;border-radius:8px;padding:12px;color:var(--ink)}.panelnav button.active{background:var(--navy);color:white}.hidden{display:none!important}.footer{background:var(--navy);border-top:3px solid var(--gold);padding:27px;text-align:center;color:#d8e6f3}.footer strong{color:#f2d27c}.modalback{position:fixed;inset:0;background:#07172caa;z-index:50;display:grid;place-items:center;padding:18px}.modal{background:white;border-radius:15px;padding:23px;width:min(520px,100%);max-height:90vh;overflow:auto}.modalhead{display:flex;justify-content:space-between;align-items:center}.modalhead h2{margin:0}.close{border:0;padding:8px 12px;border-radius:7px}.divider{height:1px;background:var(--line);margin:15px 0}
-@media(max-width:850px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}.panel{grid-template-columns:1fr}.panelnav{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}.top{gap:9px}.nav{justify-content:flex-start;width:100%}}
-@media(max-width:560px){.grid,.form{grid-template-columns:1fr}.field.full{grid-column:auto}.hero{padding:48px 16px}main{padding:24px 13px 45px}.head{align-items:start;flex-direction:column}.nav a,.nav button{padding:8px;font-size:12px}}
-</style></head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Gestão de Igrejas - Angola</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;700;900&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Outfit', sans-serif; }
+        
+        body { 
+            background: radial-gradient(circle at 15% 50%, rgba(30, 64, 175, 0.15), transparent 40%),
+                        radial-gradient(circle at 85% 30%, rgba(212, 160, 23, 0.1), transparent 40%),
+                        #020617; 
+            color: #f1f5f9; 
+            min-height: 100vh; 
+            display: flex; 
+            flex-direction: column; 
+            justify-content: center; 
+            align-items: center; 
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Efeito de luz animado no fundo */
+        .glow {
+            position: absolute;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(250, 204, 21, 0.08) 0%, transparent 60%);
+            border-radius: 50%;
+            animation: pulse 8s infinite alternate;
+            z-index: -1;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1) translate(0, 0); opacity: 0.5; }
+            100% { transform: scale(1.2) translate(50px, -50px); opacity: 1; }
+        }
+
+        /* O Cartão de Vidro (Glassmorphism) */
+        .container { 
+            background: rgba(15, 23, 42, 0.6); 
+            backdrop-filter: blur(20px); 
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.08); 
+            padding: 50px 40px; 
+            border-radius: 24px; 
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(250, 204, 21, 0.1);
+            max-width: 480px; 
+            width: 90%; 
+            text-align: center;
+            animation: fadeUp 0.8s ease-out;
+        }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Ícone central animado */
+        .icon-wrapper {
+            width: 90px;
+            height: 90px;
+            margin: 0 auto 25px;
+            background: linear-gradient(135deg, rgba(250, 204, 21, 0.2), rgba(234, 179, 8, 0.05));
+            border: 1px solid rgba(250, 204, 21, 0.3);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 45px;
+            box-shadow: 0 0 30px rgba(250, 204, 21, 0.15);
+            animation: float 4s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        h1 { 
+            font-size: 34px; 
+            font-weight: 900; 
+            letter-spacing: -0.5px;
+            background: linear-gradient(to right, #fde68a, #facc15, #eab308);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px; 
+        }
+
+        p.subtitle { 
+            color: #94a3b8; 
+            font-size: 15px; 
+            font-weight: 300;
+            line-height: 1.6;
+            margin-bottom: 35px; 
+            letter-spacing: 0.5px;
+        }
+
+        /* Botão Premium */
+        .btn { 
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            background: linear-gradient(135deg, #facc15, #d4a017); 
+            color: #020617; 
+            text-decoration: none; 
+            padding: 18px; 
+            border-radius: 14px; 
+            font-weight: 800; 
+            font-size: 16px; 
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
+            border: none;
+            width: 100%;
+            cursor: pointer;
+            box-shadow: 0 10px 20px -10px rgba(250, 204, 21, 0.5);
+        }
+
+        .btn:hover { 
+            transform: translateY(-3px) scale(1.02); 
+            box-shadow: 0 15px 25px -10px rgba(250, 204, 21, 0.7);
+            background: linear-gradient(135deg, #fde68a, #facc15);
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #cbd5e1;
+            box-shadow: none;
+            margin-top: 15px;
+            font-weight: 400;
+            font-size: 14px;
+        }
+
+        .btn-outline:hover {
+            background: rgba(255, 255, 255, 0.05);
+            color: white;
+            box-shadow: none;
+            transform: none;
+        }
+
+        .footer { 
+            margin-top: 40px; 
+            font-size: 12px; 
+            color: #475569; 
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+    </style>
+</head>
 <body>
-<header><div class="top">
-<div class="brand"><div class="logo">Ω</div><div><strong>PLENITUDE DE DEUS</strong><small>CENTRO JEOVÁ SHALOM · MINISTÉRIO EBENÉZER</small></div></div>
-<div id="backendStatus" class="status">Backend: a verificar…</div>
-<nav class="nav" aria-label="Navegação principal"><a href="#inicio">Início</a><a href="#igreja">A Igreja</a><a href="#departamentos">Departamentos</a><a href="#agenda">Agenda</a><a href="#galeria">Galeria</a><a href="#ofertas">Ofertas</a><button id="bibleBtn">📖 Bíblia</button><button id="joinBtn">Fazer Parte</button></nav>
-</div></header>
-<section class="hero" id="inicio"><small>Fé · Comunhão · Serviço</small><h1>Uma casa de adoração, esperança e transformação</h1><p>Bem-vindo ao Centro Jeová Shalom do Ministério Ebenézer. Crescemos juntos na Palavra, na oração e no serviço a Deus e à comunidade.</p><div class="actions"><a class="btn gold" href="#departamentos">Conhecer os departamentos</a><a class="btn outline" href="#ofertas">Contribuir com uma oferta</a></div><div id="apiMessage" class="statusline">A verificar a ligação ao servidor…</div></section>
-<main>
-<section class="section" id="igreja"><div class="head"><div><h2>A nossa igreja</h2><p>Adorar, aprender, servir e caminhar em comunhão.</p></div></div><div class="grid"><article class="card"><div class="icon">🙏</div><h3>Oração</h3><p>Intercedemos pelas famílias, pela comunidade e por todos os que procuram orientação espiritual.</p></article><article class="card"><div class="icon">📖</div><h3>Palavra de Deus</h3><p>Valorizamos o ensino bíblico, o discipulado e o crescimento espiritual.</p></article><article class="card"><div class="icon">🤝</div><h3>Comunhão e serviço</h3><p>Servimos com responsabilidade, amor ao próximo e colaboração entre os membros.</p></article></div></section>
-<section class="section" id="departamentos"><div class="head"><div><h2>Departamentos e sectores</h2><p>Áreas de serviço da congregação.</p></div><button class="btn" id="reloadDepartments">Atualizar</button></div><div class="grid" id="departmentList"><article class="card"><h3>A carregar…</h3></article></div><div id="departmentStatus" class="statusline"></div></section>
-<section class="section" id="agenda"><div class="head"><div><h2>Agenda e eventos</h2><p>Próximas actividades da congregação.</p></div><button class="btn" id="reloadEvents">Atualizar agenda</button></div><div class="grid" id="eventList"><article class="card"><h3>A carregar agenda…</h3></article></div><div id="eventStatus" class="statusline"></div></section>
-<section class="section" id="galeria"><div class="head"><div><h2>Galeria e vídeos</h2><p>Memórias e mensagens da comunidade.</p></div></div><div class="grid" id="videoList"><article class="card"><div class="icon">📸</div><h3>Galeria</h3><p>As fotografias aparecerão quando as rotas e o armazenamento estiverem configurados.</p></article><article class="card"><div class="icon">🎬</div><h3>Vídeos</h3><p>Os vídeos publicados no painel aparecerão nesta secção.</p></article></div><div id="videoStatus" class="statusline"></div></section>
-<section class="section" id="ofertas"><div class="head"><div><h2>Ofertas e contribuições</h2><p>Registo para validação pela tesouraria.</p></div></div><div class="notice"><strong>Importante:</strong> o envio do formulário não confirma o recebimento do dinheiro. A oferta fica pendente até a tesouraria verificar a transação. Confirme os dados de pagamento oficiais com a igreja.</div><div class="grid">
-<article class="card"><h3>Dados oficiais de pagamento</h3><p>Utilize apenas os dados confirmados pela igreja. Nunca partilhe PINs, palavras-passe bancárias ou códigos de confirmação.</p><div id="paymentSettings" class="muted">A carregar dados de pagamento…</div></article>
-<article class="card"><h3>Registar oferta</h3><form id="offeringForm" class="form"><div class="field"><label for="offerName">Nome</label><input id="offerName" name="name" required maxlength="100"></div><div class="field"><label for="offerPhone">Telefone</label><input id="offerPhone" name="phone" required maxlength="30"></div><div class="field"><label for="offerAmount">Valor (Kz)</label><input id="offerAmount" name="amount" type="number" min="1" step="1" required></div><div class="field"><label for="offerCategory">Finalidade</label><select id="offerCategory" name="category" required><option value="">Selecione</option><option>Oferta</option><option>Dízimo</option><option>Missões</option><option>Construção</option><option>Acção social</option><option>Outra contribuição</option></select></div><div class="field"><label for="offerMethod">Método</label><select id="offerMethod" name="method" required><option value="">Selecione</option><option>PayPay AO</option><option>Multicaixa Express</option><option>Unitel Money</option><option>Afrimoney</option><option>Transferência bancária</option><option>Outro</option></select></div><div class="field"><label for="offerReference">Referência da transação</label><input id="offerReference" name="reference" maxlength="120"></div><div class="field full"><button class="btn gold">Enviar para validação</button></div></form><div id="offeringResult" class="statusline" aria-live="polite"></div></article>
-<article class="card"><h3>Acompanhar oferta</h3><form id="trackForm" class="form"><div class="field full"><label for="offerCode">Código da oferta</label><input id="offerCode" required placeholder="Código recebido ao registar"></div><div class="field full"><button class="btn">Consultar estado</button></div></form><div id="trackResult" class="statusline" aria-live="polite"></div></article></div></section>
-<section class="section" id="painel"><div class="head"><div><h2>Área de membros e painéis</h2><p>O acesso depende do cargo e das permissões validadas pelo backend.</p></div></div><div class="card panel"><div class="panelnav"><button class="active" data-panel="overview">📊 Visão geral</button><button data-panel="members">👥 Membros</button><button data-panel="finance">💳 Financeiro</button><button data-panel="gallery">📸 Galeria</button><button data-panel="events">🗓️ Agenda</button><button data-panel="settings">⚙️ Configurações</button></div><div id="panelContent"><h3>Área administrativa</h3><p class="muted">Inicie sessão para consultar os dados autorizados para o seu cargo. O backend deve validar cada operação.</p><button class="btn" id="panelLogin">Entrar / iniciar sessão</button></div></div></section>
-</main><footer class="footer"><strong>ADP · PLENITUDE DE DEUS</strong><p>Centro Jeová Shalom do Ministério Ebenézer</p><small>Portal da congregação · Conteúdo administrativo sujeito a permissões</small></footer>
-<div id="modalRoot" class="hidden"></div>
-<script>
-"use strict";
-const API="/api", $=s=>document.querySelector(s), token=()=>sessionStorage.getItem("adp_token")||"";
-const esc=v=>String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-async function api(path,options={}){const headers=new Headers(options.headers||{});if(options.body)headers.set("Content-Type","application/json");if(token())headers.set("Authorization","Bearer "+token());const r=await fetch(API+path,{...options,headers});const ct=r.headers.get("content-type")||"";const d=ct.includes("json")?await r.json():await r.text();if(!r.ok)throw Error(d?.message||`Erro HTTP ${r.status}`);return d}
-function status(id,msg,kind=""){const e=$("#"+id);e.textContent=msg;e.className="statusline "+kind}
-async function health(){try{await api("/health");$("#backendStatus").innerHTML='Backend: <b class="ok">ligado ✓</b>';status("apiMessage","Ligação ao backend estabelecida.","ok")}catch(e){$("#backendStatus").innerHTML='Backend: <b class="err">indisponível</b>';status("apiMessage","Não foi possível ligar à API. Mantém o CMD aberto e testa http://localhost:5000/api/health.","err")}}
-async function departments(){const h=$("#departmentList");try{const a=await api("/departments");h.innerHTML=Array.isArray(a)&&a.length?a.map(d=>`<article class="card"><div class="icon">${esc(d.icon||"⛪")}</div><h3>${esc(d.name)}</h3><p>${d.sectors?.length||0} sectores · ${d.members?.length||0} membros associados</p></article>`).join(""):'<article class="card"><h3>Sem departamentos registados</h3><p>Adicione departamentos através do painel autorizado.</p></article>';status("departmentStatus","Dados consultados no backend.","ok")}catch(e){h.innerHTML='<article class="card"><h3>Departamentos indisponíveis</h3><p>Verifique a base de dados e a rota /api/departments.</p></article>';status("departmentStatus",e.message,"err")}}
-async function events(){const h=$("#eventList");try{const a=await api("/events");h.innerHTML=Array.isArray(a)&&a.length?a.map(v=>`<article class="card"><div class="icon">🗓️</div><h3>${esc(v.title)}</h3><p>${esc(v.description||"Actividade da congregação")}</p><p><strong>${v.startsAt?esc(new Date(v.startsAt).toLocaleString("pt-PT")):"Data a confirmar"}</strong></p></article>`).join(""):'<article class="card"><h3>Sem eventos publicados</h3><p>Os eventos registados aparecerão aqui.</p></article>';status("eventStatus","Agenda consultada no backend.","ok")}catch(e){h.innerHTML='<article class="card"><h3>Agenda indisponível</h3><p>Confirme a rota /api/events.</p></article>';status("eventStatus",e.message,"err")}}
-async function videos(){try{const a=await api("/videos");if(Array.isArray(a)&&a.length)$("#videoList").innerHTML=a.map(v=>`<article class="card"><div class="icon">🎬</div><h3>${esc(v.title)}</h3><p>${esc(v.category||"Vídeo da igreja")}</p>${v.youtubeUrl?`<p><a href="${esc(v.youtubeUrl)}" target="_blank" rel="noopener">Ver no YouTube</a></p>`:""}</article>`).join("");status("videoStatus","Vídeos consultados no backend.","ok")}catch(e){status("videoStatus","Vídeos ainda indisponíveis: confirme /api/videos.")}}
-async function paymentSettings(){try{const d=await api("/offerings/settings"),pairs=[["PayPay AO",d.paypayAo],["Multicaixa",d.multicaixa],["Unitel Money",d.unitelMoney],["Afrimoney",d.afrimoney],["Banco",d.bankName],["IBAN",d.iban],["Titular",d.churchAccountName]].filter(x=>x[1]);$("#paymentSettings").innerHTML=pairs.length?pairs.map(([k,v])=>`<p><strong>${esc(k)}:</strong> ${esc(v)}</p>`).join(""):"<p>Dados oficiais ainda não publicados. Contacte a tesouraria antes de transferir dinheiro.</p>"}catch(e){$("#paymentSettings").textContent="Não foi possível carregar os dados oficiais. Não transfira dinheiro para números não confirmados."}}
-$("#reloadDepartments").onclick=departments;$("#reloadEvents").onclick=events;
-$("#offeringForm").onsubmit=async e=>{e.preventDefault();const f=new FormData(e.currentTarget),p=Object.fromEntries(f.entries());p.amount=Number(p.amount);status("offeringResult","A enviar…");try{const d=await api("/offerings",{method:"POST",body:JSON.stringify(p)}),code=d.publicCode||d.code||d.offering?.publicCode;status("offeringResult",code?`Registada para validação. Guarda o código: ${code}. Estado inicial: pendente.`:"Pedido enviado; confirma o registo com a tesouraria.", "ok");if(code)$("#offerCode").value=code;e.currentTarget.reset()}catch(err){status("offeringResult","Falha no registo: "+err.message+". A rota de ofertas pode ainda não estar ligada.","err")}};
-$("#trackForm").onsubmit=async e=>{e.preventDefault();const code=$("#offerCode").value.trim();try{const d=await api("/offerings/track/"+encodeURIComponent(code));const x=d.offering||d;status("trackResult",`Estado: ${x.status||"não informado"}. ${x.feedback||"Sem observação da tesouraria."}`,x.status==="APPROVED"?"ok":"")}catch(err){status("trackResult","Não foi possível consultar. Confirme o código e se a rota pública de consulta está implementada.","err")}};
-const panelInfo={overview:["Visão geral","Os indicadores reais só serão mostrados quando existirem endpoints de estatísticas."],members:["Membros","Perfis, cargos, presenças e pedidos exigem autenticação e permissões do servidor."],finance:["Financeiro e tesouraria","Entradas, saídas, ofertas e aprovações devem ser validadas pelo servidor."],gallery:["Galeria","Upload real requer as rotas de galeria e armazenamento configuradas."],events:["Agenda e cultos","Eventos e cultos guardados na base de dados."],settings:["Configurações","Apenas cargos autorizados podem alterar dados e textos do site."]};
-document.querySelectorAll("[data-panel]").forEach(b=>b.onclick=()=>{document.querySelectorAll("[data-panel]").forEach(x=>x.classList.toggle("active",x===b));const [t,d]=panelInfo[b.dataset.panel];$("#panelContent").innerHTML=`<h3>${esc(t)}</h3><p class="muted">${esc(d)}</p><button class="btn" id="panelLogin">Entrar / iniciar sessão</button>`;$("#panelLogin").onclick=openAuth});
-function modal(content){const r=$("#modalRoot");r.className="";r.innerHTML=`<div class="modalback"><div class="modal" role="dialog" aria-modal="true">${content}</div></div>`;r.querySelector(".modalback").onclick=e=>{if(e.target.classList.contains("modalback"))closeModal()};r.querySelectorAll("[data-close]").forEach(b=>b.onclick=closeModal)}
-function closeModal(){const r=$("#modalRoot");r.className="hidden";r.innerHTML=""}
-function openAuth(){modal(`<div class="modalhead"><h2>Fazer Parte</h2><button class="close" data-close>Fechar</button></div><div class="notice">O cargo e as permissões são atribuídos e verificados pelo administrador.</div><form id="authForm" class="form"><div class="field full"><label for="authMode">Acção</label><select id="authMode"><option value="register">Criar conta</option><option value="login">Iniciar sessão</option></select></div><div id="nameWrap" class="field full"><label for="authName">Nome completo</label><input id="authName" required></div><div class="field full"><label for="authEmail">E-mail</label><input id="authEmail" type="email" required></div><div class="field full"><label for="authPassword">Palavra-passe</label><input id="authPassword" type="password" minlength="8" required></div><div class="field full"><button class="btn gold">Continuar</button></div></form><div id="authResult" class="statusline"></div>`);$("#authMode").onchange=()=>{$("#nameWrap").classList.toggle("hidden",$("#authMode").value==="login");$("#authName").required=$("#authMode").value==="register"};$("#authForm").onsubmit=async e=>{e.preventDefault();const reg=$("#authMode").value==="register",p={email:$("#authEmail").value.trim(),password:$("#authPassword").value};if(reg)p.name=$("#authName").value.trim();try{const d=await api(reg?"/auth/register":"/auth/login",{method:"POST",body:JSON.stringify(p)});const t=d.token||d.accessToken;if(t)sessionStorage.setItem("adp_token",t);status("authResult",t?"Sessão iniciada. Pode fechar esta janela.":"Resposta recebida, mas sem token de sessão.",t?"ok":"err")}catch(err){status("authResult","Falha: "+err.message+". Confirme as rotas de autenticação.","err")}}}
-$("#joinBtn").onclick=openAuth;$("#panelLogin").onclick=openAuth;$("#bibleBtn").onclick=()=>modal('<div class="modalhead"><h2>📖 Bíblia</h2><button class="close" data-close>Fechar</button></div><p>A Bíblia ainda precisa de uma fonte de texto/API autorizada. Não serão apresentados versículos inventados.</p>');
-health();departments();events();videos();paymentSettings();
-</script></body></html>
+    <div class="glow"></div>
+
+    <div class="container">
+        <div class="icon-wrapper">⛪</div>
+        
+        <h1>Sistema Multi-Igreja</h1>
+        <p class="subtitle">Plataforma oficial de gestão, comunicação e administração eclesiástica em Angola.</p>
+        
+        <a href="/admin.html" class="btn">
+            <span>🔐</span> Aceder ao Painel Master
+        </a>
+        
+        <a href="/site-igreja.html" class="btn btn-outline">
+            Ver Site de Exemplo
+        </a>
+        
+        <div class="footer">© 2026 · Todos os direitos reservados</div>
+    </div>
+</body>
+</html>
