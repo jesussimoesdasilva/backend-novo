@@ -32,7 +32,7 @@ main{max-width:1200px;margin:auto;padding:32px 18px 65px}.section{margin-bottom:
 <div id="modalRoot" class="hidden"></div>
 <script>
 "use strict";
-const API="http://localhost:5000/api", $=s=>document.querySelector(s), token=()=>sessionStorage.getItem("adp_token")||"";
+const API="/api", $=s=>document.querySelector(s), token=()=>sessionStorage.getItem("adp_token")||"";
 const esc=v=>String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 async function api(path,options={}){const headers=new Headers(options.headers||{});if(options.body)headers.set("Content-Type","application/json");if(token())headers.set("Authorization","Bearer "+token());const r=await fetch(API+path,{...options,headers});const ct=r.headers.get("content-type")||"";const d=ct.includes("json")?await r.json():await r.text();if(!r.ok)throw Error(d?.message||`Erro HTTP ${r.status}`);return d}
 function status(id,msg,kind=""){const e=$("#"+id);e.textContent=msg;e.className="statusline "+kind}
