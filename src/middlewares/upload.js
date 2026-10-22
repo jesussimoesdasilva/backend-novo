@@ -6,7 +6,7 @@ const storage = new CloudinaryStorage({
   cloudinary: cloudinary,
   params: {
     folder: "igreja_sistema",
-    allowed_formats: ["jpg", "jpeg", "png", "webp", "gif", "mp4", "mp3", "mkv"],
+    allowed_formats: ["jpg", "jpeg", "png", "webp", "gif"],
   },
 });
 

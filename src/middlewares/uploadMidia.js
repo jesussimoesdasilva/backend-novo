@@ -6,7 +6,7 @@ const storage = new CloudinaryStorage({
   cloudinary: cloudinary,
   params: {
     folder: "igreja_midia",
-    resource_type: "auto", // Permite vídeos e áudios
+    resource_type: "auto",
     allowed_formats: ["mp4", "mkv", "mp3"],
   },
 });
