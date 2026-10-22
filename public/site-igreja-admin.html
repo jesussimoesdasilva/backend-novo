@@ -725,10 +725,23 @@ async function criarAlbum() {
     const album = await r.json();
 
     const file = document.getElementById('gaCapa').files[0];
-    if (file) {
-      const fd = new FormData(); fd.append('capa', file);
-      await fetch(API + '/galeria/albuns/' + album.id + '/capa', { method: 'POST', body: fd });
-    }
+if (file) {
+  const fd = new FormData();
+  fd.append("file", file);
+  fd.append("upload_preset", "igreja_preset");
+  
+  const resp = await fetch("https://api.cloudinary.com/v1_1/numjnf4g/image/upload", {
+    method: "POST", body: fd
+  });
+  const data = await resp.json();
+  if (data.secure_url) {
+    await fetch(API + '/galeria/albuns/' + album.id + '/capa', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ capaUrl: data.secure_url })
+    });
+  }
+}
 
     toast('Álbum criado!', 'success');
     ['gaNome','gaDescricao','gaData','gaCapa'].forEach(id => document.getElementById(id).value = '');

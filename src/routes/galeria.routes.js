@@ -8,7 +8,7 @@ router.get("/albuns/igreja/:igrejaId", c.listAlbuns);
 router.get("/albuns/:id", c.getAlbum);
 router.post("/albuns/igreja/:igrejaId", c.createAlbum);
 router.put("/albuns/:id", c.updateAlbum);
-router.post("/albuns/:id/capa", upload.single("capa"), c.setCapaAlbum);
+router.post("/albuns/:id/capa", c.setCapaAlbum);
 router.delete("/albuns/:id", c.deleteAlbum);
 
 // Fotos

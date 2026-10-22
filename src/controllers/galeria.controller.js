@@ -25,9 +25,9 @@ async function updateAlbum(req, res, next) {
 
 async function setCapaAlbum(req, res, next) {
   try {
-    if (!req.file) return res.status(400).json({ error: true, message: "Nenhuma imagem enviada" });
-    const url = '/logos/' + req.file.filename;
-    res.json(await service.setCapaAlbum(req.params.id, url));
+    const { capaUrl } = req.body;
+    if (!capaUrl) return res.status(400).json({ error: true, message: "Nenhuma imagem enviada" });
+    res.json(await service.setCapaAlbum(req.params.id, capaUrl));
   } catch (err) { next(err); }
 }
 
@@ -38,9 +38,10 @@ async function deleteAlbum(req, res, next) {
 async function listFotos(req, res, next) {
   try { res.json(await service.listFotosByAlbum(req.params.albumId)); } catch (err) { next(err); }
 }
+
 async function uploadFotos(req, res, next) {
   try {
-    const { fotos } = req.body; // Agora recebe um array de links
+    const { fotos } = req.body;
     if (!fotos || fotos.length === 0) return res.status(400).json({ error: true, message: "Nenhuma foto enviada" });
     
     const fotosCriadas = [];
