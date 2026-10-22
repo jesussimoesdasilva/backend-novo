@@ -1921,20 +1921,46 @@ async function adicionarMidia() {
   if (fonte === 'LINK' && !url) return toast('Link obrigatório', 'error');
   if (fonte === 'ARQUIVO' && !arquivo) return toast('Ficheiro obrigatório', 'error');
 
-  const formData = new FormData();
-  formData.append('titulo', titulo);
-  formData.append('tipo', tipo);
-  if (fonte === 'LINK') formData.append('url', url);
-  else formData.append('arquivo', arquivo);
-
   try {
-    await fetch(API + '/midia/igreja/' + igrejaAtual.id, { method: 'POST', body: formData });
+    let linkFinal = url;
+
+    // Se for um ficheiro, envia para o Cloudinary
+    if (fonte === 'ARQUIVO') {
+      const formDataCloud = new FormData();
+      formDataCloud.append("file", arquivo);
+      formDataCloud.append("upload_preset", "igreja_preset");
+      
+      const responseCloud = await fetch("https://api.cloudinary.com/v1_1/numjnf4g/auto/upload", {
+        method: "POST", body: formDataCloud
+      });
+      const dataCloud = await responseCloud.json();
+      
+      if (!dataCloud.secure_url) throw new Error("Erro no upload para o Cloudinary");
+      linkFinal = dataCloud.secure_url;
+    }
+
+    // Envia os dados (com o link) para o backend
+    const r = await fetch(API + '/midia/igreja/' + igrejaAtual.id, {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ 
+        titulo, 
+        tipo, 
+        url: linkFinal, 
+        isArquivo: fonte === 'ARQUIVO' 
+      })
+    });
+    
+    if (!r.ok) throw new Error('Erro ao guardar no servidor');
+
     toast('Mídia adicionada!', 'success');
     document.getElementById('mdTitulo').value = '';
     document.getElementById('mdUrl').value = '';
     document.getElementById('mdArquivo').value = '';
     carregarMidiaAdmin();
-  } catch (e) { toast('Erro ao guardar', 'error'); }
+  } catch (e) { 
+    toast(e.message, 'error'); 
+  }
 }
 
 async function carregarMidiaAdmin() {
