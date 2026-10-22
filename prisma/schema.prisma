@@ -151,6 +151,7 @@ model Pastor {
   foto        String?
   telefone    String?
   email       String?
+  password    String   // <-- ADICIONA ESTA LINHA
   versiculo   String?
   conselho    String?
   criadoEm    DateTime @default(now())
