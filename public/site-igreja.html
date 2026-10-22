@@ -1881,50 +1881,53 @@ async function salvarPerfil(e) {
   const alerta = document.getElementById('msgAlertaPerfil');
   btn.innerHTML = "⏳ A guardar..."; btn.disabled = true;
 
-  const nome = document.getElementById('epNome').value;
-  const telefone = document.getElementById('epTelefone').value;
-  const bi = document.getElementById('epBi').value;
-  const endereco = document.getElementById('epEndereco').value;
-
   try {
-    const r = await fetch('/api/membros/' + membroLogado.id + '/perfil', {
+    // 1. Atualiza os dados de texto
+    const dados = {
+      nome: document.getElementById('epNome').value,
+      telefone: document.getElementById('epTelefone').value,
+      bi: document.getElementById('epBi').value,
+      endereco: document.getElementById('epEndereco').value
+    };
+    const r1 = await fetch('/api/membros/' + membroLogado.id + '/perfil', {
       method: 'PUT', headers: {'Content-Type':'application/json'},
-      body: JSON.stringify({ nome, telefone, bi, endereco })
+      body: JSON.stringify(dados)
     });
-    if (!r.ok) throw new Error('Erro ao atualizar dados');
+    if (!r1.ok) throw new Error('Erro ao atualizar dados');
 
+    // 2. Atualiza a foto (se houver)
     const fotoInput = document.getElementById('epFoto');
-    let membroComFoto = null;
-    
     if (fotoInput.files && fotoInput.files[0]) {
       const fd = new FormData();
-      fd.append('foto', fotoInput.files[0]);
-      const rF = await fetch('/api/membros/' + membroLogado.id + '/foto', { 
-        method: 'POST', 
-        body: fd 
+      fd.append("file", fotoInput.files[0]);
+      fd.append("upload_preset", "igreja_preset");
+      
+      const resp = await fetch("https://api.cloudinary.com/v1_1/numjnf4g/image/upload", {
+        method: "POST", body: fd
       });
-      if (!rF.ok) throw new Error('Erro ao atualizar foto');
-      membroComFoto = await rF.json(); 
+      const data = await resp.json();
+      if (!data.secure_url) throw new Error("Erro no upload para o Cloudinary");
+      
+      // 3. Envia o link da foto para o backend
+      const r2 = await fetch('/api/membros/' + membroLogado.id + '/foto', {
+        method: 'POST',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({ fotoUrl: data.secure_url })
+      });
+      if (!r2.ok) throw new Error('Erro ao guardar a foto');
+
+      membroLogado.foto = data.secure_url;
     }
 
-    membroLogado.nome = nome;
-    membroLogado.telefone = telefone;
-    membroLogado.bi = bi;
-    membroLogado.endereco = endereco;
-    
-    if (membroComFoto && membroComFoto.foto) {
-      membroLogado.foto = membroComFoto.foto; 
-    }
-    
+    membroLogado.nome = dados.nome;
+    membroLogado.telefone = dados.telefone;
+    membroLogado.bi = dados.bi;
+    membroLogado.endereco = dados.endereco;
     localStorage.setItem('membro_' + igrejaIdAtual, JSON.stringify(membroLogado));
     
     alerta.className = "alert success"; 
     alerta.textContent = "✅ Perfil atualizado!";
-    
-    setTimeout(() => {
-      fecharModal('modalEditarPerfil');
-      location.reload(); 
-    }, 1500);
+    setTimeout(() => { fecharModal('modalEditarPerfil'); location.reload(); }, 1500);
 
   } catch (err) {
     alerta.className = "alert error"; 

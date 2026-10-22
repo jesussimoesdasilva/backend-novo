@@ -21,6 +21,6 @@ router.delete("/:id", c.remove);
 
 // NOVO: Edição do próprio perfil
 router.put("/:id/perfil", c.updatePerfil);
-router.post("/:id/foto", upload.single("foto"), c.updateFoto);
+router.post("/:id/foto", c.updateFoto);
 
 module.exports = router;

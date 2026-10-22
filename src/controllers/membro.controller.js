@@ -129,8 +129,8 @@ async function updatePerfil(req, res) {
 
 async function updateFoto(req, res) {
   try {
-    if (!req.file) return res.status(400).json({ message: "Nenhuma foto enviada" });
-    const fotoUrl = '/logos/' + req.file.filename;
+    const { fotoUrl } = req.body;
+    if (!fotoUrl) return res.status(400).json({ message: "Nenhuma foto enviada" });
     const membro = await prisma.membro.update({
       where: { id: Number(req.params.id) },
       data: { foto: fotoUrl }
