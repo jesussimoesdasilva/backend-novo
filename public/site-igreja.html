@@ -334,6 +334,16 @@ footer strong{color:#f2d27c}
 .midia-paginacao button:hover:not(:disabled) { background: var(--gold); color: #fff; }
 .midia-paginacao button.active { background: var(--gold); color: #fff; }
 .midia-paginacao button:disabled { opacity: 0.4; cursor: not-allowed; }
+/* ESTILOS DO MENU HAMBÚRGUER */
+.menu-hamburger { display: none; background: transparent; border: 1px solid var(--gold); color: var(--gold); padding: 10px 15px; border-radius: 8px; font-weight: bold; font-size: 14px; cursor: pointer; }
+.menu-links { display: flex; gap: 12px; justify-content: center; padding-top: 8px; padding-bottom: 8px; }
+
+@media (max-width: 900px) {
+  .menu-hamburger { display: block; margin: 10px auto; }
+  .menu-links { display: none; flex-direction: column; gap: 5px; align-items: center; padding-bottom: 15px; }
+  .menu-links.show { display: flex; }
+  .menu-links button { width: 100%; border-bottom: 1px solid rgba(255,255,255,0.1); padding: 12px; }
+}
 </style>
 </head>
 <body>
@@ -353,19 +363,22 @@ footer strong{color:#f2d27c}
       <button class="btn red" id="btnSair" style="display:none" onclick="sairMembro()">🚪 Sair</button>
     </div>
   </div>
-  <nav>
+    <nav>
     <div class="wrap">
-      <button onclick="scrollToId('inicio')">Início</button>
-      <button onclick="scrollToId('sobre')">Sobre</button>
-      <button onclick="scrollToId('pastor')">Pastor</button>
-      <button onclick="scrollToId('departamentos')">Departamentos</button>
-      <button onclick="scrollToId('agenda')">Agenda</button>
-      <button onclick="scrollToId('midia')">Mídia</button>
-      <button onclick="scrollToId('avisos')">Avisos</button>
-      <button onclick="scrollToId('ofertas')">Ofertas</button>
-      <button onclick="scrollToId('oracao')">Oração</button>
-      <button onclick="scrollToId('galeria')">Galeria</button>
-      <button onclick="scrollToId('chat')">Chat</button>
+      <button class="menu-hamburger" onclick="toggleMenu()">☰ Menu</button>
+      <div class="menu-links" id="menuLinks">
+        <button onclick="scrollToId('inicio')">Início</button>
+        <button onclick="scrollToId('sobre')">Sobre</button>
+        <button onclick="scrollToId('pastor')">Pastor</button>
+        <button onclick="scrollToId('departamentos')">Departamentos</button>
+        <button onclick="scrollToId('agenda')">Agenda</button>
+        <button onclick="scrollToId('midia')">Mídia</button>
+        <button onclick="scrollToId('avisos')">Avisos</button>
+        <button onclick="scrollToId('ofertas')">Ofertas</button>
+        <button onclick="scrollToId('oracao')">Oração</button>
+        <button onclick="scrollToId('galeria')">Galeria</button>
+        <button onclick="scrollToId('chat')">Chat</button>
+      </div>
     </div>
   </nav>
 </header>
@@ -761,6 +774,10 @@ let filtroMidia = '';
 let abaMidiaAtual = 'VIDEO';
 
 function scrollToId(id) { document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" }); }
+function toggleMenu() {
+  const menu = document.getElementById('menuLinks');
+  menu.classList.toggle('show');
+}
 
 async function carregarAvisos() {
   const container = document.getElementById('avisosContainer');
