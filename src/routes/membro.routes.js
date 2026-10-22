@@ -4,7 +4,7 @@ const c = require("../controllers/membro.controller");
 const upload = require("../middlewares/upload");
 
 // Públicas
-router.post("/igreja/:igrejaId/registo", upload.single("foto"), c.publicRegister);
+router.post("/igreja/:igrejaId/registo", c.publicRegister);
 router.post("/login", c.login);
 router.post("/verificar-telefone", c.verificarTelefone);
 router.post("/ver-codigo", c.verCodigo);
