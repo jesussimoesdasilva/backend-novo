@@ -1445,7 +1445,7 @@ async function carregarMembros() {
               <td style="font-size:12px;color:var(--gold)">${(m.sectores || []).map(s=>s.nome).join(', ') || 'Nenhum'}</td>
               <td style="display:flex;gap:5px;flex-wrap:wrap;">
                 <button class="btn btn-outline" style="padding:5px 10px;font-size:12px" onclick="abrirModalSectores(${m.id}, '${m.nome.replace(/'/g,"\\'")}', [${(m.sectores||[]).map(s=>s.id)}])">Sectores</button>
-                <button class="btn btn-primary" style="padding:5px 10px;font-size:12px; background:#3b82f6" onclick="criarPerfilPublico('${m.nome.replace(/'/g,"\\'")}', '${m.email}')">🌐 Criar Perfil</button>
+                <button class="btn btn-primary" style="padding:5px 10px;font-size:12px; background:#facc15; color:#020617;" onclick="promoverMembro(${m.id}, '${m.nome.replace(/'/g,"\\'")}')">⬆️ Promover</button>
                 <button class="btn btn-primary" style="padding:5px 10px;font-size:12px" onclick="redefinirSenha(${m.id})">🔑</button>
                 <button class="btn btn-danger" style="padding:5px 10px;font-size:12px" onclick="eliminarMembro(${m.id})">🗑️</button>
               </td>
@@ -1463,7 +1463,7 @@ async function mudarCargoMembro(id, novoCargo) {
     return;
   }
   try {
-    const r = await fetch(API + '/membros/' + id + '/cargo', {
+    const r = await fetch(API + '/membros/' + id + '/promover', {
       method: 'PUT', headers: {'Content-Type':'application/json'},
       body: JSON.stringify({ cargo: novoCargo })
     });
@@ -1476,29 +1476,19 @@ async function mudarCargoMembro(id, novoCargo) {
   }
 }
 
-async function criarPerfilPublico(nome, email) {
-  if (!confirm(`Criar o perfil público do Pastor ${nome} no site?`)) return;
-  
+async function promoverMembro(id, nome) {
+  if (!confirm(`Tem a certeza que deseja promover "${nome}" a Pastor?`)) return;
   try {
-    const r = await fetch(API + '/pastores/igreja/' + igrejaAtual.id, {
-      method: 'POST', headers: {'Content-Type':'application/json'},
-      body: JSON.stringify({ 
-        nome: nome, 
-        cargo: "Pastor", 
-        email: email,
-        bio: "Servo dedicado à obra de Deus.",
-        conselho: "Deus tem o melhor para a sua vida."
-      })
+    const r = await fetch(API + '/membros/' + id + '/promover', {
+      method: 'PUT',
+      headers: {'Content-Type': 'application/json'}
     });
-    
-    if (!r.ok) throw new Error('Erro ao criar perfil');
-    toast('Perfil público do Pastor criado!', 'success');
-    
-    setTimeout(() => {
-      document.querySelector('[onclick="section(\'pastor\',this)"]').click();
-    }, 1000);
-    
-  } catch (e) { toast(e.message, 'error'); }
+    if (!r.ok) throw new Error('Erro ao promover');
+    toast('Membro promovido a Pastor com sucesso!', 'success');
+    carregarMembros(); 
+  } catch (e) { 
+    toast(e.message, 'error'); 
+  }
 }
 
 async function redefinirSenha(id) {
@@ -1557,7 +1547,6 @@ async function carregarMembrosAtivosSilencioso() {
   try {
     const r = await fetch(API + '/membros/igreja/' + igrejaAtual.id);
     const lista = await r.json();
-    // Aceita todos os membros, a não ser que o estado seja explicitamente "INATIVO"
     membrosAtivosLista = lista.filter(m => m.status !== 'INATIVO' && m.status !== 'inativo');
   } catch (e) { console.error("Erro ao carregar membros", e); }
 }
