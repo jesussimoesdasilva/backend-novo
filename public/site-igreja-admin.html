@@ -221,6 +221,7 @@ th{color:var(--gold);font-size:12px;text-transform:uppercase}
           <div class="field"><label>Cargo</label><input id="pCargo"></div>
           <div class="field"><label>Telefone</label><input id="pTelefone"></div>
           <div class="field"><label>Email</label><input id="pEmail"></div>
+          <div class="field"><label>Senha de Acesso *</label><input type="password" id="pSenha" placeholder="Senha para o painel"></div>
           <div class="field"><label>Versículo Favorito</label><input id="pVersiculo"></div>
           <div class="field"><label>Foto</label><input type="file" id="pFoto" accept="image/*"></div>
           <div class="field" style="grid-column:1/-1"><label>Biografia</label><textarea id="pBio"></textarea></div>
@@ -1201,7 +1202,9 @@ async function salvarPastor() {
   
   const payload = {
     nome, cargo: document.getElementById('pCargo').value, telefone: document.getElementById('pTelefone').value,
-    email: document.getElementById('pEmail').value, versiculo: document.getElementById('pVersiculo').value,
+    email: document.getElementById('pEmail').value, 
+    senha: document.getElementById('pSenha').value,
+    versiculo: document.getElementById('pVersiculo').value,
     bio: document.getElementById('pBio').value, conselho: document.getElementById('pConselho').value
   };
 
@@ -1242,6 +1245,7 @@ async function editarPastor(id) {
     document.getElementById('pCargo').value = p.cargo || '';
     document.getElementById('pTelefone').value = p.telefone || '';
     document.getElementById('pEmail').value = p.email || '';
+    document.getElementById('pSenha').value = ''; // A senha não vem por segurança
     document.getElementById('pVersiculo').value = p.versiculo || '';
     document.getElementById('pBio').value = p.bio || '';
     document.getElementById('pConselho').value = p.conselho || '';
@@ -1258,7 +1262,7 @@ function cancelarEdicaoPastor() {
   document.getElementById('formPastorTitulo').textContent = '➕ Adicionar Pastor';
   document.getElementById('btnSalvarPastor').textContent = '💾 Adicionar Pastor';
   document.getElementById('btnCancelarPastor').style.display = 'none';
-  ['pNome','pCargo','pTelefone','pEmail','pVersiculo','pBio','pConselho'].forEach(id => document.getElementById(id).value = '');
+  ['pNome','pCargo','pTelefone','pEmail','pSenha','pVersiculo','pBio','pConselho'].forEach(id => document.getElementById(id).value = '');
   document.getElementById('pFoto').value = '';
 }
 
@@ -1445,6 +1449,7 @@ async function carregarMembros() {
               <td style="font-size:12px;color:var(--gold)">${(m.sectores || []).map(s=>s.nome).join(', ') || 'Nenhum'}</td>
               <td style="display:flex;gap:5px;flex-wrap:wrap;">
                 <button class="btn btn-outline" style="padding:5px 10px;font-size:12px" onclick="abrirModalSectores(${m.id}, '${m.nome.replace(/'/g,"\\'")}', [${(m.sectores||[]).map(s=>s.id)}])">Sectores</button>
+                <button class="btn btn-primary" style="padding:5px 10px;font-size:12px; background:#3b82f6" onclick="criarPerfilPublico('${m.nome.replace(/'/g,"\\'")}', '${m.email}')">🌐 Criar Perfil</button>
                 <button class="btn btn-primary" style="padding:5px 10px;font-size:12px; background:#facc15; color:#020617;" onclick="promoverMembro(${m.id}, '${m.nome.replace(/'/g,"\\'")}')">⬆️ Promover</button>
                 <button class="btn btn-primary" style="padding:5px 10px;font-size:12px" onclick="redefinirSenha(${m.id})">🔑</button>
                 <button class="btn btn-danger" style="padding:5px 10px;font-size:12px" onclick="eliminarMembro(${m.id})">🗑️</button>
@@ -1474,6 +1479,32 @@ async function mudarCargoMembro(id, novoCargo) {
     toast(e.message, 'error'); 
     carregarMembros(); 
   }
+}
+
+async function criarPerfilPublico(nome, email) {
+  if (!confirm(`Criar o perfil público do Pastor ${nome} no site?`)) return;
+  
+  try {
+    const r = await fetch(API + '/pastores/igreja/' + igrejaAtual.id, {
+      method: 'POST', headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ 
+        nome: nome, 
+        cargo: "Pastor", 
+        email: email,
+        senha: "123456",
+        bio: "Servo dedicado à obra de Deus.",
+        conselho: "Deus tem o melhor para a sua vida."
+      })
+    });
+    
+    if (!r.ok) throw new Error('Erro ao criar perfil');
+    toast('Perfil público do Pastor criado!', 'success');
+    
+    setTimeout(() => {
+      document.querySelector('[onclick="section(\'pastor\',this)"]').click();
+    }, 1000);
+    
+  } catch (e) { toast(e.message, 'error'); }
 }
 
 async function promoverMembro(id, nome) {

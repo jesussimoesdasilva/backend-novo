@@ -4,6 +4,9 @@ const c = require("../controllers/pastor.controller");
 const upload = require("../middlewares/upload");
 const prisma = require("../config/prisma");
 
+// NOVA ROTA: LOGIN DO PASTOR (tem de estar antes das outras)
+router.post("/login", c.login);
+
 router.get("/igreja/:igrejaId", c.list);
 router.get("/:id", c.get);
 router.post("/igreja/:igrejaId", c.create);

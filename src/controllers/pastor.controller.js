@@ -20,14 +20,21 @@ async function create(req, res, next) {
   } catch (err) { next(err); }
 }
 
-async function update(req, res, next) {
+async function login(req, res, next) {
   try {
-    res.json(await service.updatePastor(req.params.id, req.body));
-  } catch (err) { next(err); }
+    const { email, senha } = req.body;
+    if (!email || !senha) return res.status(400).json({ message: "Email e senha obrigatórios" });
+    const pastor = await service.loginPastor(email, senha);
+    res.json({ ok: true, pastor });
+  } catch (err) { res.status(401).json({ message: err.message }); }
+}
+
+async function update(req, res, next) {
+  try { res.json(await service.updatePastor(req.params.id, req.body)); } catch (err) { next(err); }
 }
 
 async function remove(req, res, next) {
   try { await service.deletePastor(req.params.id); res.json({ ok: true }); } catch (err) { next(err); }
 }
 
-module.exports = { list, get, create, update, remove };
+module.exports = { list, get, create, update, remove, login };
