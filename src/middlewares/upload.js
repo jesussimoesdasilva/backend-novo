@@ -1,22 +1,15 @@
 const multer = require("multer");
-const path = require("path");
-const fs = require("fs");
+const cloudinary = require("../config/cloudinary");
+const { CloudinaryStorage } = require("multer-storage-cloudinary");
 
-const uploadDir = path.join(__dirname, "..", "..", "public", "logos");
-if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir, { recursive: true });
-
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, uploadDir),
-  filename: (req, file, cb) => {
-    const ext = path.extname(file.originalname).toLowerCase();
-    cb(null, "logo-" + Date.now() + "-" + Math.round(Math.random() * 1e6) + ext);
+const storage = new CloudinaryStorage({
+  cloudinary: cloudinary,
+  params: {
+    folder: "igreja_sistema",
+    allowed_formats: ["jpg", "jpeg", "png", "webp", "gif", "mp4", "mp3", "mkv"],
   },
 });
 
-const fileFilter = (req, file, cb) => {
-  const ok = [".png", ".jpg", ".jpeg", ".gif", ".webp", ".svg"].includes(path.extname(file.originalname).toLowerCase());
-  if (ok) cb(null, true);
-  else cb(new Error("Apenas imagens permitidas"));
-};
+const upload = multer({ storage });
 
-module.exports = multer({ storage, fileFilter, limits: { fileSize: 2 * 1024 * 1024 } });
+module.exports = upload;

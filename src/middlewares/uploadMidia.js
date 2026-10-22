@@ -1,16 +1,16 @@
-const multer = require('multer');
-const path = require('path');
+const multer = require("multer");
+const cloudinary = require("../config/cloudinary");
+const { CloudinaryStorage } = require("multer-storage-cloudinary");
 
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, path.join(__dirname, '..', '..', 'public', 'midia'));
+const storage = new CloudinaryStorage({
+  cloudinary: cloudinary,
+  params: {
+    folder: "igreja_midia",
+    resource_type: "auto", // Permite vídeos e áudios
+    allowed_formats: ["mp4", "mkv", "mp3"],
   },
-  filename: (req, file, cb) => {
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-    cb(null, uniqueSuffix + path.extname(file.originalname));
-  }
 });
 
-const uploadMidia = multer({ storage: storage });
+const uploadMidia = multer({ storage });
 
 module.exports = uploadMidia;
