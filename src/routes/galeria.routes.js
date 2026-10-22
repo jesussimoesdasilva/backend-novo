@@ -13,7 +13,7 @@ router.delete("/albuns/:id", c.deleteAlbum);
 
 // Fotos
 router.get("/fotos/album/:albumId", c.listFotos);
-router.post("/fotos/igreja/:igrejaId/album/:albumId", upload.array("fotos", 50), c.uploadFotos);
+router.post("/fotos/igreja/:igrejaId/album/:albumId", c.uploadFotos);
 router.delete("/fotos/:id", c.deleteFoto);
 
 module.exports = router;

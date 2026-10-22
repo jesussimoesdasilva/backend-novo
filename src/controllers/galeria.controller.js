@@ -38,15 +38,13 @@ async function deleteAlbum(req, res, next) {
 async function listFotos(req, res, next) {
   try { res.json(await service.listFotosByAlbum(req.params.albumId)); } catch (err) { next(err); }
 }
-
 async function uploadFotos(req, res, next) {
   try {
-    if (!req.files || req.files.length === 0) return res.status(400).json({ error: true, message: "Nenhuma foto enviada" });
+    const { fotos } = req.body; // Agora recebe um array de links
+    if (!fotos || fotos.length === 0) return res.status(400).json({ error: true, message: "Nenhuma foto enviada" });
     
-    const urls = req.files.map(f => '/logos/' + f.filename);
     const fotosCriadas = [];
-    
-    for (const url of urls) {
+    for (const url of fotos) {
       const foto = await service.createFoto(req.params.igrejaId, req.params.albumId, {
         titulo: req.body.titulo || null,
         url
