@@ -3,19 +3,29 @@ const bcrypt = require("bcryptjs");
 
 async function publicRegister(req, res) {
   try {
-    const { nome, email, password, telefone, bi, endereco } = req.body;
+    const { nome, email, password, telefone, bi, endereco, dataNascimento, foto } = req.body;
+
+    // Verifica se o email já existe
+    const existe = await prisma.membro.findUnique({ where: { email } });
+    if (existe) return res.status(400).json({ message: "Este email já está registado." });
+
     const hash = await bcrypt.hash(password, 10);
     const membro = await prisma.membro.create({
       data: {
         igrejaId: Number(req.params.igrejaId),
-        nome, email, password: hash, telefone, bi, endereco,
-        foto: req.file ? '/logos/' + req.file.filename : null
+        nome,
+        email,
+        password: hash,
+        telefone,
+        bi,
+        endereco,
+        dataNascimento: dataNascimento ? new Date(dataNascimento) : null,
+        foto: foto || null // Agora recebe o link do Cloudinary
       }
     });
     res.status(201).json(membro);
   } catch (err) { res.status(400).json({ message: err.message }); }
 }
-
 async function login(req, res) {
   try {
     const { email, senha } = req.body;
