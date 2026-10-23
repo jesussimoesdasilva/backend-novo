@@ -1248,10 +1248,25 @@ async function salvarPastor() {
     const d = await r.json();
     if (!r.ok) throw new Error(d.message);
 
+    // --- FOTO: envia para o Cloudinary e depois guarda o link ---
     const file = document.getElementById('pFoto').files[0];
     if (file) {
-      const fd = new FormData(); fd.append('foto', file);
-      await fetch(API + '/pastores/igreja/' + igrejaAtual.id + '/' + (pastorEditandoId || d.id) + '/foto', { method: 'POST', body: fd });
+      const fd = new FormData();
+      fd.append("file", file);
+      fd.append("upload_preset", "igreja_preset");
+      
+      const resp = await fetch("https://api.cloudinary.com/v1_1/numjnf4g/image/upload", {
+        method: "POST", body: fd
+      });
+      const data = await resp.json();
+      
+      if (data.secure_url) {
+        await fetch(API + '/pastores/' + (pastorEditandoId || d.id) + '/foto', {
+          method: 'PUT',
+          headers: {'Content-Type':'application/json'},
+          body: JSON.stringify({ fotoUrl: data.secure_url })
+        });
+      }
     }
 
     toast(pastorEditandoId ? 'Pastor atualizado!' : 'Pastor adicionado!', 'success');

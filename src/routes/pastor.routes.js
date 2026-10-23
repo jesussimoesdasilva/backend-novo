@@ -1,7 +1,6 @@
 const express = require("express");
 const router = express.Router();
 const c = require("../controllers/pastor.controller");
-const upload = require("../middlewares/upload");
 const prisma = require("../config/prisma");
 
 // NOVA ROTA: LOGIN DO PASTOR (tem de estar antes das outras)
@@ -13,13 +12,11 @@ router.post("/igreja/:igrejaId", c.create);
 router.put("/:id", c.update);
 router.delete("/:id", c.remove);
 
-// Rota para upload de foto do pastor
-router.post("/igreja/:igrejaId/:id/foto", upload.single("foto"), async (req, res) => {
+// Rota para atualizar foto do pastor (recebe o link do Cloudinary)
+router.put("/:id/foto", async (req, res) => {
   try {
-    if (!req.file) return res.status(400).json({ message: "Nenhuma foto enviada" });
-    
-    // O multer guarda na pasta public/logos
-    const fotoUrl = '/logos/' + req.file.filename;
+    const { fotoUrl } = req.body;
+    if (!fotoUrl) return res.status(400).json({ message: "Nenhuma foto enviada" });
     
     const p = await prisma.pastor.update({
       where: { id: Number(req.params.id) },
