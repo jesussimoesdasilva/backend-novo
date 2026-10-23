@@ -1,7 +1,21 @@
 const service = require("../services/chat.service");
 
 async function listContactos(req, res, next) {
-  try { res.json(await service.listContactos(req.params.igrejaId, req.query.meuId)); } catch (err) { next(err); }
+  try {
+    const { igrejaId } = req.params;
+    const { meuId, comNaoLidas } = req.query;
+    
+    const contactos = await service.listContactos(igrejaId, meuId);
+    
+    if (comNaoLidas === 'true') {
+      const contagem = await service.contarNaoLidasPorContacto(igrejaId, meuId);
+      contactos.forEach(c => {
+        c.naoLidas = contagem.find(x => x.deId === c.id)?.count || 0;
+      });
+    }
+    
+    res.json(contactos);
+  } catch (err) { next(err); }
 }
 
 async function listMensagens(req, res, next) {
