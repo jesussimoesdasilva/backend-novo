@@ -49,6 +49,7 @@ async function listContactos(igrejaId, meuId) {
     cargo: c.cargo
   }));
 }
+
 // Lista as mensagens entre dois utilizadores
 async function listMensagens(deId, paraId) {
   return await prisma.mensagem.findMany({
@@ -92,18 +93,45 @@ async function marcarLidas(deId, paraId) {
   });
 }
 
-// Conta quantas mensagens não lidas o utilizador tem
+// Conta quantas mensagens não lidas o utilizador tem (total)
+async function contarNaoLidas(igrejaId, meuId) {
+  return await prisma.mensagem.count({
+    where: {
+      igrejaId: Number(igrejaId),
+      paraId: Number(meuId),
+      lida: false
+    }
+  });
+}
+
+// Conta quantas mensagens não lidas há por cada contacto (para o pontinho vermelho)
 async function contarNaoLidasPorContacto(igrejaId, meuId) {
-  const mensagens = await prisma.mensagem.groupBy({
-    by: ['deId'],
+  const mensagens = await prisma.mensagem.findMany({
     where: {
       igrejaId: Number(igrejaId),
       paraId: Number(meuId),
       lida: false
     },
-    _count: { _all: true }
+    select: { deId: true }
   });
-  return mensagens.map(m => ({ deId: m.deId, count: m._count._all }));
+
+  // Conta manualmente quantas mensagens cada pessoa enviou
+  const contagem = {};
+  mensagens.forEach(m => {
+    contagem[m.deId] = (contagem[m.deId] || 0) + 1;
+  });
+
+  return Object.keys(contagem).map(deId => ({
+    deId: Number(deId),
+    count: contagem[deId]
+  }));
 }
 
-module.exports = { listContactos, listMensagens, createMensagem, marcarLidas, contarNaoLidas, contarNaoLidasPorContacto };
+module.exports = { 
+  listContactos, 
+  listMensagens, 
+  createMensagem, 
+  marcarLidas, 
+  contarNaoLidas,
+  contarNaoLidasPorContacto 
+};
