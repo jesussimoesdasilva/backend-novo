@@ -94,6 +94,33 @@ th{color:var(--gold);font-size:12px;text-transform:uppercase}
 }
 .print-header { display: none; }
 </style>
+/* =========================================
+   AJUSTES PARA TELEMÓVEL (PAINEL DO PASTOR)
+   ========================================= */
+@media (max-width: 900px) {
+  .painel { flex-direction: column; }
+  .sidebar { 
+    width: 100%; 
+    height: auto; 
+    position: relative; 
+    border-right: none; 
+    border-bottom: 1px solid var(--border); 
+    padding: 15px 0;
+  }
+  .brand { padding: 0 15px 15px; text-align: center; }
+  .brand-icon { margin: 0 auto 10px; }
+  .nav-section { padding: 0 10px; }
+  
+  .main { padding: 20px 15px; }
+  
+  .grid-2 { grid-template-columns: 1fr; gap: 10px; }
+  .grid-4 { grid-template-columns: 1fr 1fr; gap: 10px; }
+  
+  .card { padding: 15px; overflow-x: auto; }
+  
+  .btn { width: 100%; margin-bottom: 10px; }
+  input, select, textarea { font-size: 16px; }
+}
 </head>
 <body>
 
