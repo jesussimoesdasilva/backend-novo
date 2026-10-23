@@ -1212,6 +1212,9 @@ async function abrirConversa(id, nome, foto) {
   contactoAtual = { id, nome, foto };
   renderizarContactosChat();
   
+  // Marca as mensagens deste contacto como lidas (para o ponto vermelho desaparecer)
+  await marcarComoLidas(membroLogado.id, id);
+  
   document.getElementById('chatHeader').innerHTML = `
     ${foto ? `<img src="${foto}" class="chat-avatar" style="width:32px;height:32px">` : `<div class="chat-avatar" style="width:32px;height:32px;font-size:14px">${nome.charAt(0)}</div>`}
     <strong>${nome}</strong>
@@ -1225,6 +1228,17 @@ async function abrirConversa(id, nome, foto) {
   intervalChat = setInterval(carregarMensagensChat, 3000);
 }
 
+async function marcarComoLidas(deId, paraId) {
+  try {
+    await fetch('/api/chat/marcar-lidas', {
+      method: 'PUT',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ deId, paraId })
+    });
+    verificarMensagensNaoLidas(); // Atualiza o ponto vermelho
+  } catch (e) { console.error(e); }
+}
+
 async function carregarMensagensChat() {
   if (!contactoAtual) return;
   try {
@@ -1235,8 +1249,11 @@ async function carregarMensagensChat() {
     div.innerHTML = lista.map(m => {
       const enviada = m.deId === membroLogado.id;
       const hora = new Date(m.criadoEm).toLocaleTimeString('pt-PT', { hour: '2-digit', minute: '2-digit' });
+      const nomeRemetente = m.de ? m.de.nome : (enviada ? 'Eu' : 'Desconhecido');
+      
       return `
         <div class="chat-msg ${enviada ? 'enviada' : 'recebida'}">
+          ${!enviada ? `<span style="font-size:10px; font-weight:bold; color:#d7ad4b; display:block; margin-bottom:4px;">${nomeRemetente}</span>` : ''}
           ${m.texto}
           <span style="font-size:10px; opacity:0.6; display:block; text-align:right; margin-top:4px">${hora}</span>
         </div>
