@@ -29,19 +29,25 @@ async function publicRegister(req, res) {
 async function login(req, res) {
   try {
     const { email, senha } = req.body;
-    // AQUI ESTÁ A CORREÇÃO: Incluir lideraSetores e lideraDeptos
+    
     const membro = await prisma.membro.findUnique({ 
       where: { email },
       include: {
         departamento: true,
-        sectores: true,
-        lideraSetores: true, // <-- O Frontend precisa disto para a Galeria
-        lideraDeptos: true   // <-- O Frontend precisa disto
+        sectores: {
+          include: {
+            departamento: true // <-- A CORREÇÃO ESTÁ AQUI! Traz o departamento de cada sector
+          }
+        },
+        lideraSetores: true,
+        lideraDeptos: true
       }
     });
+    
     if (!membro) return res.status(404).json({ message: "Utilizador não encontrado" });
     const valid = await bcrypt.compare(senha, membro.password);
     if (!valid) return res.status(401).json({ message: "Senha incorreta" });
+    
     res.json({ membro });
   } catch (err) { res.status(500).json({ message: err.message }); }
 }

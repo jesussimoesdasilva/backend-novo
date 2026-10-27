@@ -2220,7 +2220,14 @@ function mostrarAreaMembro() {
   document.getElementById('infoEndereco').textContent = membroLogado.endereco || '-';
   document.getElementById('infoIgreja').textContent = membroLogado.igreja ? membroLogado.igreja.nome : '-';
 
-  document.getElementById('infoDepto').textContent = membroLogado.departamento ? membroLogado.departamento.nome : 'Ainda não alocado';
+  // --- A CORREÇÃO AQUI: Lógica para mostrar o departamento do sector se o departamento direto for nulo ---
+  let nomeDepto = 'Ainda não alocado';
+  if (membroLogado.departamento) {
+    nomeDepto = membroLogado.departamento.nome;
+  } else if (membroLogado.sectores && membroLogado.sectores.length > 0 && membroLogado.sectores[0].departamento) {
+    nomeDepto = membroLogado.sectores[0].departamento.nome;
+  }
+  document.getElementById('infoDepto').textContent = nomeDepto;
 
   let sectoresHtml = '';
   if (membroLogado.sectores && membroLogado.sectores.length > 0) {
