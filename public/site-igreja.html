@@ -430,19 +430,26 @@ footer strong{color:#f2d27c}
   }
 }
 
-/* Ajuste para a lista de sectores no telemóvel */
+/* ===== AJUSTE DEFINITIVO DO MODAL DE SECTORES ===== */
+.modal-premium {
+  max-height: 90vh; /* O modal nunca é maior que 90% do ecrã */
+  display: flex;
+  flex-direction: column;
+}
+
+.modal-premium .modal-header {
+  flex-shrink: 0; /* O cabeçalho com o X nunca desaparece */
+}
+
+.modal-premium .modal-body {
+  overflow-y: auto; /* O scroll acontece aqui, dentro do corpo do modal */
+  max-height: 100%; 
+}
+
+/* No telemóvel, deixamos o modal um pouco mais alto */
 @media (max-width: 768px) {
-  .sector-modal-list {
-    max-height: none !important; /* Remove a altura fixa */
-    overflow-y: visible !important; /* Remove o scroll interno */
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-  }
-  
-  .modal-premium .modal-body {
-    max-height: none !important;
-    overflow-y: auto; /* O scroll passa a ser do modal inteiro, não só da lista */
+  .modal-premium {
+    max-height: 95vh;
   }
 }
 
