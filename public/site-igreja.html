@@ -1262,6 +1262,27 @@ async function iniciarChat() {
   }
 }
 
+function renderizarContactosChat() {
+  const div = document.getElementById('chatSidebar');
+  if (!contactosChat.length) return div.innerHTML = '<p style="padding:15px;color:#64748b">Nenhum contacto disponível.</p>';
+  
+  div.innerHTML = contactosChat.map(c => {
+    const naoLidas = c.naoLidas || 0;
+    const badge = naoLidas > 0 ? `<span style="background:red; color:white; border-radius:50%; padding:2px 6px; font-size:10px; margin-left:auto;">${naoLidas}</span>` : '';
+    
+    return `
+      <div class="chat-contact ${contactoAtual && contactoAtual.id === c.id ? 'active' : ''}" onclick="abrirConversa(${c.id}, '${c.nome.replace(/'/g,"\\'")}', '${c.foto || ''}')" style="display:flex; align-items:center;">
+        ${c.foto ? `<img src="${c.foto}" class="chat-avatar">` : `<div class="chat-avatar">${c.nome.charAt(0)}</div>`}
+        <div style="flex:1">
+          <strong>${c.nome}</strong>
+          <p style="font-size:12px;color:#64748b">${c.cargo || 'Membro'}</p>
+        </div>
+        ${badge}
+      </div>
+    `;
+  }).join('');
+}
+
 async function abrirConversa(id, nome, foto) {
   contactoAtual = { id, nome, foto };
   renderizarContactosChat();
