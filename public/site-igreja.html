@@ -271,7 +271,54 @@ footer strong{color:#f2d27c}
 .chat-input-area { padding: 15px 20px; background: #fff; border-top: 1px solid #e2e8f0; display: flex; gap: 10px; }
 .chat-input-area input { flex: 1; padding: 12px; border: 1px solid #e2e8f0; border-radius: 20px; outline: none; }
 .chat-input-area button { background: var(--gold); color: var(--navy); border: none; border-radius: 20px; padding: 10px 20px; font-weight: bold; cursor: pointer; }
+/* === CHAT NO TELEMÓVEL === */
+@media (max-width: 768px) {
+  .chat-container {
+    flex-direction: column;
+    height: 600px; /* Altura fixa para o telemóvel */
+  }
+  .chat-sidebar {
+    width: 100%;
+    height: 100%;
+    border-right: none;
+    display: flex; /* Mostra a lista por defeito */
+    flex-direction: column;
+  }
+  .chat-main {
+    display: none; /* Esconde a conversa por defeito */
+    height: 100%;
+    width: 100%;
+  }
+  
+  /* Classes para alternar as telas via JavaScript */
+  .chat-container.mostrar-conversa .chat-sidebar {
+    display: none;
+  }
+  .chat-container.mostrar-conversa .chat-main {
+    display: flex;
+  }
 
+  .chat-header {
+    justify-content: flex-start;
+    gap: 15px;
+  }
+}
+
+.btn-voltar-chat {
+  display: none;
+  background: transparent;
+  border: none;
+  color: var(--gold);
+  font-size: 20px;
+  cursor: pointer;
+  padding: 5px 10px;
+  margin-right: 10px;
+}
+@media (max-width: 768px) {
+  .btn-voltar-chat {
+    display: block; /* Mostra o botão de voltar no telemóvel */
+  }
+}
 /* CHAT DE GRUPO */
 .grupo-container { display: flex; flex-direction: column; height: 400px; background: #f1f5f9; border-radius: 12px; overflow: hidden; }
 .grupo-mensagens { flex: 1; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
@@ -1169,13 +1216,14 @@ async function iniciarChat() {
 
   const div = document.getElementById('chatArea');
   div.innerHTML = `
-    <div class="chat-container">
+    <div class="chat-container" id="chatContainer">
       <div class="chat-sidebar" id="chatSidebar">
         <p style="padding:15px;text-align:center;color:#64748b">A carregar contactos...</p>
       </div>
       <div class="chat-main">
         <div class="chat-header" id="chatHeader">
-          <span>Selecione um contacto para começar</span>
+          <button class="btn-voltar-chat" onclick="voltarListaChat()">⬅</button>
+          <span id="chatHeaderNome">Selecione um contacto para começar</span>
         </div>
         <div class="chat-messages" id="chatMessages"></div>
         <div class="chat-input-area" id="chatInputArea" style="display:none">
@@ -1193,39 +1241,22 @@ async function iniciarChat() {
   } catch (e) { document.getElementById('chatSidebar').innerHTML = '<p style="padding:15px;color:#dc2626">Erro ao carregar contactos.</p>'; }
 }
 
-function renderizarContactosChat() {
-  const div = document.getElementById('chatSidebar');
-  if (!contactosChat.length) return div.innerHTML = '<p style="padding:15px;color:#64748b">Nenhum contacto disponível.</p>';
-  
-  div.innerHTML = contactosChat.map(c => {
-    // Se o backend devolver "naoLidas", mostramos o ponto
-    const naoLidas = c.naoLidas || 0;
-    const badge = naoLidas > 0 ? `<span style="background:red; color:white; border-radius:50%; padding:2px 6px; font-size:10px; margin-left:auto;">${naoLidas}</span>` : '';
-    
-    return `
-      <div class="chat-contact ${contactoAtual && contactoAtual.id === c.id ? 'active' : ''}" onclick="abrirConversa(${c.id}, '${c.nome.replace(/'/g,"\\'")}', '${c.foto || ''}')" style="display:flex; align-items:center;">
-        ${c.foto ? `<img src="${c.foto}" class="chat-avatar">` : `<div class="chat-avatar">${c.nome.charAt(0)}</div>`}
-        <div style="flex:1">
-          <strong>${c.nome}</strong>
-          <p style="font-size:12px;color:#64748b">${c.cargo || 'Membro'}</p>
-        </div>
-        ${badge}
-      </div>
-    `;
-  }).join('');
-}
-
 async function abrirConversa(id, nome, foto) {
   contactoAtual = { id, nome, foto };
   renderizarContactosChat();
   
-  // Marca as mensagens deste contacto como lidas (para o ponto vermelho desaparecer)
+  // Marca as mensagens deste contacto como lidas
   await marcarComoLidas(membroLogado.id, id);
   
-  document.getElementById('chatHeader').innerHTML = `
-    ${foto ? `<img src="${foto}" class="chat-avatar" style="width:32px;height:32px">` : `<div class="chat-avatar" style="width:32px;height:32px;font-size:14px">${nome.charAt(0)}</div>`}
+  // Adiciona a classe que esconde a lista e mostra a conversa no telemóvel
+  document.getElementById('chatContainer').classList.add('mostrar-conversa');
+  
+  // Atualiza o cabeçalho com o nome da pessoa
+  document.getElementById('chatHeaderNome').innerHTML = `
+    ${foto ? `<img src="${foto}" class="chat-avatar" style="width:30px;height:30px;display:inline-block;vertical-align:middle;margin-right:8px;">` : ''}
     <strong>${nome}</strong>
   `;
+  
   document.getElementById('chatInputArea').style.display = 'flex';
   document.getElementById('chatInput').focus();
 
@@ -1235,6 +1266,37 @@ async function abrirConversa(id, nome, foto) {
   intervalChat = setInterval(carregarMensagensChat, 3000);
 }
 
+function voltarListaChat() {
+  // Remove a classe que mostra a conversa
+  document.getElementById('chatContainer').classList.remove('mostrar-conversa');
+  
+  // Para o intervalo de atualização das mensagens
+  if (intervalChat) clearInterval(intervalChat);
+  
+  // Limpa a conversa atual
+  contactoAtual = null;
+  
+  // Reseta o cabeçalho
+  document.getElementById('chatHeaderNome').textContent = "Selecione um contacto para começar";
+  document.getElementById('chatMessages').innerHTML = "";
+  document.getElementById('chatInputArea').style.display = 'none';
+}
+
+function voltarListaChat() {
+  // Remove a classe que mostra a conversa
+  document.getElementById('chatContainer').classList.remove('mostrar-conversa');
+  
+  // Para o intervalo de atualização das mensagens
+  if (intervalChat) clearInterval(intervalChat);
+  
+  // Limpa a conversa atual
+  contactoAtual = null;
+  
+  // Reseta o cabeçalho
+  document.getElementById('chatHeaderNome').textContent = "Selecione um contacto para começar";
+  document.getElementById('chatMessages').innerHTML = "";
+  document.getElementById('chatInputArea').style.display = 'none';
+}
 async function marcarComoLidas(deId, paraId) {
   try {
     await fetch('/api/chat/marcar-lidas', {
