@@ -1282,21 +1282,6 @@ function voltarListaChat() {
   document.getElementById('chatInputArea').style.display = 'none';
 }
 
-function voltarListaChat() {
-  // Remove a classe que mostra a conversa
-  document.getElementById('chatContainer').classList.remove('mostrar-conversa');
-  
-  // Para o intervalo de atualização das mensagens
-  if (intervalChat) clearInterval(intervalChat);
-  
-  // Limpa a conversa atual
-  contactoAtual = null;
-  
-  // Reseta o cabeçalho
-  document.getElementById('chatHeaderNome').textContent = "Selecione um contacto para começar";
-  document.getElementById('chatMessages').innerHTML = "";
-  document.getElementById('chatInputArea').style.display = 'none';
-}
 async function marcarComoLidas(deId, paraId) {
   try {
     await fetch('/api/chat/marcar-lidas', {
