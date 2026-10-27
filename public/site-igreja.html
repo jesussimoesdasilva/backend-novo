@@ -392,6 +392,43 @@ footer strong{color:#f2d27c}
   .menu-links.show { display: flex; }
   .menu-links button { width: 100%; border-bottom: 1px solid rgba(255,255,255,0.1); padding: 12px; text-align: left; }
 }
+/* Ajustes para o Telemóvel */
+@media (max-width: 768px) {
+  #areaMembro {
+    padding: 0 15px; /* Adiciona margem nas laterais */
+  }
+  
+  .member-header {
+    flex-direction: column;
+    text-align: center;
+    padding: 20px;
+    margin-bottom: 20px;
+  }
+  
+  .member-header .btn {
+    margin-left: 0 !important;
+    margin-top: 15px;
+    width: 100%;
+  }
+  
+  .member-grid {
+    grid-template-columns: 1fr;
+    gap: 15px;
+  }
+  
+  .member-card {
+    padding: 20px;
+  }
+  
+  .member-card p {
+    font-size: 14px;
+    word-break: break-word; /* Evita que o texto passe das bordas */
+  }
+  
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+}
 </style>
 </head>
 <body>
