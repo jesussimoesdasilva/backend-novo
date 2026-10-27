@@ -1207,7 +1207,6 @@ function navegarLightbox(dir) {
 let contactosChat = [];
 let contactoAtual = null;
 let intervalChat = null;
-
 async function iniciarChat() {
   if (!membroLogado) {
     document.getElementById('chatArea').innerHTML = '<p style="text-align:center;color:#64748b">Faça login para conversar com a liderança.</p>';
@@ -1236,9 +1235,31 @@ async function iniciarChat() {
 
   try {
     const r = await fetch('/api/chat/contactos/' + igrejaIdAtual + '?meuId=' + membroLogado.id + '&comNaoLidas=true');
-    contactosChat = await r.json();
+    
+    // Verifica se o servidor respondeu bem
+    if (!r.ok) {
+      throw new Error('O servidor respondeu com status ' + r.status);
+    }
+
+    const dados = await r.json();
+    
+    // Verifica se o que veio é uma lista
+    if (!Array.isArray(dados)) {
+      throw new Error('O servidor não devolveu uma lista de contactos.');
+    }
+
+    contactosChat = dados;
     renderizarContactosChat();
-  } catch (e) { document.getElementById('chatSidebar').innerHTML = '<p style="padding:15px;color:#dc2626">Erro ao carregar contactos.</p>'; }
+    
+  } catch (e) { 
+    // Mostra o erro real na tela
+    document.getElementById('chatSidebar').innerHTML = `
+      <div style="padding:15px;color:#dc2626;text-align:center;">
+        <strong>Erro ao carregar contactos.</strong><br>
+        <small style="font-size:11px;">Motivo: ${e.message}</small>
+      </div>
+    `; 
+  }
 }
 
 async function abrirConversa(id, nome, foto) {
