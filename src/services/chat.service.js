@@ -1,8 +1,6 @@
 const prisma = require("../config/prisma");
 
-// Lista todos os membros da igreja para o utilizador escolher com quem falar
 async function listContactos(igrejaId, meuId) {
-  // 1. Vai buscar todos os membros da igreja (exceto eu)
   const membros = await prisma.membro.findMany({
     where: { 
       igrejaId: Number(igrejaId),
@@ -11,7 +9,6 @@ async function listContactos(igrejaId, meuId) {
     select: { id: true, nome: true, foto: true, cargo: true }
   });
 
-  // 2. Vai buscar a data da última mensagem de cada membro comigo
   const ultimasMensagens = await prisma.mensagem.groupBy({
     by: ['deId'],
     where: {
@@ -24,7 +21,6 @@ async function listContactos(igrejaId, meuId) {
     _max: { criadoEm: true }
   });
 
-  // 3. Junta as duas listas
   const contactosComData = membros.map(m => {
     const ultima = ultimasMensagens.find(u => u.deId === m.id);
     return {
@@ -33,7 +29,6 @@ async function listContactos(igrejaId, meuId) {
     };
   });
 
-  // 4. Ordena: quem tem mensagem mais recente fica no topo. Quem não tem, fica no fim.
   contactosComData.sort((a, b) => {
     if (!a.ultimaMensagem && !b.ultimaMensagem) return 0;
     if (!a.ultimaMensagem) return 1;
@@ -41,7 +36,6 @@ async function listContactos(igrejaId, meuId) {
     return new Date(b.ultimaMensagem) - new Date(a.ultimaMensagem);
   });
 
-  // 5. Devolve apenas os dados que o frontend precisa
   return contactosComData.map(c => ({
     id: c.id,
     nome: c.nome,
@@ -50,7 +44,6 @@ async function listContactos(igrejaId, meuId) {
   }));
 }
 
-// Lista as mensagens entre dois utilizadores
 async function listMensagens(deId, paraId) {
   return await prisma.mensagem.findMany({
     where: {
@@ -66,7 +59,6 @@ async function listMensagens(deId, paraId) {
   });
 }
 
-// Envia uma mensagem
 async function createMensagem(igrejaId, deId, paraId, texto) {
   return await prisma.mensagem.create({
     data: {
@@ -81,7 +73,6 @@ async function createMensagem(igrejaId, deId, paraId, texto) {
   });
 }
 
-// Marca as mensagens como lidas (quando o destinatário abre a conversa)
 async function marcarLidas(deId, paraId) {
   return await prisma.mensagem.updateMany({
     where: {
@@ -93,7 +84,6 @@ async function marcarLidas(deId, paraId) {
   });
 }
 
-// Conta quantas mensagens não lidas o utilizador tem (total)
 async function contarNaoLidas(igrejaId, meuId) {
   return await prisma.mensagem.count({
     where: {
@@ -104,7 +94,6 @@ async function contarNaoLidas(igrejaId, meuId) {
   });
 }
 
-// Conta quantas mensagens não lidas há por cada contacto (para o pontinho vermelho)
 async function contarNaoLidasPorContacto(igrejaId, meuId) {
   const mensagens = await prisma.mensagem.findMany({
     where: {
@@ -115,7 +104,6 @@ async function contarNaoLidasPorContacto(igrejaId, meuId) {
     select: { deId: true }
   });
 
-  // Conta manualmente quantas mensagens cada pessoa enviou
   const contagem = {};
   mensagens.forEach(m => {
     contagem[m.deId] = (contagem[m.deId] || 0) + 1;
