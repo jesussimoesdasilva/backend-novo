@@ -256,21 +256,42 @@ function abrirModalRecuperarAdmin() {
 function fecharModalAdmin() {
   document.getElementById('modalRecuperarAdmin').style.display = 'none';
 }
-function recuperarSenhaAdmin() {
+async function recuperarSenhaAdmin() {
   const email = document.getElementById('recEmailAdmin').value;
   const tel = document.getElementById('recTelefoneAdmin').value;
   const bi = document.getElementById('recBiAdmin').value;
   const erro = document.getElementById('recuperarAdminError');
+  const btn = event.target;
 
-  if (email && tel && bi) {
-    alert('✅ Código de recuperação enviado (Simulação).');
-    fecharModalAdmin();
-  } else {
+  if (!email || !tel || !bi) {
     erro.textContent = '❌ Preencha todos os campos.';
     erro.style.display = 'block';
+    return;
+  }
+
+  btn.innerHTML = '⏳ A enviar...';
+  btn.disabled = true;
+  erro.style.display = 'none';
+
+  try {
+    const r = await fetch('/api/igrejas/admin/recuperar', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ email, telefone: tel, bi })
+    });
+    const d = await r.json();
+    if (!r.ok) throw new Error(d.message);
+
+    alert(`✅ Código gerado (Simulação): ${d.codigo}\n\nO código deveria ser enviado por SMS.`);
+    fecharModalAdmin();
+  } catch (e) {
+    erro.textContent = '❌ ' + e.message;
+    erro.style.display = 'block';
+  } finally {
+    btn.innerHTML = '📩 Enviar Código';
+    btn.disabled = false;
   }
 }
-
 // --- RESTO DO PAINEL ---
 function mudarAba(aba, btn) {
   document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));

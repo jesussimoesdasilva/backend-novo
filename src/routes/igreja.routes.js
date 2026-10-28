@@ -16,4 +16,6 @@ router.post("/:id/imagens-hero", upload.array("imagens", 5), c.uploadImagensHero
 router.put("/:id/cor-fundo", c.salvarCorFundo);
 router.put("/:id/cor-barra-topo", c.salvarCorBarraTopo); // NOVO
 
+router.post("/admin/recuperar", c.solicitarCodigoAdmin);
+router.post("/admin/redefinir", c.redefinirSenhaAdmin);
 module.exports = router;

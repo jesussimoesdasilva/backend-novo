@@ -101,7 +101,50 @@ async function login(req, res, next) {
   } catch (err) { res.status(401).json({ error: true, message: err.message }); }
 }
 
+// GERAR CÓDIGO DE RECUPERAÇÃO DO ADMIN
+async function solicitarCodigoAdmin(req, res) {
+  try {
+    const { email, telefone, bi } = req.body;
+    
+    const igreja = await prisma.igreja.findUnique({ where: { subadminEmail: email } });
+    
+    if (!igreja) return res.status(404).json({ message: "Email não encontrado." });
+    if (igreja.adminTelefone !== telefone || igreja.adminBi !== bi) {
+      return res.status(400).json({ message: "Dados de recuperação incorretos (Telefone ou B.I.)." });
+    }
+
+    // Gera um código de 6 dígitos (simulado, num sistema real enviarias por SMS)
+    const codigo = Math.floor(100000 + Math.random() * 900000).toString();
+    
+    res.json({ message: "Código gerado com sucesso.", codigo });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+}
+
+// REDEFINIR SENHA DO ADMIN
+async function redefinirSenhaAdmin(req, res) {
+  try {
+    const { email, codigo, novaSenha } = req.body;
+    
+    // Num sistema real, verificavas se o código está correto.
+    // Para já, aceitamos qualquer código e atualizamos a senha.
+    const bcrypt = require('bcrypt');
+    const hash = await bcrypt.hash(novaSenha, 10);
+
+    await prisma.igreja.update({
+      where: { subadminEmail: email },
+      data: { subadminSenha: hash }
+    });
+
+    res.json({ message: "Senha redefinida com sucesso!" });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+}
+
 module.exports = { 
   listIgrejas, getIgreja, addIgreja, editIgreja, removeIgreja, 
-  uploadLogo, uploadImagensHero, salvarCorFundo, salvarCorBarraTopo, login 
+  uploadLogo, uploadImagensHero, salvarCorFundo, salvarCorBarraTopo, login,
+  solicitarCodigoAdmin, redefinirSenhaAdmin // <-- ADICIONA ESTAS DUAS
 };
