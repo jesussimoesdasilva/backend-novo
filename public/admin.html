@@ -77,7 +77,57 @@ tr:hover td{background:rgba(255,255,255,0.02)}
 </style>
 </head>
 <body>
-<aside class="sidebar">
+
+<!-- ECRÃ DE LOGIN -->
+<div id="loginAdminScreen" style="position:fixed; inset:0; background:var(--navy); display:flex; align-items:center; justify-content:center; z-index:9999;">
+  <div style="background:var(--navy2); padding:40px; border-radius:16px; border:1px solid var(--gold); width:100%; max-width:420px; text-align:center;">
+    <div class="brand-icon" style="margin:0 auto 20px; width:60px; height:60px; font-size:30px; line-height:60px;">⛪</div>
+    <h2 style="color:var(--gold); margin-bottom:5px;">Acesso Restrito</h2>
+    <p style="color:var(--muted); margin-bottom:25px; font-size:14px;">Painel Master</p>
+
+    <div id="loginAdminError" style="color:var(--red); margin-bottom:15px; display:none; font-size:13px;"></div>
+
+    <form onsubmit="fazerLoginAdmin(event)">
+      <div class="field" style="text-align:left;">
+        <label>Email</label>
+        <input type="email" id="adminEmail" placeholder="ex: admin@master.com" required>
+      </div>
+      <div class="field" style="text-align:left;">
+        <label>Senha</label>
+        <input type="password" id="adminSenha" placeholder="Sua senha" required>
+      </div>
+      <button type="submit" class="btn btn-primary" style="width:100%; margin-top:10px;">🔐 Entrar</button>
+    </form>
+
+    <a href="#" onclick="abrirModalRecuperarAdmin()" style="display:block; margin-top:20px; color:var(--muted); font-size:13px; text-decoration:underline;">Esqueci-me da senha</a>
+  </div>
+</div>
+
+<!-- ECRÃ DE RECUPERAÇÃO DE SENHA -->
+<div id="modalRecuperarAdmin" style="position:fixed; inset:0; background:rgba(0,0,0,0.85); display:none; align-items:center; justify-content:center; z-index:10000;">
+  <div style="background:var(--navy2); padding:40px; border-radius:16px; border:1px solid var(--gold); width:100%; max-width:420px; text-align:center;">
+    <h2 style="color:var(--gold); margin-bottom:15px;">Recuperar Senha</h2>
+    <p style="color:var(--muted); margin-bottom:20px; font-size:13px;">Insira os dados registados nas Configurações.</p>
+    <div id="recuperarAdminError" style="color:var(--red); margin-bottom:15px; display:none; font-size:13px;"></div>
+    <div class="field" style="text-align:left;">
+      <label>Email</label>
+      <input type="email" id="recEmailAdmin" placeholder="admin@master.com">
+    </div>
+    <div class="field" style="text-align:left;">
+      <label>Telefone</label>
+      <input type="text" id="recTelefoneAdmin" placeholder="Ex: 923...">
+    </div>
+    <div class="field" style="text-align:left;">
+      <label>B.I.</label>
+      <input type="text" id="recBiAdmin" placeholder="Ex: 004...">
+    </div>
+    <button class="btn btn-primary" onclick="recuperarSenhaAdmin()" style="width:100%; margin-top:10px;">📩 Enviar Código</button>
+    <button class="btn btn-outline" onclick="fecharModalAdmin()" style="width:100%; margin-top:10px;">Cancelar</button>
+  </div>
+</div>
+
+<!-- O RESTO DO PAINEL -->
+<aside class="sidebar" id="sidebarAdmin" style="display:none;">
   <div class="brand">
     <div class="brand-icon">⛪</div>
     <div class="brand-text"><h1>Admin Master</h1><p>Sistema de Igrejas</p></div>
@@ -95,10 +145,11 @@ tr:hover td{background:rgba(255,255,255,0.02)}
   </div>
   <div class="sidebar-footer">
     <div class="user-info"><div class="avatar" id="sidebarAvatar">A</div><div class="user-details"><h4>Admin Master</h4><p>admin@master.com</p></div></div>
-    <button class="btn-logout" onclick="window.location.href='/'">Sair do Sistema</button>
+    <button class="btn-logout" onclick="sairAdmin()">Sair do Sistema</button>
   </div>
 </aside>
-<main class="main">
+
+<main class="main" id="mainAdmin" style="display:none;">
   <div class="topbar"><div><h2 id="pageTitle">Igrejas</h2><p id="pageSub">Gestão de todas as igrejas no sistema</p></div><div class="top-avatar">A</div></div>
   <div class="grid-stats">
     <div class="stat-card"><div class="stat-icon">🏛️</div><div class="stat-value" id="statIgrejas">0</div><div class="stat-label">Igrejas</div></div>
@@ -154,6 +205,8 @@ tr:hover td{background:rgba(255,255,255,0.02)}
       <div id="msgAlertaConfig" style="display:none; padding:15px; border-radius:8px; margin-bottom:20px; font-size:14px;"></div>
       <div class="field" style="margin-bottom:20px;"><label>Nome do Administrador</label><input type="text" id="cfgNome" value="Admin Master"></div>
       <div class="field" style="margin-bottom:20px;"><label>Email de Acesso</label><input type="email" id="cfgEmail" value="admin@master.com"></div>
+      <div class="field" style="margin-bottom:20px;"><label>Telefone</label><input type="text" id="cfgTelefone" placeholder="Ex: 923..."></div>
+      <div class="field" style="margin-bottom:20px;"><label>B.I.</label><input type="text" id="cfgBi" placeholder="Ex: 004..."></div>
       <div class="field" style="margin-bottom:20px;"><label>Nova Palavra-passe</label><input type="password" id="cfgSenha" placeholder="Deixe em branco para não alterar"></div>
       <button class="btn btn-primary" style="width:auto;" onclick="salvarConfiguracoes()">💾 Guardar Alterações</button>
     </div>
@@ -170,6 +223,55 @@ function toast(msg, type='success') {
   document.getElementById('toasts').appendChild(el);
   setTimeout(() => el.remove(), 4000);
 }
+
+// --- LOGIN ---
+function fazerLoginAdmin(e) {
+  e.preventDefault();
+  const email = document.getElementById('adminEmail').value;
+  const senha = document.getElementById('adminSenha').value;
+  const erro = document.getElementById('loginAdminError');
+
+  // SIMULAÇÃO (Depois ligar ao backend)
+  if (email === 'admin@master.com' && senha === '123456') {
+    document.getElementById('loginAdminScreen').style.display = 'none';
+    document.getElementById('sidebarAdmin').style.display = 'flex';
+    document.getElementById('mainAdmin').style.display = 'block';
+    carregarStatsTopo();
+    carregarIgrejas();
+  } else {
+    erro.textContent = '❌ Email ou senha incorretos.';
+    erro.style.display = 'block';
+  }
+}
+
+function sairAdmin() {
+  document.getElementById('loginAdminScreen').style.display = 'flex';
+  document.getElementById('sidebarAdmin').style.display = 'none';
+  document.getElementById('mainAdmin').style.display = 'none';
+}
+
+function abrirModalRecuperarAdmin() {
+  document.getElementById('modalRecuperarAdmin').style.display = 'flex';
+}
+function fecharModalAdmin() {
+  document.getElementById('modalRecuperarAdmin').style.display = 'none';
+}
+function recuperarSenhaAdmin() {
+  const email = document.getElementById('recEmailAdmin').value;
+  const tel = document.getElementById('recTelefoneAdmin').value;
+  const bi = document.getElementById('recBiAdmin').value;
+  const erro = document.getElementById('recuperarAdminError');
+
+  if (email && tel && bi) {
+    alert('✅ Código de recuperação enviado (Simulação).');
+    fecharModalAdmin();
+  } else {
+    erro.textContent = '❌ Preencha todos os campos.';
+    erro.style.display = 'block';
+  }
+}
+
+// --- RESTO DO PAINEL ---
 function mudarAba(aba, btn) {
   document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
   if(btn) btn.classList.add('active');
@@ -422,8 +524,6 @@ function salvarConfiguracoes() {
   alerta.innerHTML = `✅ Perfil do Administrador <strong>${nome}</strong> atualizado com sucesso (Simulado)!`;
   setTimeout(() => alerta.style.display = 'none', 4000);
 }
-carregarStatsTopo();
-carregarIgrejas();
 </script>
 </body>
 </html>
