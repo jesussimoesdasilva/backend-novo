@@ -1873,10 +1873,20 @@ async function uploadLogo() {
 async function uploadHeroImagens() {
   const input = document.getElementById('heroImagens');
   if (!input.files || input.files.length === 0) return toast('Selecione pelo menos 1 imagem', 'error');
-  if (input.files.length > 5) return toast('Máximo de 5 imagens', 'error');
   
   try {
-    const urls = [];
+    // 1. Vai buscar as imagens que já existem no servidor
+    const r = await fetch(API + '/igrejas/' + igrejaAtual.id);
+    const ig = await r.json();
+    let imagensExistentes = JSON.parse(ig.imagensHero || '[]');
+    
+    // 2. Verifica se o total de imagens (existentes + novas) não passa de 5
+    if (imagensExistentes.length + input.files.length > 5) {
+      return toast('Máximo de 5 imagens no total. Apague algumas primeiro.', 'error');
+    }
+
+    // 3. Faz upload das novas imagens para o Cloudinary
+    const novasUrls = [];
     for (let i = 0; i < input.files.length; i++) {
       const formData = new FormData();
       formData.append("file", input.files[i]);
@@ -1886,16 +1896,20 @@ async function uploadHeroImagens() {
         method: "POST", body: formData
       });
       const data = await response.json();
-      if (data.secure_url) urls.push(data.secure_url);
+      if (data.secure_url) novasUrls.push(data.secure_url);
     }
     
+    // 4. Junta as existentes com as novas e guarda tudo
+    const todasAsImagens = imagensExistentes.concat(novasUrls);
+
     await fetch(API + '/igrejas/' + igrejaAtual.id, {
       method: 'PUT', headers: {'Content-Type':'application/json'},
-      body: JSON.stringify({ ...igrejaAtual, imagensHero: JSON.stringify(urls) })
+      body: JSON.stringify({ ...ig, imagensHero: JSON.stringify(todasAsImagens) })
     });
     
-    toast('Imagens enviadas com sucesso!', 'success');
-    setTimeout(() => location.reload(), 1500);
+    toast('Imagens adicionadas com sucesso!', 'success');
+    input.value = ''; // Limpa o input
+    carregarPreviewHero(); // Atualiza o preview sem recarregar a página
   } catch (e) { toast(e.message, 'error'); }
 }
 
