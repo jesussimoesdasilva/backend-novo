@@ -27,7 +27,10 @@ model Igreja {
   ativo           Boolean  @default(true)
   subadminEmail   String   @unique
   subadminSenha   String
-  
+  adminTelefone   String?
+  adminBi         String?
+
+
   // NOVOS CAMPOS DA LIVE
   liveAtiva       Boolean  @default(false)
   liveUrl         String?
