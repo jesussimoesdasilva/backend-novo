@@ -1,4 +1,5 @@
 const igrejaService = require("../services/igreja.service");
+const prisma = require("../config/prisma"); // <-- ADICIONA AQUI
 
 async function listIgrejas(req, res, next) {
   try { res.json(await igrejaService.getAllIgrejas()); } catch (err) { next(err); }
