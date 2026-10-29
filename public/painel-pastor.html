@@ -615,10 +615,18 @@ async function gerarRelatorioPastor(tipo) {
       return;
     }
 
+    // AQUI ESTÁ A MUDANÇA: O botão muda dependendo do tipo
+    let botaoHtml = '';
+    if (tipo === 'membros') {
+      botaoHtml = `<button class="btn btn-primary no-print" style="margin-top:30px; width:100%;" onclick="window.open('/api/ofertas/pdf/membros/${igrejaAtual.igrejaId}', '_blank')">🖨️ Descarregar PDF Oficial</button>`;
+    } else {
+      botaoHtml = `<button class="btn btn-primary no-print" style="margin-top:30px; width:100%;" onclick="window.print()">🖨️ Imprimir / Exportar PDF</button>`;
+    }
+
     conteudo.innerHTML = `
       <div style="background: #ffffff; color: #000000; padding: 40px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); margin-top: 20px;">
         ${html}
-        <button class="btn btn-primary no-print" style="margin-top:30px; width:100%;" onclick="window.print()">🖨️ Imprimir / Exportar PDF</button>
+        ${botaoHtml}
       </div>
     `;
     area.scrollIntoView({ behavior: 'smooth' });

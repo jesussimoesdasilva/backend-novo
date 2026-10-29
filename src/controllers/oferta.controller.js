@@ -130,4 +130,71 @@ async function zerarFinancas(req, res) {
     res.status(500).json({ message: err.message });
   }
 }
-module.exports = { list, create, consultar, preValidar, validar, negar, estatisticas, relatorioDizimistas, gerarComprovativoPDF, zerarFinancas };
+
+async function gerarPDFMembros(req, res) {
+  try {
+    const igrejaId = Number(req.params.igrejaId);
+    const igreja = await prisma.igreja.findUnique({ where: { id: igrejaId } });
+    const membros = await prisma.membro.findMany({ where: { igrejaId }, orderBy: { nome: 'asc' } });
+
+    const PDFDocument = require('pdfkit');
+    const doc = new PDFDocument({ margin: 40, size: 'A4' });
+
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', `attachment; filename="relatorio-membros-${igreja.slug}.pdf"`);
+
+    doc.pipe(res);
+
+    // 1. Cabeçalho
+    doc.fontSize(20).fillColor('#020617').text(igreja.nome, { align: 'center' });
+    doc.fontSize(12).fillColor('#64748b').text('Relatório Oficial de Membros', { align: 'center' });
+    doc.moveDown(1);
+    
+    doc.moveTo(40, doc.y).lineTo(555, doc.y).strokeColor('#facc15').lineWidth(2).stroke();
+    doc.moveDown(1);
+
+    // 2. Data e Hora
+    doc.fontSize(10).fillColor('#94a3b8').text(`Emitido em: ${new Date().toLocaleString('pt-PT')}`, { align: 'right' });
+    doc.moveDown(1);
+
+    // 3. Tabela
+    const tableTop = doc.y;
+    
+    // Cabeçalho da Tabela
+    doc.rect(40, tableTop, 515, 20).fill('#020617');
+    doc.fillColor('#ffffff').fontSize(10).text('Nome', 45, tableTop + 5);
+    doc.text('Email', 250, tableTop + 5);
+    doc.text('Telefone', 400, tableTop + 5);
+    doc.text('Cargo', 505, tableTop + 5);
+
+    let y = tableTop + 25;
+    doc.fillColor('#000000');
+
+    membros.forEach((m, i) => {
+      // Fundo alternado para melhor leitura
+      if (i % 2 === 0) {
+        doc.rect(40, y - 3, 515, 20).fill('#f8fafc');
+        doc.fillColor('#000000');
+      }
+      
+      doc.fontSize(9).text(m.nome, 45, y, { width: 200 });
+      doc.text(m.email || '-', 250, y, { width: 140 });
+      doc.text(m.telefone || '-', 400, y, { width: 90 });
+      doc.text(m.cargo || 'Membro', 505, y, { width: 50 });
+      
+      y += 22;
+
+      // Se a página encher, cria uma nova
+      if (y > 750) {
+        doc.addPage();
+        y = 40;
+      }
+    });
+
+    doc.end();
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+}
+
+module.exports = { list, create, consultar, preValidar, validar, negar, estatisticas, relatorioDizimistas, gerarComprovativoPDF, gerarPDFMembros, zerarFinancas };
