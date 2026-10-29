@@ -365,9 +365,80 @@ async function gerarPDFFinanceiro(req, res) {
     res.status(500).json({ message: err.message });
   }
 }
+async function gerarPDFFiltrado(req, res) {
+  try {
+    const igrejaId = Number(req.params.igrejaId);
+    const filtro = req.params.filtro; // 'dizimos', 'ofertas', 'saidas' ou 'saldo'
 
+    const igreja = await prisma.igreja.findUnique({ where: { id: igrejaId } });
+    let transacoes = await prisma.oferta.findMany({
+      where: { igrejaId, status: 'VALIDADO' },
+      orderBy: { criadoEm: 'desc' }
+    });
+
+    let titulo = 'Extrato Financeiro Oficial';
+    if (filtro === 'dizimos') {
+      transacoes = transacoes.filter(t => t.finalidade === 'Dízimo');
+      titulo = 'Relatório de Dízimos';
+    } else if (filtro === 'ofertas') {
+      transacoes = transacoes.filter(t => t.finalidade !== 'Dízimo' && t.finalidade !== 'SAIDA');
+      titulo = 'Relatório de Ofertas';
+    } else if (filtro === 'saidas') {
+      transacoes = transacoes.filter(t => t.finalidade === 'SAIDA');
+      titulo = 'Relatório de Saídas';
+    }
+
+    const doc = new PDFDocument({ margin: 40, size: 'A4' });
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', `attachment; filename="${filtro}-${igreja.slug}.pdf"`);
+    doc.pipe(res);
+
+    await desenharLogotipo(doc, igreja);
+
+    doc.fontSize(20).fillColor('#020617').text(igreja.nome, { align: 'center' });
+    doc.fontSize(12).fillColor('#64748b').text(titulo, { align: 'center' });
+    doc.moveDown(1);
+    doc.moveTo(40, doc.y).lineTo(555, doc.y).strokeColor('#facc15').lineWidth(2).stroke();
+    doc.moveDown(1);
+    doc.fontSize(10).fillColor('#94a3b8').text(`Emitido em: ${new Date().toLocaleString('pt-PT')}`, { align: 'right' });
+    doc.moveDown(1);
+
+    const tableTop = doc.y;
+    doc.rect(40, tableTop, 515, 20).fill('#020617');
+    doc.fillColor('#ffffff').fontSize(10).text('Data', 45, tableTop + 5);
+    doc.text('Descrição / Doador', 150, tableTop + 5);
+    doc.text('Finalidade', 350, tableTop + 5);
+    doc.text('Valor (Kz)', 480, tableTop + 5);
+
+    let y = tableTop + 25;
+    doc.fillColor('#000000');
+
+    if (transacoes.length === 0) {
+      doc.fontSize(9).text('Nenhuma transação registada para este filtro.', 45, y);
+    } else {
+      transacoes.forEach((t, i) => {
+        if (i % 2 === 0) { doc.rect(40, y - 3, 515, 20).fill('#f8fafc'); doc.fillColor('#000000'); }
+        const data = new Date(t.criadoEm).toLocaleDateString('pt-PT');
+        const desc = t.membro ? t.membro.nome : (t.nomeDoador || 'Anónimo');
+        const isSaida = t.finalidade === 'SAIDA';
+
+        doc.fontSize(9).text(data, 45, y, { width: 100 });
+        doc.text(desc, 150, y, { width: 190 });
+        doc.text(t.finalidade, 350, y, { width: 120 });
+        doc.fillColor(isSaida ? '#dc2626' : '#059669').text(`${isSaida ? '-' : '+'} ${t.valor.toLocaleString('pt-AO')}`, 480, y, { width: 80, align: 'right' });
+        doc.fillColor('#000000');
+        y += 22;
+        if (y > 750) { doc.addPage(); y = 40; }
+      });
+    }
+
+    doc.end();
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+}
 module.exports = { 
   list, create, consultar, preValidar, validar, negar, estatisticas, 
   relatorioDizimistas, gerarComprovativoPDF, zerarFinancas, 
-  gerarPDFMembros, gerarPDFDepartamentos, gerarPDFSectores, gerarPDFFinanceiro 
+  gerarPDFMembros, gerarPDFDepartamentos, gerarPDFSectores, gerarPDFFinanceiro, gerarPDFFiltrado 
 };
