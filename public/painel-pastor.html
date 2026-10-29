@@ -543,7 +543,7 @@ async function gerarRelatorioPastor(tipo) {
   conteudo.innerHTML = '<div class="empty">A carregar dados...</div>';
 
   try {
-    const igrejaId = igrejaAtual.igrejaId;
+    const igrejaId = igrejaAtual.id;
     let html = '';
 
     if (tipo === 'membros') {
