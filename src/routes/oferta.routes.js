@@ -8,6 +8,7 @@ router.get("/relatorio-dizimistas/:igrejaId", c.relatorioDizimistas);
 
 router.post("/igreja/:igrejaId", c.create);
 router.get("/consultar/:igrejaId/:codigo", c.consultar);
+router.get("/comprovativo/:igrejaId/:codigo", c.gerarComprovativoPDF); // <-- NOVA ROTA
 
 router.put("/:id/pre-validar", c.preValidar);
 router.put("/:id/validar", c.validar);

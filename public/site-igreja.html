@@ -1115,7 +1115,8 @@ function abrirModalComprovativo(codigo, valor, finalidade) {
 }
 
 function gerarPDFComprovativo() {
-  alert(`A gerar PDF Oficial...\n\nCódigo: ${dadosComprovativo.codigo}\nValor: ${dadosComprovativo.valor} Kz\nFinalidade: ${dadosComprovativo.finalidade}\n\n(Em produção, o backend envia o ficheiro PDF formatado).`);
+  // Abre a nova aba com o link do backend que gera o PDF
+  window.open(`/api/ofertas/comprovativo/${igrejaIdAtual}/${dadosComprovativo.codigo}`, '_blank');
 }
 
 // ===== BÍBLIA =====
