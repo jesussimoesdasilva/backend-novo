@@ -3,7 +3,6 @@ const service = require("../services/oferta.service");
 const PDFDocument = require('pdfkit');
 const https = require('https');
 
-
 async function list(req, res, next) {
   try { res.json(await service.listOfertas(req.params.igrejaId)); } catch (err) { next(err); }
 }
@@ -140,10 +139,7 @@ async function gerarPDFMembros(req, res) {
     res.setHeader('Content-Disposition', `attachment; filename="relatorio-membros-${igreja.slug}.pdf"`);
     doc.pipe(res);
 
-    // --- LOGOTIPO SIMPLES (RETÂNGULO COM A INICIAL) ---
-    doc.rect(40, 40, 60, 60).fill('#020617'); // Retângulo preto
-    doc.fontSize(30).fillColor('#facc15').text(igreja.nome.charAt(0).toUpperCase(), 40, 52, { width: 60, align: 'center' }); // Letra dourada
-    // ------------------------------------------------
+    await desenharLogotipo(doc, igreja);
 
     doc.fontSize(20).fillColor('#020617').text(igreja.nome, { align: 'center' });
     doc.fontSize(12).fillColor('#64748b').text('Relatório Oficial de Membros', { align: 'center' });
@@ -285,6 +281,7 @@ async function gerarPDFSectores(req, res) {
   } catch (err) { res.status(500).json({ message: err.message }); }
 }
 
+// ===== EXTRATO FINANCEIRO =====
 async function gerarPDFFinanceiro(req, res) {
   try {
     const igrejaId = Number(req.params.igrejaId);
@@ -300,22 +297,8 @@ async function gerarPDFFinanceiro(req, res) {
     res.setHeader('Content-Disposition', `attachment; filename="extrato-financeiro-${igreja.slug}.pdf"`);
     doc.pipe(res);
 
-    // 1. LOGOTIPO
-    if (igreja.logoUrl) {
-      await new Promise((resolve) => {
-        https.get(igreja.logoUrl, (response) => {
-          const data = [];
-          response.on('data', (chunk) => data.push(chunk));
-          response.on('end', () => {
-            const buffer = Buffer.concat(data);
-            doc.image(buffer, 40, 40, { width: 60 });
-            resolve();
-          });
-        }).on('error', () => resolve());
-      });
-    }
+    await desenharLogotipo(doc, igreja);
 
-    // 2. CABEÇALHO
     doc.fontSize(20).fillColor('#020617').text(igreja.nome, { align: 'center' });
     doc.fontSize(12).fillColor('#64748b').text('Extrato Financeiro Oficial', { align: 'center' });
     doc.moveDown(1);
@@ -324,7 +307,6 @@ async function gerarPDFFinanceiro(req, res) {
     doc.fontSize(10).fillColor('#94a3b8').text(`Emitido em: ${new Date().toLocaleString('pt-PT')}`, { align: 'right' });
     doc.moveDown(1);
 
-    // 3. CARTÕES DE RESUMO
     const resumoY = doc.y;
     const boxWidth = 120;
     const boxHeight = 50;
@@ -346,10 +328,9 @@ async function gerarPDFFinanceiro(req, res) {
     doc.fillColor('#facc15').fontSize(8).text('SALDO REAL', 40 + (boxWidth + gap) * 3 + 5, resumoY + 8);
     doc.fillColor('#ffffff').fontSize(12).font('Helvetica-Bold').text(`${(stats.saldoReal || 0).toLocaleString('pt-AO')} Kz`, 40 + (boxWidth + gap) * 3 + 5, resumoY + 22);
 
-    doc.font('Helvetica'); // Reset da fonte
+    doc.font('Helvetica');
     doc.y = resumoY + boxHeight + 20;
 
-    // 4. TABELA
     const tableTop = doc.y;
     doc.rect(40, tableTop, 515, 20).fill('#020617');
     doc.fillColor('#ffffff').fontSize(10).text('Data', 45, tableTop + 5);
