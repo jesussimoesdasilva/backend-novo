@@ -134,10 +134,20 @@ async function remove(req, res) {
 
 async function updatePerfil(req, res) {
   try {
-    const { nome, telefone, endereco, bi } = req.body;
+    const { nome, telefone, endereco, bi, senha } = req.body;
+    
+    // Prepara os dados para atualizar
+    const dadosParaAtualizar = { nome, telefone, endereco, bi };
+
+    // Se veio uma nova senha, encripta-a antes de guardar
+    if (senha && senha.length >= 6) {
+      const hash = await bcrypt.hash(senha, 10);
+      dadosParaAtualizar.password = hash;
+    }
+
     const membro = await prisma.membro.update({
       where: { id: Number(req.params.id) },
-      data: { nome, telefone, endereco, bi }
+      data: dadosParaAtualizar
     });
     res.json(membro);
   } catch (err) { res.status(500).json({ message: err.message }); }

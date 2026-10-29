@@ -775,6 +775,13 @@ footer strong{color:#f2d27c}
           <div class="input-group"><label>Telefone *</label><input type="tel" id="epTelefone" required></div>
           <div class="input-group"><label>Nº do BI</label><input type="text" id="epBi"></div>
           <div class="input-group full"><label>Endereço</label><input type="text" id="epEndereco"></div>
+          
+          <!-- CAMPO DE SENHA AQUI -->
+          <div class="input-group full">
+            <label>Nova Senha (deixe em branco para manter a atual)</label>
+            <input type="password" id="epSenha" minlength="6" placeholder="Nova palavra-passe">
+          </div>
+
         </div>
         <button type="submit" class="btn-submit" id="btnSalvarPerfil">💾 Guardar Alterações</button>
       </form>
@@ -2116,23 +2123,35 @@ async function salvarPerfil(e) {
   e.preventDefault();
   const btn = document.getElementById('btnSalvarPerfil');
   const alerta = document.getElementById('msgAlertaPerfil');
-  btn.innerHTML = "⏳ A guardar..."; btn.disabled = true;
+  btn.innerHTML = "⏳ A guardar..."; btn.disabled = true; alerta.className = "alert";
 
   try {
-    // 1. Atualiza os dados de texto
+    // 1. Prepara os dados
     const dados = {
       nome: document.getElementById('epNome').value,
       telefone: document.getElementById('epTelefone').value,
       bi: document.getElementById('epBi').value,
       endereco: document.getElementById('epEndereco').value
     };
+
+    // Se o utilizador digitou uma nova senha, adiciona ao pacote
+    const novaSenha = document.getElementById('epSenha').value;
+    if (novaSenha && novaSenha.length >= 6) {
+      dados.senha = novaSenha;
+    }
+
+    // 2. Envia os dados para o backend
     const r1 = await fetch('/api/membros/' + membroLogado.id + '/perfil', {
       method: 'PUT', headers: {'Content-Type':'application/json'},
       body: JSON.stringify(dados)
     });
-    if (!r1.ok) throw new Error('Erro ao atualizar dados');
+    
+    if (!r1.ok) {
+      const erro = await r1.json();
+      throw new Error(erro.message || 'Erro ao atualizar dados');
+    }
 
-    // 2. Atualiza a foto (se houver)
+    // 3. Atualiza a foto (se houver)
     const fotoInput = document.getElementById('epFoto');
     if (fotoInput.files && fotoInput.files[0]) {
       const fd = new FormData();
@@ -2145,7 +2164,7 @@ async function salvarPerfil(e) {
       const data = await resp.json();
       if (!data.secure_url) throw new Error("Erro no upload para o Cloudinary");
       
-      // 3. Envia o link da foto para o backend
+      // 4. Envia o link da foto para o backend
       const r2 = await fetch('/api/membros/' + membroLogado.id + '/foto', {
         method: 'POST',
         headers: {'Content-Type':'application/json'},
