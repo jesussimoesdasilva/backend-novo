@@ -1,4 +1,4 @@
-const service = require("../services/oferta.service");
+const prisma = require("../config/prisma");
 const prisma = require("../config/prisma"); // <-- ADICIONA ESTA LINHA
 const PDFDocument = require('pdfkit');
 
