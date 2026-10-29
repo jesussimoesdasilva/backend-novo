@@ -1362,24 +1362,35 @@ function renderizarContactosChat() {
 
 async function abrirConversa(id, nome, foto) {
   contactoAtual = { id, nome, foto };
+  
+  // Limpa o contador de mensagens não lidas na lista de contactos (o número vermelho)
+  const contactoNaLista = contactosChat.find(c => c.id === id);
+  if (contactoNaLista) contactoNaLista.naoLidas = 0;
+  
+  // Redesenha a lista imediatamente (o número desaparece)
   renderizarContactosChat();
   
-  // Marca as mensagens deste contacto como lidas
+  // Marca as mensagens deste contacto como lidas no servidor
   await marcarComoLidas(membroLogado.id, id);
+  
+  // Atualiza o menu superior (o ponto vermelho do menu)
+  verificarMensagensNaoLidas();
   
   // Adiciona a classe que esconde a lista e mostra a conversa no telemóvel
   document.getElementById('chatContainer').classList.add('mostrar-conversa');
   
-     // Atualiza o cabeçalho com o nome da pessoa (com a capa protetora)
+    // Atualiza o cabeçalho com o nome da pessoa
   const fotoSegura = JSON.stringify(foto || '');
   const nomeSeguro = JSON.stringify(nome);
   
   document.getElementById('chatHeaderNome').innerHTML = `
-    ${foto 
-      ? `<img src="${foto}" class="chat-avatar" onclick='abrirFotoMembro(${fotoSegura}, ${nomeSeguro})' style="width:30px;height:30px;display:inline-block;vertical-align:middle;margin-right:8px;cursor:pointer;">` 
-      : `<div class="chat-avatar" onclick='abrirFotoMembro(${fotoSegura}, ${nomeSeguro})' style="width:30px;height:30px;display:inline-block;vertical-align:middle;margin-right:8px;cursor:pointer;">${nome.charAt(0)}</div>`
-    }
-    <strong>${nome}</strong>
+    <div onclick='abrirFotoMembro(${fotoSegura}, ${nomeSeguro})' style="display:flex; align-items:center; gap:8px; cursor:pointer; width:100%;">
+      ${foto 
+        ? `<img src="${foto}" class="chat-avatar" style="width:30px;height:30px;pointer-events:none;">` 
+        : `<div class="chat-avatar" style="width:30px;height:30px;pointer-events:none;">${nome.charAt(0)}</div>`
+      }
+      <strong style="pointer-events:none;">${nome}</strong>
+    </div>
   `;
   
   document.getElementById('chatInputArea').style.display = 'flex';
