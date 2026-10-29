@@ -163,21 +163,28 @@ th{color:var(--gold);font-size:12px;text-transform:uppercase}
     </div>
 
     <!-- PERFIL -->
-    <div id="section-perfil" class="section active">
-      <div class="card">
-        <h3>👤 Dados do Pastor</h3>
-        <div class="grid-2">
-          <div class="field"><label>Nome</label><input id="pNome"></div>
-          <div class="field"><label>Cargo</label><input id="pCargo"></div>
-          <div class="field"><label>Telefone</label><input id="pTelefone"></div>
-          <div class="field"><label>Email</label><input id="pEmail"></div>
-        </div>
-        <div class="field"><label>Biografia</label><textarea id="pBio"></textarea></div>
-        <div class="field"><label>Versículo Favorito</label><input id="pVersiculo"></div>
-        <div class="field"><label>Conselho da Semana</label><textarea id="pConselho"></textarea></div>
-        <button class="btn btn-primary" onclick="salvarPerfilPastor()" style="margin-top:20px; width:100%">💾 Guardar Alterações</button>
-      </div>
+<div id="section-perfil" class="section active">
+  <div class="card">
+    <h3>👤 Dados do Pastor</h3>
+    <div class="grid-2">
+      <div class="field"><label>Nome</label><input id="pNome"></div>
+      <div class="field"><label>Cargo</label><input id="pCargo"></div>
+      <div class="field"><label>Telefone</label><input id="pTelefone"></div>
+      <div class="field"><label>Email</label><input id="pEmail"></div>
     </div>
+    <div class="field"><label>Biografia</label><textarea id="pBio"></textarea></div>
+    <div class="field"><label>Versículo Favorito</label><input id="pVersiculo"></div>
+    <div class="field"><label>Conselho da Semana</label><textarea id="pConselho"></textarea></div>
+    
+    <!-- NOVO CAMPO DE FOTO -->
+    <div class="field"><label>Foto de Perfil</label><input type="file" id="pFoto" accept="image/*"></div>
+
+    <!-- NOVO CAMPO DE SENHA -->
+    <div class="field"><label>Nova Senha (deixe em branco para manter a atual)</label><input type="password" id="pSenha" minlength="6" placeholder="Nova palavra-passe"></div>
+
+    <button class="btn btn-primary" onclick="salvarPerfilPastor()" style="margin-top:20px; width:100%">💾 Guardar Alterações</button>
+  </div>
+</div>
 
     <!-- TESOURARIA -->
     <div id="section-tesouraria" class="section">
