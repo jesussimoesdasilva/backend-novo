@@ -1572,6 +1572,9 @@ async function carregarLive() {
   try {
     const r = await fetch('/api/igrejas/' + igrejaIdAtual);
     const ig = await r.json();
+    
+    // Isto vai mostrar-nos no console o que o backend está a enviar
+    console.log("Dados da Igreja (Live):", ig);
 
     if (ig.liveAtiva && ig.liveUrl) {
       const videoId = getYouTubeId(ig.liveUrl);
@@ -1584,12 +1587,14 @@ async function carregarLive() {
           </div>
         `;
       } else {
+        console.log("Link do YouTube inválido ou não reconhecido.");
         container.style.display = 'none';
       }
     } else {
+      console.log("Live não está ativa ou não tem URL.");
       container.style.display = 'none';
     }
-  } catch (e) { console.error(e); }
+  } catch (e) { console.error("Erro ao carregar live:", e); }
 }
 
 async function carregarMidia() {
