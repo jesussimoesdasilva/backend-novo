@@ -1,4 +1,6 @@
 const service = require("../services/oferta.service");
+const prisma = require("../config/prisma"); // <-- ADICIONA ESTA LINHA
+const PDFDocument = require('pdfkit');
 
 async function list(req, res, next) {
   try { res.json(await service.listOfertas(req.params.igrejaId)); } catch (err) { next(err); }
