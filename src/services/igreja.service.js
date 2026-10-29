@@ -3,9 +3,10 @@ const bcrypt = require("bcrypt");
 
 async function getAllIgrejas() {
   return await prisma.igreja.findMany({
-    orderBy: { nome: "asc" },
     include: {
-      _count: { select: { membros: true, departamentos: true, sectores: true, eventos: true } }
+      _count: {
+        select: { membros: true, departamentos: true, sectores: true, eventos: true }
+      }
     }
   });
 }
