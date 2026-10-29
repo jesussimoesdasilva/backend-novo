@@ -343,6 +343,7 @@ async function carregarIgrejas() {
                 <a href="/igreja/${ig.slug}" target="_blank" class="btn btn-primary" style="padding:6px 12px; font-size:12px; text-decoration:none; width:auto; margin:0;">🌐 Abrir Site</a>
                 <button class="btn btn-outline" onclick="prepararEdicao(${ig.id}, '${ig.nome.replace(/'/g, "\\'")}', '${ig.slug}', '${ig.subadminEmail || ''}')">✏️ Editar</button>
                 <button class="btn btn-danger" onclick="eliminarIgreja(${ig.id}, '${ig.nome.replace(/'/g, "\\'")}')">🗑️ Apagar</button>
+                <button class="btn btn-danger" onclick="zerarFinancasAdmin(${ig.id}, '${ig.nome.replace(/'/g, "\\'")}')">🗑️ Zerar Finanças</button>
               </td>
             </tr>
           `).join('')}
@@ -351,6 +352,7 @@ async function carregarIgrejas() {
     `;
   } catch (e) { div.innerHTML = '<p style="color:var(--red)">Erro ao carregar igrejas.</p>'; }
 }
+
 async function eliminarIgreja(id, nome) {
   if (!confirm(`Apagar a igreja "${nome}"? Todos os dados serão perdidos!`)) return;
   try {
@@ -545,6 +547,38 @@ function salvarConfiguracoes() {
   alerta.innerHTML = `✅ Perfil do Administrador <strong>${nome}</strong> atualizado com sucesso (Simulado)!`;
   setTimeout(() => alerta.style.display = 'none', 4000);
 }
+
+async function zerarFinancasAdmin(igrejaId, nomeIgreja) {
+  // 1ª Confirmação
+  const confirmar1 = confirm(`⚠️ ATENÇÃO ADMIN!\n\nTens a certeza que queres apagar TODAS as finanças da igreja "${nomeIgreja}"?\n\nEsta ação não pode ser desfeita.`);
+  if (!confirmar1) return;
+
+  // 2ª Confirmação (Segurança extra)
+  const confirmar2 = prompt(`Para confirmar a eliminação das finanças de "${nomeIgreja}", escreve a palavra ZERAR em maiúsculas:`);
+  if (confirmar2 !== "ZERAR") {
+    alert("Ação cancelada. A palavra não corresponde.");
+    return;
+  }
+
+  try {
+    const r = await fetch(`/api/ofertas/igreja/${igrejaId}/zerar`, {
+      method: 'DELETE'
+    });
+    
+    const d = await r.json();
+    if (!r.ok) throw new Error(d.message);
+
+    alert(`✅ ${d.message}`);
+    
+    // Atualiza a lista e as estatísticas
+    carregarFinanceiroGlobal(); 
+    carregarStatsTopo();
+
+  } catch (e) {
+    alert(`❌ Erro ao zerar: ${e.message}`);
+  }
+}
+
 </script>
 </body>
 </html>

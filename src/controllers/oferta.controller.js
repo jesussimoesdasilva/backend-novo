@@ -119,5 +119,15 @@ async function gerarComprovativoPDF(req, res) {
     res.status(500).json({ message: err.message });
   }
 }
-
-module.exports = { list, create, consultar, preValidar, validar, negar, estatisticas, relatorioDizimistas, gerarComprovativoPDF };
+async function zerarFinancas(req, res) {
+  try {
+    const igrejaId = Number(req.params.igrejaId);
+    const resultado = await prisma.oferta.deleteMany({
+      where: { igrejaId: igrejaId }
+    });
+    res.json({ message: `Finanças zeradas. ${resultado.count} registos apagados.` });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+}
+module.exports = { list, create, consultar, preValidar, validar, negar, estatisticas, relatorioDizimistas, gerarComprovativoPDF, zerarFinancas };
