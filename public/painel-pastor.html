@@ -274,10 +274,13 @@ th{color:var(--gold);font-size:12px;text-transform:uppercase}
 <div class="toast-container" id="toasts"></div>
 
 <script>
+<script>
 const API = '/api';
 const pathParts = window.location.pathname.split('/');
 const slug = pathParts[pathParts.length - 2];
 let igrejaAtual = null;
+let transacoesGlobais = [];
+let filtroRelatorioAtual = 'todos';
 
 function toast(msg, type='success') {
   const el = document.createElement('div');
@@ -399,6 +402,9 @@ async function carregarRelatorios() {
 }
 
 // ===== GERAR RELATÓRIO PREMIUM COM DETALHES =====
+let transacoesGlobais = [];
+let filtroRelatorioAtual = 'todos';
+
 async function gerarRelatorioDetalhado() {
   const div = document.getElementById('areaRelatorio');
   const content = document.getElementById('conteudoRelatorio');
@@ -408,7 +414,6 @@ async function gerarRelatorioDetalhado() {
   try {
     const igrejaId = igrejaAtual.igrejaId;
     
-    // Vai buscar as estatísticas, as transações E o nome oficial da igreja
     const [resStats, resTransacoes, resIgreja] = await Promise.all([
       fetch(API + '/ofertas/estatisticas/' + igrejaId),
       fetch(API + '/ofertas/igreja/' + igrejaId),
@@ -419,40 +424,39 @@ async function gerarRelatorioDetalhado() {
     const transacoes = await resTransacoes.json();
     const igrejaDados = await resIgreja.json();
 
-    const validadas = transacoes.filter(t => t.status === 'VALIDADO');
+    // Guarda os dados para permitir filtragem
+    transacoesGlobais = transacoes.filter(t => t.status === 'VALIDADO');
+    filtroRelatorioAtual = 'todos';
 
-    const headerImpressao = `
-      <div class="print-header">
-        <h1>${igrejaDados.nome}</h1>
-        <p>Extrato Financeiro Oficial</p>
-        <div class="print-date">Emitido em: ${new Date().toLocaleDateString('pt-PT')} às ${new Date().toLocaleTimeString('pt-PT')}</div>
-      </div>
-    `;
-
-    const html = `
+    // Desenha a estrutura principal (cartões + área da tabela)
+    content.innerHTML = `
       <div style="background: #ffffff; color: #000000; padding: 40px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); margin-top: 20px;">
-        ${headerImpressao}
+        <div class="print-header">
+          <h1>${igrejaDados.nome}</h1>
+          <p>Extrato Financeiro Oficial</p>
+          <div class="print-date">Emitido em: ${new Date().toLocaleDateString('pt-PT')} às ${new Date().toLocaleTimeString('pt-PT')}</div>
+        </div>
         
-        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 15px; margin-bottom: 40px;">
-          <div style="border: 1px solid #cbd5e1; border-radius: 12px; padding: 20px; text-align: center; background: #f8fafc;">
+        <div id="cartoesResumo" style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 15px; margin-bottom: 40px;">
+          <div onclick="filtrarRelatorio('dizimos')" style="border: 1px solid #cbd5e1; border-radius: 12px; padding: 20px; text-align: center; background: #f8fafc; cursor: pointer;">
             <h4 style="font-size: 12px; color: #64748b; text-transform: uppercase; margin: 0 0 10px 0;">Dízimos</h4>
             <p style="font-size: 22px; font-weight: 900; color: #020617; margin: 0;">${(stats.totalDizimos || 0).toLocaleString('pt-AO')} Kz</p>
           </div>
-          <div style="border: 1px solid #cbd5e1; border-radius: 12px; padding: 20px; text-align: center; background: #f8fafc;">
+          <div onclick="filtrarRelatorio('ofertas')" style="border: 1px solid #cbd5e1; border-radius: 12px; padding: 20px; text-align: center; background: #f8fafc; cursor: pointer;">
             <h4 style="font-size: 12px; color: #64748b; text-transform: uppercase; margin: 0 0 10px 0;">Ofertas</h4>
             <p style="font-size: 22px; font-weight: 900; color: #020617; margin: 0;">${(stats.totalOfertas || 0).toLocaleString('pt-AO')} Kz</p>
           </div>
-          <div style="border: 1px solid #cbd5e1; border-radius: 12px; padding: 20px; text-align: center; background: #f8fafc;">
+          <div onclick="filtrarRelatorio('saidas')" style="border: 1px solid #cbd5e1; border-radius: 12px; padding: 20px; text-align: center; background: #f8fafc; cursor: pointer;">
             <h4 style="font-size: 12px; color: #64748b; text-transform: uppercase; margin: 0 0 10px 0;">Saídas</h4>
             <p style="font-size: 22px; font-weight: 900; color: #dc2626; margin: 0;">-${(stats.totalSaidas || 0).toLocaleString('pt-AO')} Kz</p>
           </div>
-          <div style="border: 1px solid #020617; border-radius: 12px; padding: 20px; text-align: center; background: #020617; color: white;">
+          <div onclick="filtrarRelatorio('saldo')" style="border: 1px solid #020617; border-radius: 12px; padding: 20px; text-align: center; background: #020617; color: white; cursor: pointer;">
             <h4 style="font-size: 12px; color: #facc15; text-transform: uppercase; margin: 0 0 10px 0;">SALDO REAL</h4>
             <p style="font-size: 22px; font-weight: 900; color: #ffffff; margin: 0;">${(stats.saldoReal || 0).toLocaleString('pt-AO')} Kz</p>
           </div>
         </div>
 
-        <h3 style="text-align:center; margin-bottom:20px; color:#020617; font-size:18px; text-transform: uppercase;">Detalhes das Transações</h3>
+        <h3 style="text-align:center; margin-bottom:20px; color:#020617; font-size:18px; text-transform: uppercase;" id="tituloTabelaRelatorio">Detalhes das Transações</h3>
         
         <table style="width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 14px; color: #000;">
           <thead>
@@ -463,37 +467,70 @@ async function gerarRelatorioDetalhado() {
               <th style="background: #020617; color: #ffffff; padding: 12px; text-align: right; font-size: 12px; text-transform: uppercase;">Valor (Kz)</th>
             </tr>
           </thead>
-          <tbody>
-            ${validadas.length === 0 ? '<tr><td colspan="4" style="text-align:center; padding: 20px;">Nenhuma transação registada.</td></tr>' : ''}
-            ${validadas.map(t => {
-              const data = new Date(t.criadoEm).toLocaleDateString('pt-PT');
-              const isSaida = t.finalidade === 'SAIDA';
-              const desc = t.membro ? t.membro.nome : (t.nomeDoador || 'Anónimo');
-              
-              return `
-                <tr style="border-bottom: 1px solid #e2e8f0;">
-                  <td style="padding: 12px;">${data}</td>
-                  <td style="padding: 12px;">${desc}</td>
-                  <td style="padding: 12px;">${t.finalidade}</td>
-                  <td style="padding: 12px; text-align: right; color: ${isSaida ? '#dc2626' : '#059669'}; font-weight: bold;">
-                    ${isSaida ? '-' : '+'} ${t.valor.toLocaleString('pt-AO')}
-                  </td>
-                </tr>
-              `;
-            }).join('')}
-          </tbody>
+          <tbody id="corpoTabelaRelatorio"></tbody>
         </table>
         
         <button class="btn btn-primary no-print" style="margin-top:30px; width:100%;" onclick="window.print()">🖨️ Imprimir / Exportar PDF</button>
       </div>
     `;
 
-    content.innerHTML = html;
+    desenharTabelaRelatorio();
     div.scrollIntoView({ behavior: 'smooth' });
 
   } catch (e) {
     content.innerHTML = `<div class="empty" style="color:red">Erro ao gerar relatório: ${e.message}</div>`;
   }
+}
+
+function desenharTabelaRelatorio() {
+  const tbody = document.getElementById('corpoTabelaRelatorio');
+  const titulo = document.getElementById('tituloTabelaRelatorio');
+  if (!tbody) return;
+
+  let listaFiltrada = transacoesGlobais;
+
+  if (filtroRelatorioAtual === 'dizimos') {
+    listaFiltrada = transacoesGlobais.filter(t => t.finalidade === 'Dízimo');
+    titulo.textContent = 'Detalhes das Transações: Dízimos';
+  } else if (filtroRelatorioAtual === 'ofertas') {
+    listaFiltrada = transacoesGlobais.filter(t => t.finalidade !== 'Dízimo' && t.finalidade !== 'SAIDA');
+    titulo.textContent = 'Detalhes das Transações: Ofertas';
+  } else if (filtroRelatorioAtual === 'saidas') {
+    listaFiltrada = transacoesGlobais.filter(t => t.finalidade === 'SAIDA');
+    titulo.textContent = 'Detalhes das Transações: Saídas';
+  } else if (filtroRelatorioAtual === 'saldo') {
+    listaFiltrada = transacoesGlobais;
+    titulo.textContent = 'Detalhes das Transações: Todas';
+  } else {
+    titulo.textContent = 'Detalhes das Transações';
+  }
+
+  if (listaFiltrada.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding: 20px;">Nenhuma transação registada.</td></tr>';
+    return;
+  }
+
+  tbody.innerHTML = listaFiltrada.map(t => {
+    const data = new Date(t.criadoEm).toLocaleDateString('pt-PT');
+    const isSaida = t.finalidade === 'SAIDA';
+    const desc = t.membro ? t.membro.nome : (t.nomeDoador || 'Anónimo');
+    
+    return `
+      <tr style="border-bottom: 1px solid #e2e8f0;">
+        <td style="padding: 12px;">${data}</td>
+        <td style="padding: 12px;">${desc}</td>
+        <td style="padding: 12px;">${t.finalidade}</td>
+        <td style="padding: 12px; text-align: right; color: ${isSaida ? '#dc2626' : '#059669'}; font-weight: bold;">
+          ${isSaida ? '-' : '+'} ${t.valor.toLocaleString('pt-AO')}
+        </td>
+      </tr>
+    `;
+  }).join('');
+}
+
+function filtrarRelatorio(tipo) {
+  filtroRelatorioAtual = tipo;
+  desenharTabelaRelatorio();
 }
 
 async function gerarRelatorioPastor(tipo) {
