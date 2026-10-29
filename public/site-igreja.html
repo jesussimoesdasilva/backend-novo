@@ -1804,10 +1804,7 @@ async function carregar() {
             <div class="pastor-section">
               <div class="pastor-grid">
                 <div class="pastor-img-wrap">
-                  ${p.foto 
-  ? `<img src="${p.foto}" class="pastor-img" style="cursor:pointer;" onclick='abrirFotoMembro(${JSON.stringify(p.foto)}, ${JSON.stringify(p.nome)})' alt="${p.nome}">` 
-  : `<div class="pastor-img" style="display:grid;place-items:center;font-size:80px;cursor:pointer;" onclick='abrirFotoMembro("", ${JSON.stringify(p.nome)})'>👤</div>`
-}s:center;font-size:80px">👤</div>`}
+                  ${p.foto ? `<img src="${p.foto}" class="pastor-img" alt="${p.nome}">` : `<div class="pastor-img" style="display:grid;place-items:center;font-size:80px">👤</div>`}
                 </div>
                 <div class="pastor-info">
                   <div class="pastor-cargo">${p.cargo || 'Pastor'}</div>
