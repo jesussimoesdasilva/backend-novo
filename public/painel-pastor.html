@@ -429,9 +429,11 @@ async function gerarRelatorioDetalhado() {
     const transacoes = await resTransacoes.json();
     const igrejaDados = await resIgreja.json();
 
+    // Guarda os dados para permitir filtragem
     transacoesGlobais = transacoes.filter(t => t.status === 'VALIDADO');
     filtroRelatorioAtual = 'todos';
 
+    // Desenha a estrutura principal (cartões + área da tabela)
     content.innerHTML = `
       <div style="background: #ffffff; color: #000000; padding: 40px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); margin-top: 20px;">
         <div class="print-header">
@@ -441,19 +443,19 @@ async function gerarRelatorioDetalhado() {
         </div>
         
         <div id="cartoesResumo" style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 15px; margin-bottom: 40px;">
-          <div onclick="window.open('/api/ofertas/pdf/filtrado/${igrejaId}/dizimos', '_blank')" style="border: 1px solid #cbd5e1; border-radius: 12px; padding: 20px; text-align: center; background: #f8fafc; cursor: pointer;">
+          <div onclick="filtrarRelatorio('dizimos')" style="border: 1px solid #cbd5e1; border-radius: 12px; padding: 20px; text-align: center; background: #f8fafc; cursor: pointer;">
             <h4 style="font-size: 12px; color: #64748b; text-transform: uppercase; margin: 0 0 10px 0;">Dízimos</h4>
             <p style="font-size: 22px; font-weight: 900; color: #020617; margin: 0;">${(stats.totalDizimos || 0).toLocaleString('pt-AO')} Kz</p>
           </div>
-          <div onclick="window.open('/api/ofertas/pdf/filtrado/${igrejaId}/ofertas', '_blank')" style="border: 1px solid #cbd5e1; border-radius: 12px; padding: 20px; text-align: center; background: #f8fafc; cursor: pointer;">
+          <div onclick="filtrarRelatorio('ofertas')" style="border: 1px solid #cbd5e1; border-radius: 12px; padding: 20px; text-align: center; background: #f8fafc; cursor: pointer;">
             <h4 style="font-size: 12px; color: #64748b; text-transform: uppercase; margin: 0 0 10px 0;">Ofertas</h4>
             <p style="font-size: 22px; font-weight: 900; color: #020617; margin: 0;">${(stats.totalOfertas || 0).toLocaleString('pt-AO')} Kz</p>
           </div>
-          <div onclick="window.open('/api/ofertas/pdf/filtrado/${igrejaId}/saidas', '_blank')" style="border: 1px solid #cbd5e1; border-radius: 12px; padding: 20px; text-align: center; background: #f8fafc; cursor: pointer;">
+          <div onclick="filtrarRelatorio('saidas')" style="border: 1px solid #cbd5e1; border-radius: 12px; padding: 20px; text-align: center; background: #f8fafc; cursor: pointer;">
             <h4 style="font-size: 12px; color: #64748b; text-transform: uppercase; margin: 0 0 10px 0;">Saídas</h4>
             <p style="font-size: 22px; font-weight: 900; color: #dc2626; margin: 0;">-${(stats.totalSaidas || 0).toLocaleString('pt-AO')} Kz</p>
           </div>
-          <div onclick="window.open('/api/ofertas/pdf/filtrado/${igrejaId}/saldo', '_blank')" style="border: 1px solid #020617; border-radius: 12px; padding: 20px; text-align: center; background: #020617; color: white; cursor: pointer;">
+          <div onclick="filtrarRelatorio('saldo')" style="border: 1px solid #020617; border-radius: 12px; padding: 20px; text-align: center; background: #020617; color: white; cursor: pointer;">
             <h4 style="font-size: 12px; color: #facc15; text-transform: uppercase; margin: 0 0 10px 0;">SALDO REAL</h4>
             <p style="font-size: 22px; font-weight: 900; color: #ffffff; margin: 0;">${(stats.saldoReal || 0).toLocaleString('pt-AO')} Kz</p>
           </div>
@@ -543,7 +545,7 @@ async function gerarRelatorioPastor(tipo) {
   conteudo.innerHTML = '<div class="empty">A carregar dados...</div>';
 
   try {
-    const igrejaId = igrejaAtual.id;
+    const igrejaId = igrejaAtual.igrejaId;
     let html = '';
 
     if (tipo === 'membros') {
@@ -609,12 +611,11 @@ async function gerarRelatorioPastor(tipo) {
     }
 
     else if (tipo === 'financeiro') {
-      // Descarrega o PDF diretamente, sem gerar a tabela no ecrã
-      window.open('/api/ofertas/pdf/financeiro/' + igrejaId, '_blank');
+      gerarRelatorioDetalhado(); 
       return;
     }
 
-    // O botão muda dependendo do tipo (só para membros, departamentos e sectores)
+    // O botão muda dependendo do tipo
     let botaoHtml = '';
     if (tipo === 'membros') {
       botaoHtml = `<button class="btn btn-primary no-print" style="margin-top:30px; width:100%;" onclick="window.open('/api/ofertas/pdf/membros/${igrejaAtual.igrejaId}', '_blank')">🖨️ Descarregar PDF Oficial</button>`;
@@ -622,6 +623,8 @@ async function gerarRelatorioPastor(tipo) {
       botaoHtml = `<button class="btn btn-primary no-print" style="margin-top:30px; width:100%;" onclick="window.open('/api/ofertas/pdf/departamentos/${igrejaAtual.igrejaId}', '_blank')">🖨️ Descarregar PDF Oficial</button>`;
     } else if (tipo === 'sectores') {
       botaoHtml = `<button class="btn btn-primary no-print" style="margin-top:30px; width:100%;" onclick="window.open('/api/ofertas/pdf/sectores/${igrejaAtual.igrejaId}', '_blank')">🖨️ Descarregar PDF Oficial</button>`;
+    } else {
+      botaoHtml = `<button class="btn btn-primary no-print" style="margin-top:30px; width:100%;" onclick="window.print()">🖨️ Imprimir / Exportar PDF</button>`;
     }
 
     conteudo.innerHTML = `

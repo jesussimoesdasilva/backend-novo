@@ -1,7 +1,7 @@
 const prisma = require("../config/prisma");
 const service = require("../services/oferta.service");
 const PDFDocument = require('pdfkit');
-const https = require('https');
+const https = require('https'); // Necessário para o logotipo
 
 async function list(req, res, next) {
   try { res.json(await service.listOfertas(req.params.igrejaId)); } catch (err) { next(err); }
@@ -10,12 +10,14 @@ async function list(req, res, next) {
 async function create(req, res, next) {
   try {
     const { finalidade, valor, metodo } = req.body;
+    
     if (!finalidade || !valor) {
       return res.status(400).json({ error: true, message: "Finalidade e valor são obrigatórios" });
     }
     if (finalidade !== 'SAIDA' && !metodo) {
       return res.status(400).json({ error: true, message: "Método é obrigatório para ofertas/dízimos" });
     }
+
     const oferta = await service.createOferta(req.params.igrejaId, req.body);
     res.status(201).json({ message: "Registo efetuado", oferta });
   } catch (err) { 
@@ -55,24 +57,6 @@ async function relatorioDizimistas(req, res, next) {
   } catch (err) { next(err); }
 }
 
-// ===== FUNÇÃO AUXILIAR PARA DESENHAR O LOGOTIPO =====
-async function desenharLogotipo(doc, igreja) {
-  if (igreja.logoUrl) {
-    await new Promise((resolve) => {
-      https.get(igreja.logoUrl, (response) => {
-        const data = [];
-        response.on('data', (chunk) => data.push(chunk));
-        response.on('end', () => {
-          const buffer = Buffer.concat(data);
-          doc.image(buffer, 40, 40, { width: 60 });
-          resolve();
-        });
-      }).on('error', () => resolve());
-    });
-  }
-}
-
-// ===== COMPROVATIVO PDF =====
 async function gerarComprovativoPDF(req, res) {
   try {
     const { igrejaId, codigo } = req.params;
@@ -86,8 +70,6 @@ async function gerarComprovativoPDF(req, res) {
     res.setHeader('Content-Type', 'application/pdf');
     res.setHeader('Content-Disposition', `attachment; filename="comprovativo-${codigo}.pdf"`);
     doc.pipe(res);
-
-    await desenharLogotipo(doc, oferta.igreja);
 
     doc.fontSize(20).fillColor('#020617').text(oferta.igreja.nome, { align: 'center' });
     doc.fontSize(12).fillColor('#64748b').text('Comprovativo Oficial de Oferta', { align: 'center' });
@@ -116,7 +98,6 @@ async function gerarComprovativoPDF(req, res) {
   }
 }
 
-// ===== ZERAR FINANÇAS =====
 async function zerarFinancas(req, res) {
   try {
     const igrejaId = Number(req.params.igrejaId);
@@ -127,7 +108,6 @@ async function zerarFinancas(req, res) {
   }
 }
 
-// ===== RELATÓRIO DE MEMBROS =====
 async function gerarPDFMembros(req, res) {
   try {
     const igrejaId = Number(req.params.igrejaId);
@@ -139,17 +119,33 @@ async function gerarPDFMembros(req, res) {
     res.setHeader('Content-Disposition', `attachment; filename="relatorio-membros-${igreja.slug}.pdf"`);
     doc.pipe(res);
 
-    await desenharLogotipo(doc, igreja);
+    // --- LOGOTIPO (Corrigido para o Cloudinary) ---
+    if (igreja.logoUrl) {
+      await new Promise((resolve) => {
+        https.get(igreja.logoUrl, (response) => {
+          const data = [];
+          response.on('data', (chunk) => data.push(chunk));
+          response.on('end', () => {
+            const buffer = Buffer.concat(data);
+            doc.image(buffer, 40, 40, { width: 60 });
+            resolve();
+          });
+        }).on('error', () => resolve());
+      });
+    }
 
+    // Cabeçalho
     doc.fontSize(20).fillColor('#020617').text(igreja.nome, { align: 'center' });
     doc.fontSize(12).fillColor('#64748b').text('Relatório Oficial de Membros', { align: 'center' });
     doc.moveDown(1);
     doc.moveTo(40, doc.y).lineTo(555, doc.y).strokeColor('#facc15').lineWidth(2).stroke();
     doc.moveDown(1);
 
+    // Data
     doc.fontSize(10).fillColor('#94a3b8').text(`Emitido em: ${new Date().toLocaleString('pt-PT')}`, { align: 'right' });
     doc.moveDown(1);
 
+    // Tabela
     const tableTop = doc.y;
     doc.rect(40, tableTop, 515, 20).fill('#020617');
     doc.fillColor('#ffffff').fontSize(10).text('Nome', 45, tableTop + 5);
@@ -176,7 +172,6 @@ async function gerarPDFMembros(req, res) {
   }
 }
 
-// ===== RELATÓRIO DE DEPARTAMENTOS =====
 async function gerarPDFDepartamentos(req, res) {
   try {
     const igrejaId = Number(req.params.igrejaId);
@@ -192,7 +187,20 @@ async function gerarPDFDepartamentos(req, res) {
     res.setHeader('Content-Disposition', `attachment; filename="relatorio-departamentos-${igreja.slug}.pdf"`);
     doc.pipe(res);
 
-    await desenharLogotipo(doc, igreja);
+    // LOGOTIPO (a mesma lógica do Cloudinary)
+    if (igreja.logoUrl) {
+      await new Promise((resolve) => {
+        https.get(igreja.logoUrl, (response) => {
+          const data = [];
+          response.on('data', (chunk) => data.push(chunk));
+          response.on('end', () => {
+            const buffer = Buffer.concat(data);
+            doc.image(buffer, 40, 40, { width: 60 });
+            resolve();
+          });
+        }).on('error', () => resolve());
+      });
+    }
 
     doc.fontSize(20).fillColor('#020617').text(igreja.nome, { align: 'center' });
     doc.fontSize(12).fillColor('#64748b').text('Relatório Oficial de Departamentos', { align: 'center' });
@@ -227,7 +235,6 @@ async function gerarPDFDepartamentos(req, res) {
   } catch (err) { res.status(500).json({ message: err.message }); }
 }
 
-// ===== RELATÓRIO DE SECTORES =====
 async function gerarPDFSectores(req, res) {
   try {
     const igrejaId = Number(req.params.igrejaId);
@@ -243,7 +250,20 @@ async function gerarPDFSectores(req, res) {
     res.setHeader('Content-Disposition', `attachment; filename="relatorio-sectores-${igreja.slug}.pdf"`);
     doc.pipe(res);
 
-    await desenharLogotipo(doc, igreja);
+    // LOGOTIPO
+    if (igreja.logoUrl) {
+      await new Promise((resolve) => {
+        https.get(igreja.logoUrl, (response) => {
+          const data = [];
+          response.on('data', (chunk) => data.push(chunk));
+          response.on('end', () => {
+            const buffer = Buffer.concat(data);
+            doc.image(buffer, 40, 40, { width: 60 });
+            resolve();
+          });
+        }).on('error', () => resolve());
+      });
+    }
 
     doc.fontSize(20).fillColor('#020617').text(igreja.nome, { align: 'center' });
     doc.fontSize(12).fillColor('#64748b').text('Relatório Oficial de Sectores Detalhados', { align: 'center' });
@@ -281,164 +301,7 @@ async function gerarPDFSectores(req, res) {
   } catch (err) { res.status(500).json({ message: err.message }); }
 }
 
-// ===== EXTRATO FINANCEIRO =====
-async function gerarPDFFinanceiro(req, res) {
-  try {
-    const igrejaId = Number(req.params.igrejaId);
-    const igreja = await prisma.igreja.findUnique({ where: { id: igrejaId } });
-    const transacoes = await prisma.oferta.findMany({ 
-      where: { igrejaId, status: 'VALIDADO' }, 
-      orderBy: { criadoEm: 'desc' } 
-    });
-    const stats = await service.getEstatisticas(igrejaId);
-
-    const doc = new PDFDocument({ margin: 40, size: 'A4' });
-    res.setHeader('Content-Type', 'application/pdf');
-    res.setHeader('Content-Disposition', `attachment; filename="extrato-financeiro-${igreja.slug}.pdf"`);
-    doc.pipe(res);
-
-    await desenharLogotipo(doc, igreja);
-
-    doc.fontSize(20).fillColor('#020617').text(igreja.nome, { align: 'center' });
-    doc.fontSize(12).fillColor('#64748b').text('Extrato Financeiro Oficial', { align: 'center' });
-    doc.moveDown(1);
-    doc.moveTo(40, doc.y).lineTo(555, doc.y).strokeColor('#facc15').lineWidth(2).stroke();
-    doc.moveDown(1);
-    doc.fontSize(10).fillColor('#94a3b8').text(`Emitido em: ${new Date().toLocaleString('pt-PT')}`, { align: 'right' });
-    doc.moveDown(1);
-
-    const resumoY = doc.y;
-    const boxWidth = 120;
-    const boxHeight = 50;
-    const gap = 10;
-
-    doc.rect(40, resumoY, boxWidth, boxHeight).fill('#f8fafc').stroke('#e2e8f0');
-    doc.fillColor('#64748b').fontSize(8).text('DÍZIMOS', 45, resumoY + 8);
-    doc.fillColor('#020617').fontSize(12).font('Helvetica-Bold').text(`${(stats.totalDizimos || 0).toLocaleString('pt-AO')} Kz`, 45, resumoY + 22);
-
-    doc.rect(40 + boxWidth + gap, resumoY, boxWidth, boxHeight).fill('#f8fafc').stroke('#e2e8f0');
-    doc.fillColor('#64748b').fontSize(8).text('OFERTAS', 40 + boxWidth + gap + 5, resumoY + 8);
-    doc.fillColor('#020617').fontSize(12).font('Helvetica-Bold').text(`${(stats.totalOfertas || 0).toLocaleString('pt-AO')} Kz`, 40 + boxWidth + gap + 5, resumoY + 22);
-
-    doc.rect(40 + (boxWidth + gap) * 2, resumoY, boxWidth, boxHeight).fill('#f8fafc').stroke('#e2e8f0');
-    doc.fillColor('#64748b').fontSize(8).text('SAÍDAS', 40 + (boxWidth + gap) * 2 + 5, resumoY + 8);
-    doc.fillColor('#dc2626').fontSize(12).font('Helvetica-Bold').text(`-${(stats.totalSaidas || 0).toLocaleString('pt-AO')} Kz`, 40 + (boxWidth + gap) * 2 + 5, resumoY + 22);
-
-    doc.rect(40 + (boxWidth + gap) * 3, resumoY, boxWidth, boxHeight).fill('#020617');
-    doc.fillColor('#facc15').fontSize(8).text('SALDO REAL', 40 + (boxWidth + gap) * 3 + 5, resumoY + 8);
-    doc.fillColor('#ffffff').fontSize(12).font('Helvetica-Bold').text(`${(stats.saldoReal || 0).toLocaleString('pt-AO')} Kz`, 40 + (boxWidth + gap) * 3 + 5, resumoY + 22);
-
-    doc.font('Helvetica');
-    doc.y = resumoY + boxHeight + 20;
-
-    const tableTop = doc.y;
-    doc.rect(40, tableTop, 515, 20).fill('#020617');
-    doc.fillColor('#ffffff').fontSize(10).text('Data', 45, tableTop + 5);
-    doc.text('Descrição / Doador', 150, tableTop + 5);
-    doc.text('Finalidade', 350, tableTop + 5);
-    doc.text('Valor (Kz)', 480, tableTop + 5);
-
-    let y = tableTop + 25;
-    doc.fillColor('#000000');
-
-    if (transacoes.length === 0) {
-      doc.fontSize(9).text('Nenhuma transação registada.', 45, y);
-    } else {
-      transacoes.forEach((t, i) => {
-        if (i % 2 === 0) { doc.rect(40, y - 3, 515, 20).fill('#f8fafc'); doc.fillColor('#000000'); }
-        const data = new Date(t.criadoEm).toLocaleDateString('pt-PT');
-        const desc = t.membro ? t.membro.nome : (t.nomeDoador || 'Anónimo');
-        const isSaida = t.finalidade === 'SAIDA';
-        
-        doc.fontSize(9).text(data, 45, y, { width: 100 });
-        doc.text(desc, 150, y, { width: 190 });
-        doc.text(t.finalidade, 350, y, { width: 120 });
-        doc.fillColor(isSaida ? '#dc2626' : '#059669').text(`${isSaida ? '-' : '+'} ${t.valor.toLocaleString('pt-AO')}`, 480, y, { width: 80, align: 'right' });
-        doc.fillColor('#000000');
-        y += 22;
-        if (y > 750) { doc.addPage(); y = 40; }
-      });
-    }
-
-    doc.end();
-  } catch (err) {
-    res.status(500).json({ message: err.message });
-  }
-}
-async function gerarPDFFiltrado(req, res) {
-  try {
-    const igrejaId = Number(req.params.igrejaId);
-    const filtro = req.params.filtro; // 'dizimos', 'ofertas', 'saidas' ou 'saldo'
-
-    const igreja = await prisma.igreja.findUnique({ where: { id: igrejaId } });
-    let transacoes = await prisma.oferta.findMany({
-      where: { igrejaId, status: 'VALIDADO' },
-      orderBy: { criadoEm: 'desc' }
-    });
-
-    let titulo = 'Extrato Financeiro Oficial';
-    if (filtro === 'dizimos') {
-      transacoes = transacoes.filter(t => t.finalidade === 'Dízimo');
-      titulo = 'Relatório de Dízimos';
-    } else if (filtro === 'ofertas') {
-      transacoes = transacoes.filter(t => t.finalidade !== 'Dízimo' && t.finalidade !== 'SAIDA');
-      titulo = 'Relatório de Ofertas';
-    } else if (filtro === 'saidas') {
-      transacoes = transacoes.filter(t => t.finalidade === 'SAIDA');
-      titulo = 'Relatório de Saídas';
-    }
-
-    const doc = new PDFDocument({ margin: 40, size: 'A4' });
-    res.setHeader('Content-Type', 'application/pdf');
-    res.setHeader('Content-Disposition', `attachment; filename="${filtro}-${igreja.slug}.pdf"`);
-    doc.pipe(res);
-
-    await desenharLogotipo(doc, igreja);
-
-    doc.fontSize(20).fillColor('#020617').text(igreja.nome, { align: 'center' });
-    doc.fontSize(12).fillColor('#64748b').text(titulo, { align: 'center' });
-    doc.moveDown(1);
-    doc.moveTo(40, doc.y).lineTo(555, doc.y).strokeColor('#facc15').lineWidth(2).stroke();
-    doc.moveDown(1);
-    doc.fontSize(10).fillColor('#94a3b8').text(`Emitido em: ${new Date().toLocaleString('pt-PT')}`, { align: 'right' });
-    doc.moveDown(1);
-
-    const tableTop = doc.y;
-    doc.rect(40, tableTop, 515, 20).fill('#020617');
-    doc.fillColor('#ffffff').fontSize(10).text('Data', 45, tableTop + 5);
-    doc.text('Descrição / Doador', 150, tableTop + 5);
-    doc.text('Finalidade', 350, tableTop + 5);
-    doc.text('Valor (Kz)', 480, tableTop + 5);
-
-    let y = tableTop + 25;
-    doc.fillColor('#000000');
-
-    if (transacoes.length === 0) {
-      doc.fontSize(9).text('Nenhuma transação registada para este filtro.', 45, y);
-    } else {
-      transacoes.forEach((t, i) => {
-        if (i % 2 === 0) { doc.rect(40, y - 3, 515, 20).fill('#f8fafc'); doc.fillColor('#000000'); }
-        const data = new Date(t.criadoEm).toLocaleDateString('pt-PT');
-        const desc = t.membro ? t.membro.nome : (t.nomeDoador || 'Anónimo');
-        const isSaida = t.finalidade === 'SAIDA';
-
-        doc.fontSize(9).text(data, 45, y, { width: 100 });
-        doc.text(desc, 150, y, { width: 190 });
-        doc.text(t.finalidade, 350, y, { width: 120 });
-        doc.fillColor(isSaida ? '#dc2626' : '#059669').text(`${isSaida ? '-' : '+'} ${t.valor.toLocaleString('pt-AO')}`, 480, y, { width: 80, align: 'right' });
-        doc.fillColor('#000000');
-        y += 22;
-        if (y > 750) { doc.addPage(); y = 40; }
-      });
-    }
-
-    doc.end();
-  } catch (err) {
-    res.status(500).json({ message: err.message });
-  }
-}
 module.exports = { 
   list, create, consultar, preValidar, validar, negar, estatisticas, 
-  relatorioDizimistas, gerarComprovativoPDF, zerarFinancas, 
-  gerarPDFMembros, gerarPDFDepartamentos, gerarPDFSectores, gerarPDFFinanceiro, gerarPDFFiltrado 
+  relatorioDizimistas, gerarComprovativoPDF, zerarFinancas, gerarPDFMembros, gerarPDFDepartamentos, gerarPDFSectores 
 };
