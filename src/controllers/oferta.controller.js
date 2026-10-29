@@ -57,7 +57,6 @@ async function relatorioDizimistas(req, res, next) {
   } catch (err) { next(err); }
 }
 
-const PDFDocument = require('pdfkit');
 const fs = require('fs');
 const path = require('path');
 
