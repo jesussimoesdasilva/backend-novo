@@ -826,6 +826,22 @@ footer strong{color:#f2d27c}
   </div>
 </div>
 
+<!-- MODAL DA FOTO DO MEMBRO (ESTILO WHATSAPP) -->
+<div class="modal-overlay" id="modalFotoMembro" onclick="fecharFotoMembro()">
+  <div class="modal" style="max-width: 450px; background: transparent; box-shadow: none; border: none;">
+    
+    <div class="modal-header" style="background: transparent; padding: 0 0 20px 0; justify-content: flex-end; border: none;">
+      <button class="close-btn" onclick="fecharFotoMembro()" style="color: #fff; font-size: 30px; background: rgba(0,0,0,0.5); border-radius: 50%; width: 40px; height: 40px; display: grid; place-items: center;">✕</button>
+    </div>
+
+    <div class="modal-body" style="padding: 0; display: flex; flex-direction: column; align-items: center;">
+      <img id="fotoAmpliadaMembro" src="" alt="Foto do Membro" style="width: 100%; max-width: 300px; aspect-ratio: 1/1; object-fit: cover; border-radius: 50%; border: 5px solid var(--gold); box-shadow: 0 10px 40px rgba(0,0,0,0.5); background: #fff;">
+      <h3 id="nomeAmpliadoMembro" style="color: white; margin-top: 20px; font-size: 24px; font-weight: 900; text-align: center; text-shadow: 0 2px 10px rgba(0,0,0,0.8);"></h3>
+    </div>
+    
+  </div>
+</div>
+
 <!-- MODAL DA GALERIA DE ATIVIDADES -->
 <div class="modal-overlay" id="modalGaleriaAtividade">
   <div class="modal" style="max-width:700px;">
@@ -1354,9 +1370,12 @@ async function abrirConversa(id, nome, foto) {
   // Adiciona a classe que esconde a lista e mostra a conversa no telemóvel
   document.getElementById('chatContainer').classList.add('mostrar-conversa');
   
-  // Atualiza o cabeçalho com o nome da pessoa
+    // Atualiza o cabeçalho com o nome da pessoa
   document.getElementById('chatHeaderNome').innerHTML = `
-    ${foto ? `<img src="${foto}" class="chat-avatar" style="width:30px;height:30px;display:inline-block;vertical-align:middle;margin-right:8px;">` : ''}
+    ${foto 
+      ? `<img src="${foto}" class="chat-avatar" onclick="abrirFotoMembro('${foto}', '${nome.replace(/'/g, "\\'")}')" style="width:30px;height:30px;display:inline-block;vertical-align:middle;margin-right:8px;cursor:pointer;">` 
+      : `<div class="chat-avatar" onclick="abrirFotoMembro('', '${nome.replace(/'/g, "\\'")}')" style="width:30px;height:30px;display:inline-block;vertical-align:middle;margin-right:8px;cursor:pointer;">${nome.charAt(0)}</div>`
+    }
     <strong>${nome}</strong>
   `;
   
