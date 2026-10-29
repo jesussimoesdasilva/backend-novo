@@ -285,8 +285,108 @@ async function gerarPDFSectores(req, res) {
   } catch (err) { res.status(500).json({ message: err.message }); }
 }
 
+async function gerarPDFFinanceiro(req, res) {
+  try {
+    const igrejaId = Number(req.params.igrejaId);
+    const igreja = await prisma.igreja.findUnique({ where: { id: igrejaId } });
+    const transacoes = await prisma.oferta.findMany({ 
+      where: { igrejaId, status: 'VALIDADO' }, 
+      orderBy: { criadoEm: 'desc' } 
+    });
+    const stats = await service.getEstatisticas(igrejaId);
+
+    const doc = new PDFDocument({ margin: 40, size: 'A4' });
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', `attachment; filename="extrato-financeiro-${igreja.slug}.pdf"`);
+    doc.pipe(res);
+
+    // 1. LOGOTIPO
+    if (igreja.logoUrl) {
+      await new Promise((resolve) => {
+        https.get(igreja.logoUrl, (response) => {
+          const data = [];
+          response.on('data', (chunk) => data.push(chunk));
+          response.on('end', () => {
+            const buffer = Buffer.concat(data);
+            doc.image(buffer, 40, 40, { width: 60 });
+            resolve();
+          });
+        }).on('error', () => resolve());
+      });
+    }
+
+    // 2. CABEÇALHO
+    doc.fontSize(20).fillColor('#020617').text(igreja.nome, { align: 'center' });
+    doc.fontSize(12).fillColor('#64748b').text('Extrato Financeiro Oficial', { align: 'center' });
+    doc.moveDown(1);
+    doc.moveTo(40, doc.y).lineTo(555, doc.y).strokeColor('#facc15').lineWidth(2).stroke();
+    doc.moveDown(1);
+    doc.fontSize(10).fillColor('#94a3b8').text(`Emitido em: ${new Date().toLocaleString('pt-PT')}`, { align: 'right' });
+    doc.moveDown(1);
+
+    // 3. CARTÕES DE RESUMO
+    const resumoY = doc.y;
+    const boxWidth = 120;
+    const boxHeight = 50;
+    const gap = 10;
+
+    doc.rect(40, resumoY, boxWidth, boxHeight).fill('#f8fafc').stroke('#e2e8f0');
+    doc.fillColor('#64748b').fontSize(8).text('DÍZIMOS', 45, resumoY + 8);
+    doc.fillColor('#020617').fontSize(12).font('Helvetica-Bold').text(`${(stats.totalDizimos || 0).toLocaleString('pt-AO')} Kz`, 45, resumoY + 22);
+
+    doc.rect(40 + boxWidth + gap, resumoY, boxWidth, boxHeight).fill('#f8fafc').stroke('#e2e8f0');
+    doc.fillColor('#64748b').fontSize(8).text('OFERTAS', 40 + boxWidth + gap + 5, resumoY + 8);
+    doc.fillColor('#020617').fontSize(12).font('Helvetica-Bold').text(`${(stats.totalOfertas || 0).toLocaleString('pt-AO')} Kz`, 40 + boxWidth + gap + 5, resumoY + 22);
+
+    doc.rect(40 + (boxWidth + gap) * 2, resumoY, boxWidth, boxHeight).fill('#f8fafc').stroke('#e2e8f0');
+    doc.fillColor('#64748b').fontSize(8).text('SAÍDAS', 40 + (boxWidth + gap) * 2 + 5, resumoY + 8);
+    doc.fillColor('#dc2626').fontSize(12).font('Helvetica-Bold').text(`-${(stats.totalSaidas || 0).toLocaleString('pt-AO')} Kz`, 40 + (boxWidth + gap) * 2 + 5, resumoY + 22);
+
+    doc.rect(40 + (boxWidth + gap) * 3, resumoY, boxWidth, boxHeight).fill('#020617');
+    doc.fillColor('#facc15').fontSize(8).text('SALDO REAL', 40 + (boxWidth + gap) * 3 + 5, resumoY + 8);
+    doc.fillColor('#ffffff').fontSize(12).font('Helvetica-Bold').text(`${(stats.saldoReal || 0).toLocaleString('pt-AO')} Kz`, 40 + (boxWidth + gap) * 3 + 5, resumoY + 22);
+
+    doc.font('Helvetica'); // Reset da fonte
+    doc.y = resumoY + boxHeight + 20;
+
+    // 4. TABELA
+    const tableTop = doc.y;
+    doc.rect(40, tableTop, 515, 20).fill('#020617');
+    doc.fillColor('#ffffff').fontSize(10).text('Data', 45, tableTop + 5);
+    doc.text('Descrição / Doador', 150, tableTop + 5);
+    doc.text('Finalidade', 350, tableTop + 5);
+    doc.text('Valor (Kz)', 480, tableTop + 5);
+
+    let y = tableTop + 25;
+    doc.fillColor('#000000');
+
+    if (transacoes.length === 0) {
+      doc.fontSize(9).text('Nenhuma transação registada.', 45, y);
+    } else {
+      transacoes.forEach((t, i) => {
+        if (i % 2 === 0) { doc.rect(40, y - 3, 515, 20).fill('#f8fafc'); doc.fillColor('#000000'); }
+        const data = new Date(t.criadoEm).toLocaleDateString('pt-PT');
+        const desc = t.membro ? t.membro.nome : (t.nomeDoador || 'Anónimo');
+        const isSaida = t.finalidade === 'SAIDA';
+        
+        doc.fontSize(9).text(data, 45, y, { width: 100 });
+        doc.text(desc, 150, y, { width: 190 });
+        doc.text(t.finalidade, 350, y, { width: 120 });
+        doc.fillColor(isSaida ? '#dc2626' : '#059669').text(`${isSaida ? '-' : '+'} ${t.valor.toLocaleString('pt-AO')}`, 480, y, { width: 80, align: 'right' });
+        doc.fillColor('#000000');
+        y += 22;
+        if (y > 750) { doc.addPage(); y = 40; }
+      });
+    }
+
+    doc.end();
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+}
+
 module.exports = { 
   list, create, consultar, preValidar, validar, negar, estatisticas, 
   relatorioDizimistas, gerarComprovativoPDF, zerarFinancas, 
-  gerarPDFMembros, gerarPDFDepartamentos, gerarPDFSectores 
+  gerarPDFMembros, gerarPDFDepartamentos, gerarPDFSectores, gerarPDFFinanceiro 
 };

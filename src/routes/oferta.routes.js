@@ -12,6 +12,7 @@ router.get("/comprovativo/:igrejaId/:codigo", c.gerarComprovativoPDF);
 router.get("/pdf/membros/:igrejaId", c.gerarPDFMembros); // <-- NOVA ROTA AQUI
 router.get("/pdf/departamentos/:igrejaId", c.gerarPDFDepartamentos);
 router.get("/pdf/sectores/:igrejaId", c.gerarPDFSectores);
+router.get("/pdf/financeiro/:igrejaId", c.gerarPDFFinanceiro);
 router.delete("/igreja/:igrejaId/zerar", c.zerarFinancas);
 
 router.put("/:id/pre-validar", c.preValidar);

@@ -611,11 +611,12 @@ async function gerarRelatorioPastor(tipo) {
     }
 
     else if (tipo === 'financeiro') {
-      gerarRelatorioDetalhado(); 
+      // Descarrega o PDF diretamente, sem gerar a tabela no ecrã
+      window.open('/api/ofertas/pdf/financeiro/' + igrejaId, '_blank');
       return;
     }
 
-    // O botão muda dependendo do tipo
+    // O botão muda dependendo do tipo (só para membros, departamentos e sectores)
     let botaoHtml = '';
     if (tipo === 'membros') {
       botaoHtml = `<button class="btn btn-primary no-print" style="margin-top:30px; width:100%;" onclick="window.open('/api/ofertas/pdf/membros/${igrejaAtual.igrejaId}', '_blank')">🖨️ Descarregar PDF Oficial</button>`;
@@ -623,8 +624,6 @@ async function gerarRelatorioPastor(tipo) {
       botaoHtml = `<button class="btn btn-primary no-print" style="margin-top:30px; width:100%;" onclick="window.open('/api/ofertas/pdf/departamentos/${igrejaAtual.igrejaId}', '_blank')">🖨️ Descarregar PDF Oficial</button>`;
     } else if (tipo === 'sectores') {
       botaoHtml = `<button class="btn btn-primary no-print" style="margin-top:30px; width:100%;" onclick="window.open('/api/ofertas/pdf/sectores/${igrejaAtual.igrejaId}', '_blank')">🖨️ Descarregar PDF Oficial</button>`;
-    } else {
-      botaoHtml = `<button class="btn btn-primary no-print" style="margin-top:30px; width:100%;" onclick="window.print()">🖨️ Imprimir / Exportar PDF</button>`;
     }
 
     conteudo.innerHTML = `
