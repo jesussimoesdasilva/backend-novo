@@ -1,6 +1,7 @@
 const prisma = require("../config/prisma");
-const service = require("../services/oferta.service"); // <-- Esta linha já devia estar aqui antes
+const service = require("../services/oferta.service");
 const PDFDocument = require('pdfkit');
+const https = require('https'); // Necessário para o logotipo
 
 async function list(req, res, next) {
   try { res.json(await service.listOfertas(req.params.igrejaId)); } catch (err) { next(err); }
@@ -10,7 +11,6 @@ async function create(req, res, next) {
   try {
     const { finalidade, valor, metodo } = req.body;
     
-    // Se for uma SAIDA (despesa), não exige o método. Se for oferta/dízimo, exige.
     if (!finalidade || !valor) {
       return res.status(400).json({ error: true, message: "Finalidade e valor são obrigatórios" });
     }
@@ -21,7 +21,7 @@ async function create(req, res, next) {
     const oferta = await service.createOferta(req.params.igrejaId, req.body);
     res.status(201).json({ message: "Registo efetuado", oferta });
   } catch (err) { 
-    console.error("ERRO AO CRIAR:", err); // Mostra o erro no CMD
+    console.error("ERRO AO CRIAR:", err);
     next(err); 
   }
 }
@@ -57,43 +57,28 @@ async function relatorioDizimistas(req, res, next) {
   } catch (err) { next(err); }
 }
 
-const fs = require('fs');
-const path = require('path');
-
 async function gerarComprovativoPDF(req, res) {
   try {
     const { igrejaId, codigo } = req.params;
-
-    // 1. Vai buscar a oferta à base de dados
     const oferta = await prisma.oferta.findFirst({
       where: { codigo, igrejaId: Number(igrejaId) },
       include: { igreja: true, membro: true }
     });
-
     if (!oferta) return res.status(404).json({ message: "Oferta não encontrada" });
 
-    // 2. Cria o documento PDF
     const doc = new PDFDocument({ margin: 50 });
-
-    // Configura os headers para forçar o download
     res.setHeader('Content-Type', 'application/pdf');
     res.setHeader('Content-Disposition', `attachment; filename="comprovativo-${codigo}.pdf"`);
-
     doc.pipe(res);
 
-    // 3. Desenha o cabeçalho
     doc.fontSize(20).fillColor('#020617').text(oferta.igreja.nome, { align: 'center' });
     doc.fontSize(12).fillColor('#64748b').text('Comprovativo Oficial de Oferta', { align: 'center' });
     doc.moveDown(2);
-
-    // Linha divisória
     doc.moveTo(50, doc.y).lineTo(550, doc.y).strokeColor('#facc15').lineWidth(2).stroke();
     doc.moveDown(1);
 
-    // 4. Desenha os dados da oferta
     doc.fontSize(14).fillColor('#020617').text('Detalhes da Oferta', { underline: true });
     doc.moveDown(1);
-
     doc.fontSize(12).fillColor('#334155');
     doc.text(`Código: ${oferta.codigo}`);
     doc.text(`Valor: ${oferta.valor.toLocaleString('pt-AO')} Kz`);
@@ -102,29 +87,21 @@ async function gerarComprovativoPDF(req, res) {
     doc.text(`Doador: ${oferta.membro ? oferta.membro.nome : (oferta.nomeDoador || 'Anónimo')}`);
     doc.text(`Data: ${new Date(oferta.criadoEm).toLocaleDateString('pt-PT')}`);
     doc.moveDown(2);
-
-    // 5. Mensagem de agradecimento
     doc.fontSize(14).fillColor('#020617').text('Obrigado pela sua fidelidade!', { align: 'center' });
     doc.moveDown(1);
     doc.fontSize(10).fillColor('#64748b').text('Este comprovativo foi gerado automaticamente pelo Sistema de Gestão Eclesiástica.', { align: 'center' });
-
-    // Linha final
     doc.moveDown(2);
     doc.moveTo(50, doc.y).lineTo(550, doc.y).strokeColor('#facc15').lineWidth(1).stroke();
-
-    // Finaliza o PDF
     doc.end();
-
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
 }
+
 async function zerarFinancas(req, res) {
   try {
     const igrejaId = Number(req.params.igrejaId);
-    const resultado = await prisma.oferta.deleteMany({
-      where: { igrejaId: igrejaId }
-    });
+    const resultado = await prisma.oferta.deleteMany({ where: { igrejaId } });
     res.json({ message: `Finanças zeradas. ${resultado.count} registos apagados.` });
   } catch (err) {
     res.status(500).json({ message: err.message });
@@ -137,30 +114,39 @@ async function gerarPDFMembros(req, res) {
     const igreja = await prisma.igreja.findUnique({ where: { id: igrejaId } });
     const membros = await prisma.membro.findMany({ where: { igrejaId }, orderBy: { nome: 'asc' } });
 
-    const PDFDocument = require('pdfkit');
     const doc = new PDFDocument({ margin: 40, size: 'A4' });
-
     res.setHeader('Content-Type', 'application/pdf');
     res.setHeader('Content-Disposition', `attachment; filename="relatorio-membros-${igreja.slug}.pdf"`);
-
     doc.pipe(res);
 
-    // 1. Cabeçalho
+    // --- LOGOTIPO (Corrigido para o Cloudinary) ---
+    if (igreja.logoUrl) {
+      await new Promise((resolve) => {
+        https.get(igreja.logoUrl, (response) => {
+          const data = [];
+          response.on('data', (chunk) => data.push(chunk));
+          response.on('end', () => {
+            const buffer = Buffer.concat(data);
+            doc.image(buffer, 40, 40, { width: 60 });
+            resolve();
+          });
+        }).on('error', () => resolve());
+      });
+    }
+
+    // Cabeçalho
     doc.fontSize(20).fillColor('#020617').text(igreja.nome, { align: 'center' });
     doc.fontSize(12).fillColor('#64748b').text('Relatório Oficial de Membros', { align: 'center' });
     doc.moveDown(1);
-    
     doc.moveTo(40, doc.y).lineTo(555, doc.y).strokeColor('#facc15').lineWidth(2).stroke();
     doc.moveDown(1);
 
-    // 2. Data e Hora
+    // Data
     doc.fontSize(10).fillColor('#94a3b8').text(`Emitido em: ${new Date().toLocaleString('pt-PT')}`, { align: 'right' });
     doc.moveDown(1);
 
-    // 3. Tabela
+    // Tabela
     const tableTop = doc.y;
-    
-    // Cabeçalho da Tabela
     doc.rect(40, tableTop, 515, 20).fill('#020617');
     doc.fillColor('#ffffff').fontSize(10).text('Nome', 45, tableTop + 5);
     doc.text('Email', 250, tableTop + 5);
@@ -171,24 +157,13 @@ async function gerarPDFMembros(req, res) {
     doc.fillColor('#000000');
 
     membros.forEach((m, i) => {
-      // Fundo alternado para melhor leitura
-      if (i % 2 === 0) {
-        doc.rect(40, y - 3, 515, 20).fill('#f8fafc');
-        doc.fillColor('#000000');
-      }
-      
+      if (i % 2 === 0) { doc.rect(40, y - 3, 515, 20).fill('#f8fafc'); doc.fillColor('#000000'); }
       doc.fontSize(9).text(m.nome, 45, y, { width: 200 });
       doc.text(m.email || '-', 250, y, { width: 140 });
       doc.text(m.telefone || '-', 400, y, { width: 90 });
       doc.text(m.cargo || 'Membro', 505, y, { width: 50 });
-      
       y += 22;
-
-      // Se a página encher, cria uma nova
-      if (y > 750) {
-        doc.addPage();
-        y = 40;
-      }
+      if (y > 750) { doc.addPage(); y = 40; }
     });
 
     doc.end();
@@ -197,4 +172,7 @@ async function gerarPDFMembros(req, res) {
   }
 }
 
-module.exports = { list, create, consultar, preValidar, validar, negar, estatisticas, relatorioDizimistas, gerarComprovativoPDF, gerarPDFMembros, zerarFinancas };
+module.exports = { 
+  list, create, consultar, preValidar, validar, negar, estatisticas, 
+  relatorioDizimistas, gerarComprovativoPDF, zerarFinancas, gerarPDFMembros 
+};
