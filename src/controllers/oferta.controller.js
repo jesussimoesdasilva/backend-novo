@@ -3,6 +3,7 @@ const service = require("../services/oferta.service");
 const PDFDocument = require('pdfkit');
 const https = require('https');
 
+
 async function list(req, res, next) {
   try { res.json(await service.listOfertas(req.params.igrejaId)); } catch (err) { next(err); }
 }
@@ -139,7 +140,10 @@ async function gerarPDFMembros(req, res) {
     res.setHeader('Content-Disposition', `attachment; filename="relatorio-membros-${igreja.slug}.pdf"`);
     doc.pipe(res);
 
-    await desenharLogotipo(doc, igreja);
+    // --- LOGOTIPO SIMPLES (RETÂNGULO COM A INICIAL) ---
+    doc.rect(40, 40, 60, 60).fill('#020617'); // Retângulo preto
+    doc.fontSize(30).fillColor('#facc15').text(igreja.nome.charAt(0).toUpperCase(), 40, 52, { width: 60, align: 'center' }); // Letra dourada
+    // ------------------------------------------------
 
     doc.fontSize(20).fillColor('#020617').text(igreja.nome, { align: 'center' });
     doc.fontSize(12).fillColor('#64748b').text('Relatório Oficial de Membros', { align: 'center' });
