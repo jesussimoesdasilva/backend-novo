@@ -2340,7 +2340,7 @@ function mostrarAreaMembro() {
   document.getElementById('infoTelefone').textContent = membroLogado.telefone || '-';
   document.getElementById('infoBi').textContent = membroLogado.bi || '-';
   document.getElementById('infoEndereco').textContent = membroLogado.endereco || '-';
-  document.getElementById('infoIgreja').textContent = membroLogado.igreja ? membroLogado.igreja.nome : '-';
+  document.getElementById('infoIgreja').textContent = document.getElementById('igrejaNome').textContent;
 
   // --- A CORREÇÃO AQUI: Lógica para mostrar o departamento do sector se o departamento direto for nulo ---
   let nomeDepto = 'Ainda não alocado';
