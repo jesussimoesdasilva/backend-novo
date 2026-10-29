@@ -1292,6 +1292,7 @@ function navegarLightbox(dir) {
 let contactosChat = [];
 let contactoAtual = null;
 let intervalChat = null;
+let intervalContactos = null;
 async function iniciarChat() {
   if (!membroLogado) {
     document.getElementById('chatArea').innerHTML = '<p style="text-align:center;color:#64748b">Faça login para conversar com a liderança.</p>';
@@ -1336,6 +1337,9 @@ async function iniciarChat() {
     contactosChat = dados;
     renderizarContactosChat();
     
+    // NOVO: Atualiza a lista de contactos a cada 5 segundos
+    if (intervalContactos) clearInterval(intervalContactos);
+    intervalContactos = setInterval(atualizarListaContactos, 5000);
   } catch (e) { 
     // Mostra o erro real na tela
     document.getElementById('chatSidebar').innerHTML = `
@@ -1345,6 +1349,24 @@ async function iniciarChat() {
       </div>
     `; 
   }
+}
+
+async function atualizarListaContactos() {
+  if (!membroLogado) return;
+  try {
+    const r = await fetch('/api/chat/contactos/' + igrejaIdAtual + '?meuId=' + membroLogado.id + '&comNaoLidas=true');
+    if (!r.ok) return;
+    const dados = await r.json();
+    if (!Array.isArray(dados)) return;
+
+    // Só redesenha se os dados mudaram (para não piscar a lista sem razão)
+    const dadosAntigos = JSON.stringify(contactosChat);
+    const dadosNovos = JSON.stringify(dados);
+    if (dadosAntigos !== dadosNovos) {
+      contactosChat = dados;
+      renderizarContactosChat();
+    }
+  } catch (e) { console.error("Erro ao atualizar contactos:", e); }
 }
 
 function renderizarContactosChat() {
@@ -2386,6 +2408,7 @@ function sairMembro() {
   document.getElementById('areaMembro').style.display = 'none';
   document.getElementById('chatArea').innerHTML = '<p style="text-align:center;color:#64748b">Faça login para conversar com a liderança.</p>';
   if (intervalChat) clearInterval(intervalChat);
+  if (intervalContactos) clearInterval(intervalContactos);
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
