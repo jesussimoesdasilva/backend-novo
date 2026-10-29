@@ -217,36 +217,42 @@ th{color:var(--gold);font-size:12px;text-transform:uppercase}
     </div>
 
     <!-- RELATÓRIOS -->
-    <div id="section-relatorios" class="section">
-      <div class="card no-print">
-        <h3>📊 Central de Relatórios</h3>
-        <p style="color:var(--muted); font-size:13px; margin-bottom:20px;">Visão geral das finanças da igreja.</p>
-        
-        <div class="grid-4">
-          <div style="border:1px solid #ccc; padding:20px; border-radius:12px; text-align:center; background:rgba(255,255,255,0.05)">
-            <h4 style="color:#059669">Dízimos</h4>
-            <p style="font-size:24px; font-weight:800; color:#fff;" id="relDizimos">0 Kz</p>
-          </div>
-          <div style="border:1px solid #ccc; padding:20px; border-radius:12px; text-align:center; background:rgba(255,255,255,0.05)">
-            <h4 style="color:#d4a017">Ofertas</h4>
-            <p style="font-size:24px; font-weight:800; color:#fff;" id="relOfertas">0 Kz</p>
-          </div>
-          <div style="border:1px solid #ccc; padding:20px; border-radius:12px; text-align:center; background:rgba(255,255,255,0.05)">
-            <h4 style="color:#dc2626">Despesas</h4>
-            <p style="font-size:24px; font-weight:800; color:#fff;" id="relSaidas">0 Kz</p>
-          </div>
-          <div style="border:1px solid #ccc; padding:20px; border-radius:12px; text-align:center; background:rgba(34,211,238,0.1)">
-            <h4 style="color:#0284c7">SALDO REAL</h4>
-            <p style="font-size:24px; font-weight:800; color:#fff;" id="relSaldo">0 Kz</p>
-          </div>
-        </div>
-        <button class="btn btn-primary" style="margin-top:20px; width:100%;" onclick="gerarRelatorioDetalhado()">📄 Gerar Extrato Completo (PDF)</button>
-      </div>
-
-      <div class="card" id="areaRelatorio" style="display:none; background:transparent; border:none; box-shadow:none; padding:0;">
-        <div id="conteudoRelatorio"></div>
-      </div>
+<div id="section-relatorios" class="section">
+  <div class="card no-print" style="background: #071b36; border: 1px solid rgba(212,160,23,.3);">
+    <h3 style="color: #facc15;">📊 Central de Relatórios</h3>
+    <p style="color: #94a3b8; font-size: 13px; margin-bottom: 20px;">Selecione o relatório que deseja visualizar e imprimir.</p>
+    
+    <div class="grid-4">
+      <!-- Botão Membros -->
+      <button onclick="gerarRelatorioPastor('membros')" style="background: #facc15; color: #020617; border: none; padding: 20px; border-radius: 15px; font-weight: 900; font-size: 16px; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 10px;">
+        <span style="font-size: 30px;">👥</span>
+        Relatório de Membros
+      </button>
+      
+      <!-- Botão Departamentos -->
+      <button onclick="gerarRelatorioPastor('departamentos')" style="background: #1e293b; color: white; border: 1px solid #475569; padding: 20px; border-radius: 15px; font-weight: 900; font-size: 16px; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 10px;">
+        <span style="font-size: 30px;">🏛️</span>
+        Departamentos
+      </button>
+      
+      <!-- Botão Sectores -->
+      <button onclick="gerarRelatorioPastor('sectores')" style="background: #1e293b; color: white; border: 1px solid #475569; padding: 20px; border-radius: 15px; font-weight: 900; font-size: 16px; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 10px;">
+        <span style="font-size: 30px;">🎯</span>
+        Sectores Detalhados
+      </button>
+      
+      <!-- Botão Extrato Financeiro -->
+      <button onclick="gerarRelatorioPastor('financeiro')" style="background: #059669; color: white; border: none; padding: 20px; border-radius: 15px; font-weight: 900; font-size: 16px; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 10px;">
+        <span style="font-size: 30px;">💰</span>
+        Extrato Financeiro
+      </button>
     </div>
+  </div>
+
+  <div class="card" id="areaRelatorio" style="display:none; background:transparent; border:none; box-shadow:none; padding:0;">
+    <div id="conteudoRelatorio"></div>
+  </div>
+</div>
 
     <!-- ORAÇÃO E TESTEMUNHOS -->
     <div id="section-oracao" class="section">
@@ -487,6 +493,96 @@ async function gerarRelatorioDetalhado() {
 
   } catch (e) {
     content.innerHTML = `<div class="empty" style="color:red">Erro ao gerar relatório: ${e.message}</div>`;
+  }
+}
+
+async function gerarRelatorioPastor(tipo) {
+  const area = document.getElementById('areaRelatorio');
+  const conteudo = document.getElementById('conteudoRelatorio');
+  area.style.display = 'block';
+  conteudo.innerHTML = '<div class="empty">A carregar dados...</div>';
+
+  try {
+    const igrejaId = igrejaAtual.igrejaId;
+    let html = '';
+
+    if (tipo === 'membros') {
+      const r = await fetch(API + '/membros/igreja/' + igrejaId);
+      const membros = await r.json();
+      html = `<h3>Relatório de Membros</h3>
+              <table style="width:100%; border-collapse:collapse; margin-top:20px;">
+                <thead><tr style="background:#f1f5f9; text-align:left; color: #020617;">
+                  <th style="padding:10px;">Nome</th><th style="padding:10px;">Email</th><th style="padding:10px;">Telefone</th><th style="padding:10px;">Cargo</th>
+                </tr></thead>
+                <tbody>${membros.map(m => `
+                  <tr style="border-bottom:1px solid #e2e8f0; color: #020617;">
+                    <td style="padding:10px;">${m.nome}</td>
+                    <td style="padding:10px;">${m.email}</td>
+                    <td style="padding:10px;">${m.telefone || '-'}</td>
+                    <td style="padding:10px;">${m.cargo || 'Membro'}</td>
+                  </tr>
+                `).join('')}</tbody>
+              </table>`;
+    } 
+    
+    else if (tipo === 'departamentos') {
+      const r = await fetch(API + '/departamentos/igreja/' + igrejaId);
+      const deptos = await r.json();
+      html = `<h3>Relatório de Departamentos</h3>
+              <table style="width:100%; border-collapse:collapse; margin-top:20px;">
+                <thead><tr style="background:#f1f5f9; text-align:left; color: #020617;">
+                  <th style="padding:10px;">Nome</th><th style="padding:10px;">Líder</th><th style="padding:10px;">Nº de Membros</th>
+                </tr></thead>
+                <tbody>${deptos.map(d => `
+                  <tr style="border-bottom:1px solid #e2e8f0; color: #020617;">
+                    <td style="padding:10px;">${d.nome}</td>
+                    <td style="padding:10px;">${d.lider ? d.lider.nome : 'A definir'}</td>
+                    <td style="padding:10px;">${d._count?.membros || 0}</td>
+                  </tr>
+                `).join('')}</tbody>
+              </table>`;
+    }
+
+    else if (tipo === 'sectores') {
+      const r = await fetch(API + '/departamentos/igreja/' + igrejaId);
+      const deptos = await r.json();
+      let linhas = '';
+      deptos.forEach(d => {
+        d.sectores.forEach(s => {
+          linhas += `
+            <tr style="border-bottom:1px solid #e2e8f0; color: #020617;">
+              <td style="padding:10px;">${s.nome}</td>
+              <td style="padding:10px;">${d.nome}</td>
+              <td style="padding:10px;">${s.lider ? s.lider.nome : 'A definir'}</td>
+              <td style="padding:10px;">${s._count?.membros || 0}</td>
+            </tr>
+          `;
+        });
+      });
+      html = `<h3>Relatório de Sectores Detalhados</h3>
+              <table style="width:100%; border-collapse:collapse; margin-top:20px;">
+                <thead><tr style="background:#f1f5f9; text-align:left; color: #020617;">
+                  <th style="padding:10px;">Sector</th><th style="padding:10px;">Departamento</th><th style="padding:10px;">Líder</th><th style="padding:10px;">Nº de Membros</th>
+                </tr></thead>
+                <tbody>${linhas}</tbody>
+              </table>`;
+    }
+
+    else if (tipo === 'financeiro') {
+      gerarRelatorioDetalhado(); 
+      return;
+    }
+
+    conteudo.innerHTML = `
+      <div style="background: #ffffff; color: #000000; padding: 40px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); margin-top: 20px;">
+        ${html}
+        <button class="btn btn-primary no-print" style="margin-top:30px; width:100%;" onclick="window.print()">🖨️ Imprimir / Exportar PDF</button>
+      </div>
+    `;
+    area.scrollIntoView({ behavior: 'smooth' });
+
+  } catch (e) {
+    conteudo.innerHTML = `<div class="empty" style="color:red">Erro ao carregar o relatório: ${e.message}</div>`;
   }
 }
 
