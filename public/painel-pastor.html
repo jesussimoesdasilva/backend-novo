@@ -274,7 +274,7 @@ th{color:var(--gold);font-size:12px;text-transform:uppercase}
 <div class="toast-container" id="toasts"></div>
 
 <script>
-<script>
+
 const API = '/api';
 const pathParts = window.location.pathname.split('/');
 const slug = pathParts[pathParts.length - 2];
@@ -402,8 +402,6 @@ async function carregarRelatorios() {
 }
 
 // ===== GERAR RELATÓRIO PREMIUM COM DETALHES =====
-let transacoesGlobais = [];
-let filtroRelatorioAtual = 'todos';
 
 async function gerarRelatorioDetalhado() {
   const div = document.getElementById('areaRelatorio');
