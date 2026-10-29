@@ -1379,17 +1379,17 @@ async function abrirConversa(id, nome, foto) {
   // Adiciona a classe que esconde a lista e mostra a conversa no telemóvel
   document.getElementById('chatContainer').classList.add('mostrar-conversa');
   
-    // Atualiza o cabeçalho com o nome da pessoa
+      // Atualiza o cabeçalho com o nome da pessoa
   const fotoSegura = JSON.stringify(foto || '');
   const nomeSeguro = JSON.stringify(nome);
   
   document.getElementById('chatHeaderNome').innerHTML = `
-    <div onclick='abrirFotoMembro(${fotoSegura}, ${nomeSeguro})' style="display:flex; align-items:center; gap:8px; cursor:pointer; width:100%;">
+    <div onclick='event.stopPropagation(); abrirFotoMembro(${fotoSegura}, ${nomeSeguro})' style="display:flex; align-items:center; gap:8px; cursor:pointer; width:100%;">
       ${foto 
-        ? `<img src="${foto}" class="chat-avatar" style="width:30px;height:30px;pointer-events:none;">` 
-        : `<div class="chat-avatar" style="width:30px;height:30px;pointer-events:none;">${nome.charAt(0)}</div>`
+        ? `<img src="${foto}" class="chat-avatar" style="width:30px;height:30px;">` 
+        : `<div class="chat-avatar" style="width:30px;height:30px;">${nome.charAt(0)}</div>`
       }
-      <strong style="pointer-events:none;">${nome}</strong>
+      <strong>${nome}</strong>
     </div>
   `;
   
