@@ -45,6 +45,7 @@ async function buscarMembroCompletoParaPDF(id) {
     include: { 
       igreja: true, 
       departamento: true,
+      sectores: true, // <-- ADICIONA ESTA LINHA
       documentos: true,
       presencas: { orderBy: { data: 'desc' }, take: 5 }
     }
