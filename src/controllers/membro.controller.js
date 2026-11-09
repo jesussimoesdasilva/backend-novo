@@ -429,8 +429,26 @@ async function gerarPDFPresencasSecretario(req, res) {
   } catch (err) { res.status(500).json({ message: err.message }); }
 }
 
+async function editarMembroSecretario(req, res) {
+  try {
+    const { id } = req.params;
+    const { departamentoId, dataBatismo } = req.body;
+
+    const membro = await prisma.membro.update({
+      where: { id: Number(id) },
+      data: {
+        departamentoId: departamentoId ? Number(departamentoId) : null,
+        dataBatismo: dataBatismo ? new Date(dataBatismo) : null
+      }
+    });
+    res.json(membro);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+}
+
 module.exports = {
   publicRegister, login, verificarTelefone, verCodigo, redefinirSenhaComCodigo,
   list, create, aprovar, promover, setSectores, resetPassword, remove,
-  updatePerfil, updateFoto, gerarFichaMembroPDF, gerarPDFMembrosSecretario, gerarPDFBatismosSecretario, gerarPDFPresencasSecretario
+  updatePerfil, updateFoto, gerarFichaMembroPDF, gerarPDFMembrosSecretario, gerarPDFBatismosSecretario, gerarPDFPresencasSecretario, editarMembroSecretario
 };

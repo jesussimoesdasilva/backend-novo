@@ -24,6 +24,7 @@ router.put("/:id/aprovar", c.aprovar);
 router.put("/:id/promover", c.promover);
 router.put("/:id/sectores", c.setSectores);
 router.put("/:id/reset-password", c.resetPassword);
+router.put("/:id/secretario", c.editarMembroSecretario);
 router.delete("/:id", c.remove);
 
 // NOVO: Edição do próprio perfil
