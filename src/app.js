@@ -24,6 +24,8 @@ app.use('/api/galeria', require('./routes/galeria.routes'));
 app.use('/api/chat', require('./routes/chat.routes')); // <-- CHAT AQUI
 app.use('/api/oracao', require('./routes/oracao.routes'));
 app.use('/api/midia', require('./routes/midia.routes'));
+app.use('/api/documentos', require('./routes/documento.routes'));
+app.use('/api/presencas', require('./routes/presenca.routes'));
 
 app.get('/igreja/:slug', (req, res) => {
   res.sendFile(path.join(__dirname, '..', 'public', 'site-igreja.html'));
