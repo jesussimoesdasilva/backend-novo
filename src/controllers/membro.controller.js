@@ -20,15 +20,34 @@ async function publicRegister(req, res) {
 
 async function login(req, res) {
   try {
-    const { email, senha } = req.body;
-    const membro = await prisma.membro.findUnique({ where: { email }, include: { departamento: true, sectores: { include: { departamento: true } }, lideraSetores: true, lideraDeptos: true } });
+    const { email, senha, igrejaSlug } = req.body; // <-- Recebe o slug
+
+    const membro = await prisma.membro.findUnique({ 
+      where: { email },
+      include: {
+        igreja: true,
+        departamento: true,
+        sectores: { include: { departamento: true } },
+        lideraSetores: true,
+        lideraDeptos: true
+      }
+    });
+
     if (!membro) return res.status(404).json({ message: "Utilizador não encontrado" });
+
+    // Verifica se o membro pertence à igreja
+    if (membro.igreja.slug !== igrejaSlug) {
+      return res.status(403).json({ message: "Este email não pertence a esta igreja." });
+    }
+
     const valid = await bcrypt.compare(senha, membro.password);
     if (!valid) return res.status(401).json({ message: "Senha incorreta" });
-    res.json({ membro });
-  } catch (err) { res.status(500).json({ message: err.message }); }
-}
 
+    res.json({ membro });
+  } catch (err) { 
+    res.status(500).json({ message: err.message }); 
+  }
+}
 async function verificarTelefone(req, res) { res.json({ ok: true }); }
 async function verCodigo(req, res) { res.json({ ok: true }); }
 async function redefinirSenhaComCodigo(req, res) { res.json({ ok: true }); }

@@ -2333,7 +2333,7 @@ async function submeterLogin(e) {
   try {
     const r = await fetch('/api/membros/login', {
       method: 'POST', headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({ email, senha })
+      body: JSON.stringify({ email, senha, igrejaSlug: slug }) // <-- ADICIONA O SLUG AQUI
     });
     const dados = await r.json();
     if (!r.ok) throw new Error(dados.message || 'Erro ao entrar');
