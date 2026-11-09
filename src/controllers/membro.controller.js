@@ -176,8 +176,12 @@ async function updateFoto(req, res) {
 async function gerarFichaMembroPDF(req, res) {
   try {
     const { membroId } = req.params;
+    const { finalidade } = req.query; // <-- Recebe a finalidade
     const membro = await membroService.buscarMembroCompletoParaPDF(membroId);
     if (!membro) return res.status(404).json({ message: "Membro não encontrado" });
+
+    // Vai buscar o Pastor para a assinatura
+    const pastor = await prisma.pastor.findFirst({ where: { igrejaId: membro.igrejaId } });
 
     const doc = new PDFDocument({ margin: 40, size: 'A4' });
     res.setHeader('Content-Type', 'application/pdf');
@@ -233,10 +237,10 @@ async function gerarFichaMembroPDF(req, res) {
     doc.text(`BI: ${membro.bi || '-'}`, 160, y + 55);
     doc.text(`Nascimento: ${membro.dataNascimento ? new Date(membro.dataNascimento).toLocaleDateString('pt-PT') : '-'}`, 160, y + 70);
     doc.text(`Batismo: ${membro.dataBatismo ? new Date(membro.dataBatismo).toLocaleDateString('pt-PT') : '-'}`, 160, y + 85);
-    doc.text(`Endereço: ${membro.endereco || '-'}`, 160, y + 100); // <-- ENDEREÇO ADICIONADO AQUI
+    doc.text(`Endereço: ${membro.endereco || '-'}`, 160, y + 100);
 
     // ===== 4. DEPARTAMENTO E CARGO =====
-    y += 145; // <-- AUMENTADO PARA BAIXAR A BARRA ESCURA E NÃO SOBREPOR O ENDEREÇO
+    y += 145;
     doc.fillColor('#020617').rect(40, y, 520, 40).fill();
     doc.fillColor('#ffffff').font('Helvetica-Bold').fontSize(11);
     doc.text(`DEPARTAMENTO: ${membro.departamento ? membro.departamento.nome : 'Sem departamento'}`, 50, y + 15);
@@ -261,6 +265,24 @@ async function gerarFichaMembroPDF(req, res) {
     } else {
       doc.fillColor('#94a3b8').font('Helvetica').fontSize(10).text('Nenhuma presenca registada.', 50, y); y += 15;
     }
+
+    // ===== 7. FINALIDADE E ASSINATURA =====
+    const textoFinalidade = finalidade || 'Diversos Efeitos';
+    
+    // Coloca no fundo da página
+    let footerY = 620; 
+    
+    doc.fillColor('#334155').font('Helvetica').fontSize(10);
+    doc.text(`Finalidade: ${textoFinalidade}`, 40, footerY);
+    
+    // Linha de assinatura à direita
+    doc.moveTo(350, footerY + 40).lineTo(550, footerY + 40).stroke('#020617');
+    
+    // Nome do Pastor e Cargo
+    doc.fillColor('#020617').font('Helvetica-Bold').fontSize(11);
+    doc.text(pastor ? pastor.nome : 'O Pastor', 350, footerY + 45);
+    doc.font('Helvetica').fontSize(9).fillColor('#64748b');
+    doc.text(pastor ? (pastor.cargo || 'Pastor') : 'Pastor', 350, footerY + 60);
 
     doc.end();
   } catch (err) {
