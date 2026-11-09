@@ -298,46 +298,48 @@ async function gerarFichaMembroPDF(req, res) {
 async function gerarPDFMembrosSecretario(req, res) {
   try {
     const { igrejaId } = req.params;
-    const membros = await prisma.membro.findMany({
-      where: { igrejaId: Number(igrejaId) },
-      include: { departamento: true },
-      orderBy: { nome: 'asc' }
-    });
-    const igreja = await prisma.igreja.findUnique({ where: { id: Number(igrejaId) } });
+    const { membros, igreja, pastor } = await membroService.buscarDadosParaRelatorioMembros(igrejaId);
 
     const doc = new PDFDocument({ margin: 40, size: 'A4' });
     res.setHeader('Content-Type', 'application/pdf');
     res.setHeader('Content-Disposition', `attachment; filename=relatorio-membros-${igreja.slug}.pdf`);
     doc.pipe(res);
 
-    // Cabeçalho
-    doc.fillColor('#020617').font('Helvetica-Bold').fontSize(20).text(igreja.nome.toUpperCase(), 40, 40);
-    doc.fillColor('#64748b').font('Helvetica').fontSize(12).text('Relatório Oficial de Membros', 40, 65);
-    doc.fillColor('#facc15').rect(40, 85, 520, 3).fill();
-    doc.fillColor('#94a3b8').fontSize(9).text(`Emitido em: ${new Date().toLocaleDateString('pt-PT')}`, 40, 95);
+    // --- O RESTO DO CÓDIGO DO PDF DE MEMBROS (que já tinhas) ---
+    // (Usa `membros`, `igreja` e `pastor` normalmente, pois o service já os buscou)
+    // ...
+    doc.end();
+  } catch (err) { res.status(500).json({ message: err.message }); }
+}
 
-    // Tabela
-    let y = 130;
-    doc.fillColor('#020617').rect(40, y, 520, 20).fill();
-    doc.fillColor('#ffffff').font('Helvetica-Bold').fontSize(9);
-    doc.text('NOME', 45, y + 6);
-    doc.text('EMAIL', 220, y + 6);
-    doc.text('TELEFONE', 400, y + 6);
-    doc.text('CARGO', 480, y + 6);
-    y += 20;
+async function gerarPDFBatismosSecretario(req, res) {
+  try {
+    const { igrejaId } = req.params;
+    const { membros, igreja, pastor } = await membroService.buscarDadosParaRelatorioBatismos(igrejaId);
 
-    doc.font('Helvetica').fontSize(9);
-    membros.forEach((m, i) => {
-      if (y > 750) { doc.addPage(); y = 40; }
-      if (i % 2 === 0) doc.fillColor('#f8fafc').rect(40, y, 520, 18).fill();
-      doc.fillColor('#020617');
-      doc.text(m.nome || '-', 45, y + 4, { width: 170 });
-      doc.text(m.email || '-', 220, y + 4, { width: 170 });
-      doc.text(m.telefone || '-', 400, y + 4, { width: 75 });
-      doc.text(m.cargo || 'Membro', 480, y + 4, { width: 80 });
-      y += 18;
-    });
+    const doc = new PDFDocument({ margin: 40, size: 'A4' });
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', `attachment; filename=relatorio-batismos-${igreja.slug}.pdf`);
+    doc.pipe(res);
 
+    // --- O RESTO DO CÓDIGO DO PDF DE BATISMOS (que já tinhas) ---
+    // ...
+    doc.end();
+  } catch (err) { res.status(500).json({ message: err.message }); }
+}
+
+async function gerarPDFPresencasSecretario(req, res) {
+  try {
+    const { igrejaId } = req.params;
+    const { presencas, igreja, pastor } = await membroService.buscarDadosParaRelatorioPresencas(igrejaId);
+
+    const doc = new PDFDocument({ margin: 40, size: 'A4' });
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', `attachment; filename=relatorio-presencas-${igreja.slug}.pdf`);
+    doc.pipe(res);
+
+    // --- O RESTO DO CÓDIGO DO PDF DE PRESENÇAS (que já tinhas) ---
+    // ...
     doc.end();
   } catch (err) { res.status(500).json({ message: err.message }); }
 }
@@ -345,5 +347,5 @@ async function gerarPDFMembrosSecretario(req, res) {
 module.exports = {
   publicRegister, login, verificarTelefone, verCodigo, redefinirSenhaComCodigo,
   list, create, aprovar, promover, setSectores, resetPassword, remove,
-  updatePerfil, updateFoto, gerarFichaMembroPDF, gerarPDFMembrosSecretario
+  updatePerfil, updateFoto, gerarFichaMembroPDF, gerarPDFMembrosSecretario, gerarPDFBatismosSecretario, gerarPDFPresencasSecretario
 };
