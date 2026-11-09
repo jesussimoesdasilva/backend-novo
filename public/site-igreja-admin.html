@@ -1513,16 +1513,20 @@ async function carregarMembros() {
               <td><strong>${m.nome}</strong></td>
               <td>${m.email}</td>
               <td>
-                <select onchange="mudarCargoMembro(${m.id}, this.value)" style="padding:6px; font-size:13px; background:${m.cargo === 'Pastor' ? 'var(--gold)' : 'rgba(2,6,23,.6)'}; color:${m.cargo === 'Pastor' ? '#000' : 'var(--text)'}; border:1px solid var(--border); border-radius:6px; font-weight:bold; cursor:pointer;">
-                  <option value="Membro" ${m.cargo === 'Membro' || !m.cargo ? 'selected' : ''}>Membro</option>
-                  <option value="Diácono" ${m.cargo === 'Diácono' ? 'selected' : ''}>Diácono</option>
-                  <option value="Presbítero" ${m.cargo === 'Presbítero' ? 'selected' : ''}>Presbítero</option>
-                  <option value="Evangelista" ${m.cargo === 'Evangelista' ? 'selected' : ''}>Evangelista</option>
-                  <option value="Pastor" ${m.cargo === 'Pastor' ? 'selected' : ''}>Pastor</option>
-                  <option value="Secretário" ${m.cargo === 'Secretário' ? 'selected' : ''}>Secretário</option>
-                  <option value="Administrador" ${m.cargo === 'Administrador' ? 'selected' : ''}>Administrador</option>
-                </select>
-              </td>
+  <select onchange="mudarCargoMembro(${m.id}, this.value)" style="padding:6px; font-size:13px; background:${m.cargo === 'Pastor' ? 'var(--gold)' : 'rgba(2,6,23,.6)'}; color:${m.cargo === 'Pastor' ? '#000' : 'var(--text)'}; border:1px solid var(--border); border-radius:6px; font-weight:bold; cursor:pointer;">
+    <option value="Membro" ${m.cargo === 'Membro' || !m.cargo ? 'selected' : ''}>Membro</option>
+    <option value="Diácono" ${m.cargo === 'Diácono' ? 'selected' : ''}>Diácono</option>
+    <option value="Presbítero" ${m.cargo === 'Presbítero' ? 'selected' : ''}>Presbítero</option>
+    <option value="Evangelista" ${m.cargo === 'Evangelista' ? 'selected' : ''}>Evangelista</option>
+    <option value="Pastor" ${m.cargo === 'Pastor' ? 'selected' : ''}>Pastor</option>
+    <option value="Secretário" ${m.cargo === 'Secretário' ? 'selected' : ''}>Secretário</option>
+    <option value="Financeiro" ${m.cargo === 'Financeiro' ? 'selected' : ''}>Financeiro</option>
+    <option value="Líder de Departamento" ${m.cargo === 'Líder de Departamento' ? 'selected' : ''}>Líder de Departamento</option>
+    <option value="Líder de Sector" ${m.cargo === 'Líder de Sector' ? 'selected' : ''}>Líder de Sector</option>
+    <option value="Madre" ${m.cargo === 'Madre' ? 'selected' : ''}>Madre</option>
+    <option value="Outros" ${m.cargo && !['Membro','Diácono','Presbítero','Evangelista','Pastor','Secretário','Financeiro','Líder de Departamento','Líder de Sector','Madre'].includes(m.cargo) ? 'selected' : ''}>Outros (Escrever)</option>
+  </select>
+</td>
               <td style="font-size:12px;color:var(--gold)">${(m.sectores || []).map(s=>s.nome).join(', ') || 'Nenhum'}</td>
               <td style="display:flex;gap:5px;flex-wrap:wrap;">
                 <button class="btn btn-outline" style="padding:5px 10px;font-size:12px" onclick="abrirModalSectores(${m.id}, '${m.nome.replace(/'/g,"\\'")}', [${(m.sectores||[]).map(s=>s.id)}])">Sectores</button>
@@ -1540,10 +1544,20 @@ async function carregarMembros() {
 }
 
 async function mudarCargoMembro(id, novoCargo) {
+  if (novoCargo === 'Outros') {
+    const cargoPersonalizado = prompt('Escreva o cargo personalizado (ex: Líder do Louvor, Financeiro, Madre):');
+    if (!cargoPersonalizado) {
+      carregarMembros(); // Se cancelar, recarrega a lista
+      return;
+    }
+    novoCargo = cargoPersonalizado;
+  }
+
   if (!confirm(`Tem a certeza que quer mudar o cargo deste membro para "${novoCargo}"?`)) {
-    carregarMembros(); // Reverte o dropdown se cancelar
+    carregarMembros();
     return;
   }
+
   try {
     const r = await fetch(API + '/membros/' + id + '/promover', {
       method: 'PUT', headers: {'Content-Type':'application/json'},
@@ -1552,9 +1566,9 @@ async function mudarCargoMembro(id, novoCargo) {
     if (!r.ok) throw new Error('Erro ao atualizar cargo');
     toast('Cargo atualizado com sucesso!', 'success');
     carregarMembros();
-  } catch (e) { 
-    toast(e.message, 'error'); 
-    carregarMembros(); 
+  } catch (e) {
+    toast(e.message, 'error');
+    carregarMembros();
   }
 }
 
