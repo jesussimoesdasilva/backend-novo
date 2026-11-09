@@ -176,7 +176,7 @@ async function updateFoto(req, res) {
 async function gerarFichaMembroPDF(req, res) {
   try {
     const { membroId } = req.params;
-    const { finalidade } = req.query; // <-- Recebe a finalidade
+    const { finalidade } = req.query; // Recebe a finalidade
     const membro = await membroService.buscarMembroCompletoParaPDF(membroId);
     if (!membro) return res.status(404).json({ message: "Membro não encontrado" });
 
@@ -270,21 +270,25 @@ async function gerarFichaMembroPDF(req, res) {
     const textoFinalidade = finalidade || 'Diversos Efeitos';
     
     // Coloca no fundo da página
-    let footerY = 620; 
+    let footerY = 600; 
     
+    // Texto de Declaração Formal
     doc.fillColor('#334155').font('Helvetica').fontSize(10);
-    doc.text(`Finalidade: ${textoFinalidade}`, 40, footerY);
+    doc.text(`Certificamos, para os devidos efeitos, que a presente Ficha Individual se destina a comprovar a situação do membro para fins de ${textoFinalidade}.`, 40, footerY, { align: 'justify', width: 520 });
     
-    // Linha de assinatura à direita
-    doc.moveTo(350, footerY + 40).lineTo(550, footerY + 40).stroke('#020617');
+    // Assinatura Centralizada
+    const centroX = 40 + (520 / 2); // Centro exato da área útil (300)
     
-    // Nome do Pastor e Cargo
     doc.fillColor('#020617').font('Helvetica-Bold').fontSize(11);
-    doc.text(pastor ? pastor.nome : 'O Pastor', 350, footerY + 45);
-    doc.font('Helvetica').fontSize(9).fillColor('#64748b');
-    doc.text(pastor ? (pastor.cargo || 'Pastor') : 'Pastor', 350, footerY + 60);
+    doc.text('O Pastor', centroX - 30, footerY + 60); // "O Pastor" por cima da linha
+    
+    doc.moveTo(centroX - 100, footerY + 75).lineTo(centroX + 100, footerY + 75).stroke('#020617'); // Linha
+    
+    doc.font('Helvetica-Bold').fontSize(11).text(pastor ? pastor.nome : 'Nome do Pastor', centroX - 100, footerY + 80, { width: 200, align: 'center' });
+    doc.font('Helvetica').fontSize(9).fillColor('#64748b').text(pastor ? (pastor.cargo || 'Pastor') : 'Pastor', centroX - 100, footerY + 95, { width: 200, align: 'center' });
 
-    doc.end();
+    doc.end(); // <-- ESTA LINHA É OBRIGATÓRIA PARA FECHAR O PDF
+
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: err.message });
