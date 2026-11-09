@@ -16,6 +16,7 @@ router.post("/igreja/:igrejaId", c.create);
 
 // ⚠️ A ROTA DA FICHA TEM DE FICAR ANTES DAS ROTAS COM /:id
 router.get("/pdf/ficha/:membroId", c.gerarFichaMembroPDF);
+router.get("/pdf/membros-secretario/:igrejaId", c.gerarPDFMembrosSecretario);
 
 router.put("/:id/aprovar", c.aprovar);
 router.put("/:id/promover", c.promover);
