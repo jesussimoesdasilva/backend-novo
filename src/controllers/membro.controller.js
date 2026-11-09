@@ -197,10 +197,13 @@ async function gerarPDFMembrosSecretario(req, res) {
   try {
     const { igrejaId } = req.params;
     const { membros, igreja, pastor } = await membroService.buscarDadosParaRelatorioMembros(igrejaId);
+
     const doc = new PDFDocument({ margin: 40, size: 'A4' });
     res.setHeader('Content-Type', 'application/pdf');
     res.setHeader('Content-Disposition', `attachment; filename=relatorio-membros-${igreja.slug}.pdf`);
     doc.pipe(res);
+
+    // Logotipo
     const logoUrl = igreja.logoUrl || igreja.icone;
     if (logoUrl && logoUrl.startsWith('http')) {
       try {
@@ -214,10 +217,13 @@ async function gerarPDFMembrosSecretario(req, res) {
         doc.image(logoBuffer, 40, 40, { width: 50, height: 50 });
       } catch (e) { console.log("Erro ao carregar logo", e.message); }
     }
+
     doc.fillColor('#020617').font('Helvetica-Bold').fontSize(20).text(igreja.nome.toUpperCase(), 100, 40);
     doc.fillColor('#64748b').font('Helvetica').fontSize(12).text('Relatório Oficial de Membros', 100, 65);
     doc.fillColor('#facc15').rect(40, 95, 520, 3).fill();
     doc.fillColor('#94a3b8').fontSize(9).text(`Emitido em: ${new Date().toLocaleDateString('pt-PT')}`, 40, 105);
+
+    // Cartões de Resumo
     const total = membros.length;
     const batizados = membros.filter(m => m.dataBatismo).length;
     const ativos = membros.filter(m => m.status === 'ATIVO').length;
@@ -229,22 +235,28 @@ async function gerarPDFMembrosSecretario(req, res) {
       }
     });
     const mediaIdade = comIdade > 0 ? Math.round(somaIdades / comIdade) : 0;
+
     const resumoY = 130;
     const boxWidth = 120;
     const boxHeight = 50;
     const gap = 13;
+
     doc.rect(40, resumoY, boxWidth, boxHeight).fill('#f8fafc').stroke('#e2e8f0');
     doc.fillColor('#64748b').fontSize(8).font('Helvetica-Bold').text('TOTAL', 45, resumoY + 8);
     doc.fillColor('#020617').fontSize(16).text(total.toString(), 45, resumoY + 22);
+
     doc.rect(40 + boxWidth + gap, resumoY, boxWidth, boxHeight).fill('#f8fafc').stroke('#e2e8f0');
     doc.fillColor('#64748b').fontSize(8).font('Helvetica-Bold').text('BATISMOS', 40 + boxWidth + gap + 5, resumoY + 8);
     doc.fillColor('#020617').fontSize(16).text(batizados.toString(), 40 + boxWidth + gap + 5, resumoY + 22);
+
     doc.rect(40 + (boxWidth + gap) * 2, resumoY, boxWidth, boxHeight).fill('#f8fafc').stroke('#e2e8f0');
     doc.fillColor('#64748b').fontSize(8).font('Helvetica-Bold').text('ATIVOS', 40 + (boxWidth + gap) * 2 + 5, resumoY + 8);
     doc.fillColor('#020617').fontSize(16).text(ativos.toString(), 40 + (boxWidth + gap) * 2 + 5, resumoY + 22);
+
     doc.rect(40 + (boxWidth + gap) * 3, resumoY, boxWidth, boxHeight).fill('#020617').stroke('#020617');
     doc.fillColor('#facc15').fontSize(8).font('Helvetica-Bold').text('MÉDIA IDADE', 40 + (boxWidth + gap) * 3 + 5, resumoY + 8);
     doc.fillColor('#ffffff').fontSize(16).text(`${mediaIdade} anos`, 40 + (boxWidth + gap) * 3 + 5, resumoY + 22);
+
     let tableY = 210;
     doc.fillColor('#020617').rect(40, tableY, 520, 20).fill();
     doc.fillColor('#ffffff').fontSize(9).font('Helvetica-Bold');
@@ -252,6 +264,7 @@ async function gerarPDFMembrosSecretario(req, res) {
     doc.text('EMAIL', 200, tableY + 6);
     doc.text('TELEFONE', 370, tableY + 6);
     doc.text('CARGO', 460, tableY + 6);
+
     tableY += 20;
     doc.font('Helvetica').fontSize(9);
     membros.forEach((m, i) => {
@@ -264,14 +277,16 @@ async function gerarPDFMembrosSecretario(req, res) {
       doc.text(m.cargo || 'Membro', 460, tableY + 6, { width: 95 });
       tableY += 20;
     });
-    if (tableY > 650) { doc.addPage(); tableY = 40; }
-    let footerY = Math.max(tableY + 40, 650);
+
+    // Assinatura com MUITO espaço
+    let footerY = 680; // <-- Aumentado para descer a assinatura
     const centroX = 40 + (520 / 2);
     doc.fillColor('#020617').font('Helvetica-Bold').fontSize(11);
     doc.text('O Pastor', centroX - 30, footerY);
-    doc.moveTo(centroX - 100, footerY + 15).lineTo(centroX + 100, footerY + 15).stroke('#020617');
-    doc.font('Helvetica-Bold').fontSize(11).text(pastor ? pastor.nome : 'Nome do Pastor', centroX - 100, footerY + 20, { width: 200, align: 'center' });
-    doc.font('Helvetica').fontSize(9).fillColor('#64748b').text(pastor ? (pastor.cargo || 'Pastor') : 'Pastor', centroX - 100, footerY + 35, { width: 200, align: 'center' });
+    doc.moveTo(centroX - 100, footerY + 20).lineTo(centroX + 100, footerY + 20).stroke('#020617'); // <-- Linha mais abaixo
+    doc.font('Helvetica-Bold').fontSize(11).text(pastor ? pastor.nome : 'Nome do Pastor', centroX - 100, footerY + 25, { width: 200, align: 'center' });
+    doc.font('Helvetica').fontSize(9).fillColor('#64748b').text(pastor ? (pastor.cargo || 'Pastor') : 'Pastor', centroX - 100, footerY + 40, { width: 200, align: 'center' });
+
     doc.end();
   } catch (err) { res.status(500).json({ message: err.message }); }
 }
@@ -280,10 +295,12 @@ async function gerarPDFBatismosSecretario(req, res) {
   try {
     const { igrejaId } = req.params;
     const { membros, igreja, pastor } = await membroService.buscarDadosParaRelatorioBatismos(igrejaId);
+
     const doc = new PDFDocument({ margin: 40, size: 'A4' });
     res.setHeader('Content-Type', 'application/pdf');
     res.setHeader('Content-Disposition', `attachment; filename=relatorio-batismos-${igreja.slug}.pdf`);
     doc.pipe(res);
+
     const logoUrl = igreja.logoUrl || igreja.icone;
     if (logoUrl && logoUrl.startsWith('http')) {
       try {
@@ -297,21 +314,25 @@ async function gerarPDFBatismosSecretario(req, res) {
         doc.image(logoBuffer, 40, 40, { width: 50, height: 50 });
       } catch (e) { console.log("Erro ao carregar logo", e.message); }
     }
+
     doc.fillColor('#020617').font('Helvetica-Bold').fontSize(20).text(igreja.nome.toUpperCase(), 100, 40);
     doc.fillColor('#64748b').font('Helvetica').fontSize(12).text('Relatório Oficial de Batismos', 100, 65);
     doc.fillColor('#facc15').rect(40, 95, 520, 3).fill();
     doc.fillColor('#94a3b8').fontSize(9).text(`Emitido em: ${new Date().toLocaleDateString('pt-PT')}`, 40, 105);
+
     const totalBatismos = membros.length;
     let y = 130;
     doc.rect(40, y, 520, 50).fill('#f8fafc').stroke('#e2e8f0');
     doc.fillColor('#64748b').fontSize(10).font('Helvetica-Bold').text('TOTAL DE BATISMOS REGISTADOS', 50, y + 12);
     doc.fillColor('#020617').fontSize(22).text(totalBatismos.toString(), 50, y + 25);
+
     let tableY = y + 70;
     doc.fillColor('#020617').rect(40, tableY, 520, 20).fill();
     doc.fillColor('#ffffff').font('Helvetica-Bold').fontSize(9);
     doc.text('NOME', 45, tableY + 6);
     doc.text('DATA DE BATISMO', 300, tableY + 6);
     doc.text('DEPARTAMENTO', 450, tableY + 6);
+
     tableY += 20;
     doc.font('Helvetica').fontSize(9);
     membros.forEach((m, i) => {
@@ -323,14 +344,15 @@ async function gerarPDFBatismosSecretario(req, res) {
       doc.text(m.departamento ? m.departamento.nome : 'Sem departamento', 450, tableY + 6, { width: 105 });
       tableY += 20;
     });
-    if (tableY > 650) { doc.addPage(); tableY = 40; }
-    let footerY = Math.max(tableY + 40, 650);
+
+    let footerY = 680;
     const centroX = 40 + (520 / 2);
     doc.fillColor('#020617').font('Helvetica-Bold').fontSize(11);
     doc.text('O Pastor', centroX - 30, footerY);
-    doc.moveTo(centroX - 100, footerY + 15).lineTo(centroX + 100, footerY + 15).stroke('#020617');
-    doc.font('Helvetica-Bold').fontSize(11).text(pastor ? pastor.nome : 'Nome do Pastor', centroX - 100, footerY + 20, { width: 200, align: 'center' });
-    doc.font('Helvetica').fontSize(9).fillColor('#64748b').text(pastor ? (pastor.cargo || 'Pastor') : 'Pastor', centroX - 100, footerY + 35, { width: 200, align: 'center' });
+    doc.moveTo(centroX - 100, footerY + 20).lineTo(centroX + 100, footerY + 20).stroke('#020617');
+    doc.font('Helvetica-Bold').fontSize(11).text(pastor ? pastor.nome : 'Nome do Pastor', centroX - 100, footerY + 25, { width: 200, align: 'center' });
+    doc.font('Helvetica').fontSize(9).fillColor('#64748b').text(pastor ? (pastor.cargo || 'Pastor') : 'Pastor', centroX - 100, footerY + 40, { width: 200, align: 'center' });
+
     doc.end();
   } catch (err) { res.status(500).json({ message: err.message }); }
 }
@@ -339,10 +361,12 @@ async function gerarPDFPresencasSecretario(req, res) {
   try {
     const { igrejaId } = req.params;
     const { presencas, igreja, pastor } = await membroService.buscarDadosParaRelatorioPresencas(igrejaId);
+
     const doc = new PDFDocument({ margin: 40, size: 'A4' });
     res.setHeader('Content-Type', 'application/pdf');
     res.setHeader('Content-Disposition', `attachment; filename=relatorio-presencas-${igreja.slug}.pdf`);
     doc.pipe(res);
+
     const logoUrl = igreja.logoUrl || igreja.icone;
     if (logoUrl && logoUrl.startsWith('http')) {
       try {
@@ -356,21 +380,25 @@ async function gerarPDFPresencasSecretario(req, res) {
         doc.image(logoBuffer, 40, 40, { width: 50, height: 50 });
       } catch (e) { console.log("Erro ao carregar logo", e.message); }
     }
+
     doc.fillColor('#020617').font('Helvetica-Bold').fontSize(20).text(igreja.nome.toUpperCase(), 100, 40);
     doc.fillColor('#64748b').font('Helvetica').fontSize(12).text('Relatório Oficial de Presenças', 100, 65);
     doc.fillColor('#facc15').rect(40, 95, 520, 3).fill();
     doc.fillColor('#94a3b8').fontSize(9).text(`Emitido em: ${new Date().toLocaleDateString('pt-PT')}`, 40, 105);
+
     const totalPresencas = presencas.length;
     let y = 130;
     doc.rect(40, y, 520, 50).fill('#f8fafc').stroke('#e2e8f0');
     doc.fillColor('#64748b').fontSize(10).font('Helvetica-Bold').text('TOTAL DE PRESENÇAS REGISTADAS', 50, y + 12);
     doc.fillColor('#020617').fontSize(22).text(totalPresencas.toString(), 50, y + 25);
+
     let tableY = y + 70;
     doc.fillColor('#020617').rect(40, tableY, 520, 20).fill();
     doc.fillColor('#ffffff').font('Helvetica-Bold').fontSize(9);
     doc.text('MEMBRO', 45, tableY + 6);
     doc.text('TIPO', 300, tableY + 6);
     doc.text('DATA', 450, tableY + 6);
+
     tableY += 20;
     doc.font('Helvetica').fontSize(9);
     presencas.forEach((p, i) => {
@@ -382,14 +410,15 @@ async function gerarPDFPresencasSecretario(req, res) {
       doc.text(new Date(p.data).toLocaleDateString('pt-PT'), 450, tableY + 6, { width: 105 });
       tableY += 20;
     });
-    if (tableY > 650) { doc.addPage(); tableY = 40; }
-    let footerY = Math.max(tableY + 40, 650);
+
+    let footerY = 680;
     const centroX = 40 + (520 / 2);
     doc.fillColor('#020617').font('Helvetica-Bold').fontSize(11);
     doc.text('O Pastor', centroX - 30, footerY);
-    doc.moveTo(centroX - 100, footerY + 15).lineTo(centroX + 100, footerY + 15).stroke('#020617');
-    doc.font('Helvetica-Bold').fontSize(11).text(pastor ? pastor.nome : 'Nome do Pastor', centroX - 100, footerY + 20, { width: 200, align: 'center' });
-    doc.font('Helvetica').fontSize(9).fillColor('#64748b').text(pastor ? (pastor.cargo || 'Pastor') : 'Pastor', centroX - 100, footerY + 35, { width: 200, align: 'center' });
+    doc.moveTo(centroX - 100, footerY + 20).lineTo(centroX + 100, footerY + 20).stroke('#020617');
+    doc.font('Helvetica-Bold').fontSize(11).text(pastor ? pastor.nome : 'Nome do Pastor', centroX - 100, footerY + 25, { width: 200, align: 'center' });
+    doc.font('Helvetica').fontSize(9).fillColor('#64748b').text(pastor ? (pastor.cargo || 'Pastor') : 'Pastor', centroX - 100, footerY + 40, { width: 200, align: 'center' });
+
     doc.end();
   } catch (err) { res.status(500).json({ message: err.message }); }
 }
