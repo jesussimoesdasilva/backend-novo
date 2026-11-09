@@ -95,9 +95,14 @@ async function aprovar(req, res) {
 
 async function promover(req, res) {
   try {
+    const { cargo } = req.body;
+    let role = 'member'; // Valor por defeito
+    if (cargo === 'Pastor') role = 'pastor';
+    else if (cargo === 'Secretário') role = 'secretario';
+
     const m = await prisma.membro.update({
       where: { id: Number(req.params.id) },
-      data: { cargo: 'Pastor', role: 'pastor' }
+      data: { cargo, role } // <-- O role é sempre atualizado
     });
     res.json(m);
   } catch (err) { res.status(500).json({ message: err.message }); }
