@@ -155,7 +155,13 @@ async function gerarFichaMembroPDF(req, res) {
     doc.text(`Nascimento: ${membro.dataNascimento ? new Date(membro.dataNascimento).toLocaleDateString('pt-PT') : '-'}`, 160, y + 70);
     doc.text(`Batismo: ${membro.dataBatismo ? new Date(membro.dataBatismo).toLocaleDateString('pt-PT') : '-'}`, 160, y + 85);
     doc.text(`Endereço: ${membro.endereco || '-'}`, 160, y + 100);
-    y += 145;
+    
+    // NOVO: Adiciona os Sectores
+    const nomesSectores = membro.sectores && membro.sectores.length > 0 
+      ? membro.sectores.map(s => s.nome).join(', ') 
+      : 'Nenhum';
+    doc.text(`Sectores: ${nomesSectores}`, 160, y + 115);
+        y += 160; // <-- AUMENTADO DE 145 PARA 160
     doc.fillColor('#020617').rect(40, y, 520, 40).fill();
     doc.fillColor('#ffffff').font('Helvetica-Bold').fontSize(11);
     doc.text(`DEPARTAMENTO: ${membro.departamento ? membro.departamento.nome : 'Sem departamento'}`, 50, y + 15);
