@@ -233,9 +233,10 @@ async function gerarFichaMembroPDF(req, res) {
     doc.text(`BI: ${membro.bi || '-'}`, 160, y + 55);
     doc.text(`Nascimento: ${membro.dataNascimento ? new Date(membro.dataNascimento).toLocaleDateString('pt-PT') : '-'}`, 160, y + 70);
     doc.text(`Batismo: ${membro.dataBatismo ? new Date(membro.dataBatismo).toLocaleDateString('pt-PT') : '-'}`, 160, y + 85);
+    doc.text(`Endereço: ${membro.endereco || '-'}`, 160, y + 100); // <-- ENDEREÇO ADICIONADO AQUI
 
     // ===== 4. DEPARTAMENTO E CARGO =====
-    y += 130;
+    y += 145; // <-- AUMENTADO PARA BAIXAR A BARRA ESCURA E NÃO SOBREPOR O ENDEREÇO
     doc.fillColor('#020617').rect(40, y, 520, 40).fill();
     doc.fillColor('#ffffff').font('Helvetica-Bold').fontSize(11);
     doc.text(`DEPARTAMENTO: ${membro.departamento ? membro.departamento.nome : 'Sem departamento'}`, 50, y + 15);
