@@ -39,4 +39,8 @@ app.get('/igreja/:slug/pastor', (req, res) => {
   res.sendFile(path.join(__dirname, '..', 'public', 'painel-pastor.html'));
 });
 
+app.get('/igreja/:slug/secretario', (req, res) => {
+  res.sendFile(path.join(__dirname, '..', 'public', 'painel-secretario.html'));
+});
+
 module.exports = app;
