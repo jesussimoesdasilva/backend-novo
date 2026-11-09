@@ -30,7 +30,6 @@ model Igreja {
   adminTelefone   String?
   adminBi         String?
 
-
   // NOVOS CAMPOS DA LIVE
   liveAtiva       Boolean  @default(false)
   liveUrl         String?
@@ -49,7 +48,10 @@ model Igreja {
   pedidosOracao   PedidoOracao[]
   mensagensGrupo  MensagemGrupo[]
   fotosAtividade  FotoAtividade[]
-  midias          Midia[]          // <-- NOVA RELAÇÃO DE MÍDIA
+  midias          Midia[]
+  documentos      Documento[]       // <-- NOVA RELAÇÃO
+  presencas       Presenca[]        // <-- NOVA RELAÇÃO
+  escalas         Escala[]          // <-- NOVA RELAÇÃO
   
   criadoEm        DateTime @default(now())
   atualizadoEm    DateTime @updatedAt
@@ -83,6 +85,9 @@ model Membro {
   mensagensEnviadas  Mensagem[] @relation("MensagensEnviadas")
   mensagensRecebidas Mensagem[] @relation("MensagensRecebidas")
   mensagensGrupo  MensagemGrupo[]
+  documentos      Documento[]    // <-- NOVA RELAÇÃO
+  presencas       Presenca[]     // <-- NOVA RELAÇÃO
+  escalas         Escala[]       // <-- NOVA RELAÇÃO
   
   criadoEm        DateTime @default(now())
   atualizadoEm    DateTime @updatedAt
@@ -288,4 +293,48 @@ model Midia {
   url       String   // Link do YouTube ou caminho do ficheiro
   isArquivo Boolean  @default(false) // true se for ficheiro carregado, false se for link
   criadoEm  DateTime @default(now())
+}
+
+// ===== MODELO PARA DOCUMENTOS (Atas, Certidões, etc.) =====
+model Documento {
+  id          Int      @id @default(autoincrement())
+  nome        String
+  url         String
+  tipo        String
+  membroId    Int?
+  membro      Membro?  @relation(fields: [membroId], references: [id])
+  igrejaId    Int
+  igreja      Igreja   @relation(fields: [igrejaId], references: [id])
+  criadoEm    DateTime @default(now())
+
+  @@index([igrejaId])
+  @@index([membroId])
+}
+
+// ===== MODELO PARA PRESENÇAS =====
+model Presenca {
+  id          Int      @id @default(autoincrement())
+  membroId    Int
+  membro      Membro   @relation(fields: [membroId], references: [id])
+  igrejaId    Int
+  igreja      Igreja   @relation(fields: [igrejaId], references: [id])
+  data        DateTime @default(now())
+  tipo        String
+
+  @@index([igrejaId])
+  @@index([membroId])
+}
+
+// ===== MODELO PARA ESCALAS =====
+model Escala {
+  id          Int      @id @default(autoincrement())
+  titulo      String
+  descricao   String?
+  data        DateTime
+  igrejaId    Int
+  igreja      Igreja   @relation(fields: [igrejaId], references: [id])
+  membros     Membro[]
+  criadoEm    DateTime @default(now())
+
+  @@index([igrejaId])
 }
