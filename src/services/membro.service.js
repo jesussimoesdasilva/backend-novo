@@ -35,6 +35,25 @@ async function atualizarSectoresMembro(id, sectorIds) {
   });
 }
 
+// ===== NOVA FUNÇÃO ADICIONADA AQUI =====
+async function buscarMembroCompletoParaPDF(id) {
+  return await prisma.membro.findUnique({
+    where: { id: Number(id) },
+    include: { 
+      igreja: true, 
+      departamento: true,
+      documentos: true,
+      presencas: { orderBy: { data: 'desc' }, take: 5 }
+    }
+  });
+}
+
+// ===== EXPORTAR TODAS AS FUNÇÕES =====
 module.exports = { 
-  listMembros, promoverPastor, redefinirSenha, deleteMembro, atualizarSectoresMembro 
+  listMembros, 
+  promoverPastor, 
+  redefinirSenha, 
+  deleteMembro, 
+  atualizarSectoresMembro,
+  buscarMembroCompletoParaPDF  // <-- Adicionada aqui também
 };

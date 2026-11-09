@@ -1,5 +1,7 @@
 const prisma = require("../config/prisma");
 const bcrypt = require("bcryptjs");
+const PDFDocument = require('pdfkit');
+const membroService = require("../services/membro.service");
 
 async function publicRegister(req, res) {
   try {
@@ -170,8 +172,77 @@ async function updateFoto(req, res) {
   } catch (err) { res.status(500).json({ message: err.message }); }
 }
 
+async function gerarFichaMembroPDF(req, res) {
+  try {
+    const { membroId } = req.params;
+    const membro = await membroService.buscarMembroCompletoParaPDF(membroId);
+    if (!membro) return res.status(404).json({ message: "Membro não encontrado" });
+
+    const doc = new PDFDocument({ margin: 40, size: 'A4' });
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', `attachment; filename=ficha-${membro.nome.replace(/\s+/g, '-')}.pdf`);
+    doc.pipe(res);
+
+    // Cabeçalho
+    doc.fillColor('#020617').font('Helvetica-Bold').fontSize(20).text(membro.igreja.nome.toUpperCase(), 40, 40);
+    doc.fillColor('#64748b').font('Helvetica').fontSize(12).text('Ficha Individual do Membro', 40, 65);
+    doc.fillColor('#facc15').rect(40, 85, 520, 3).fill();
+    doc.fillColor('#94a3b8').fontSize(9).text(`Emitido em: ${new Date().toLocaleDateString('pt-PT')}`, 40, 95);
+
+    // Foto e Dados Pessoais
+    let y = 130;
+    if (membro.foto) {
+      try { doc.image(membro.foto, 40, y, { width: 100, height: 100, fit: [100, 100] }); } 
+      catch(e) { doc.rect(40, y, 100, 100).stroke('#e2e8f0'); doc.fillColor('#94a3b8').fontSize(10).text('Sem Foto', 60, y + 45); }
+    } else {
+      doc.rect(40, y, 100, 100).stroke('#e2e8f0'); 
+      doc.fillColor('#94a3b8').fontSize(10).text('Sem Foto', 60, y + 45);
+    }
+
+    doc.fillColor('#020617').font('Helvetica-Bold').fontSize(16).text(membro.nome, 160, y);
+    doc.font('Helvetica').fontSize(10).fillColor('#334155');
+    doc.text(`Email: ${membro.email || '-'}`, 160, y + 25);
+    doc.text(`Telefone: ${membro.telefone || '-'}`, 160, y + 40);
+    doc.text(`BI: ${membro.bi || '-'}`, 160, y + 55);
+    doc.text(`Nascimento: ${membro.dataNascimento ? new Date(membro.dataNascimento).toLocaleDateString('pt-PT') : '-'}`, 160, y + 70);
+    doc.text(`Batismo: ${membro.dataBatismo ? new Date(membro.dataBatismo).toLocaleDateString('pt-PT') : '-'}`, 160, y + 85);
+
+    // Departamento e Cargo
+    y += 130;
+    doc.fillColor('#020617').rect(40, y, 520, 40).fill();
+    doc.fillColor('#ffffff').font('Helvetica-Bold').fontSize(11);
+    doc.text(`DEPARTAMENTO: ${membro.departamento ? membro.departamento.nome : 'Sem departamento'}`, 50, y + 15);
+    doc.text(`CARGO: ${membro.cargo || 'Membro'}`, 350, y + 15);
+
+    // Documentos
+    y += 60;
+    doc.fillColor('#020617').font('Helvetica-Bold').fontSize(12).text('DOCUMENTOS ANEXADOS', 40, y);
+    y += 20;
+    if (membro.documentos && membro.documentos.length > 0) {
+      membro.documentos.forEach(d => { doc.fillColor('#334155').font('Helvetica').fontSize(10).text(`- ${d.nome} (${d.tipo})`, 50, y); y += 15; });
+    } else {
+      doc.fillColor('#94a3b8').font('Helvetica').fontSize(10).text('Nenhum documento anexado.', 50, y); y += 15;
+    }
+
+    // Presenças
+    y += 20;
+    doc.fillColor('#020617').font('Helvetica-Bold').fontSize(12).text('PRESENCAS RECENTES', 40, y);
+    y += 20;
+    if (membro.presencas && membro.presencas.length > 0) {
+      membro.presencas.forEach(p => { doc.fillColor('#334155').font('Helvetica').fontSize(10).text(`- ${p.tipo} - ${new Date(p.data).toLocaleDateString('pt-PT')}`, 50, y); y += 15; });
+    } else {
+      doc.fillColor('#94a3b8').font('Helvetica').fontSize(10).text('Nenhuma presenca registada.', 50, y); y += 15;
+    }
+
+    doc.end();
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: err.message });
+  }
+}
+
 module.exports = {
   publicRegister, login, verificarTelefone, verCodigo, redefinirSenhaComCodigo,
   list, create, aprovar, promover, setSectores, resetPassword, remove,
-  updatePerfil, updateFoto
+  updatePerfil, updateFoto, gerarFichaMembroPDF
 };
