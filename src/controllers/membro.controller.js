@@ -2,6 +2,7 @@ const prisma = require("../config/prisma");
 const bcrypt = require("bcryptjs");
 const PDFDocument = require('pdfkit');
 const membroService = require("../services/membro.service");
+const https = require('https');
 
 async function publicRegister(req, res) {
   try {
@@ -183,17 +184,43 @@ async function gerarFichaMembroPDF(req, res) {
     res.setHeader('Content-Disposition', `attachment; filename=ficha-${membro.nome.replace(/\s+/g, '-')}.pdf`);
     doc.pipe(res);
 
-    // Cabeçalho
-    doc.fillColor('#020617').font('Helvetica-Bold').fontSize(20).text(membro.igreja.nome.toUpperCase(), 40, 40);
-    doc.fillColor('#64748b').font('Helvetica').fontSize(12).text('Ficha Individual do Membro', 40, 65);
-    doc.fillColor('#facc15').rect(40, 85, 520, 3).fill();
-    doc.fillColor('#94a3b8').fontSize(9).text(`Emitido em: ${new Date().toLocaleDateString('pt-PT')}`, 40, 95);
+    // ===== 1. LOGOTIPO DA IGREJA =====
+    const logoUrl = membro.igreja.logoUrl || membro.igreja.icone;
+    if (logoUrl && logoUrl.startsWith('http')) {
+      try {
+        const logoBuffer = await new Promise((resolve, reject) => {
+          https.get(logoUrl, (response) => {
+            const data = [];
+            response.on('data', (chunk) => data.push(chunk));
+            response.on('end', () => resolve(Buffer.concat(data)));
+          }).on('error', reject);
+        });
+        doc.image(logoBuffer, 40, 40, { width: 50, height: 50 });
+      } catch (e) { console.log("Erro ao carregar logo", e.message); }
+    }
 
-    // Foto e Dados Pessoais
-    let y = 130;
-    if (membro.foto) {
-      try { doc.image(membro.foto, 40, y, { width: 100, height: 100, fit: [100, 100] }); } 
-      catch(e) { doc.rect(40, y, 100, 100).stroke('#e2e8f0'); doc.fillColor('#94a3b8').fontSize(10).text('Sem Foto', 60, y + 45); }
+    // ===== 2. CABEÇALHO =====
+    doc.fillColor('#020617').font('Helvetica-Bold').fontSize(20).text(membro.igreja.nome.toUpperCase(), 100, 40);
+    doc.fillColor('#64748b').font('Helvetica').fontSize(12).text('Ficha Individual do Membro', 100, 65);
+    doc.fillColor('#facc15').rect(40, 95, 520, 3).fill();
+    doc.fillColor('#94a3b8').fontSize(9).text(`Emitido em: ${new Date().toLocaleDateString('pt-PT')}`, 40, 105);
+
+    // ===== 3. FOTO E DADOS PESSOAIS =====
+    let y = 140;
+    if (membro.foto && membro.foto.startsWith('http')) {
+      try {
+        const fotoBuffer = await new Promise((resolve, reject) => {
+          https.get(membro.foto, (response) => {
+            const data = [];
+            response.on('data', (chunk) => data.push(chunk));
+            response.on('end', () => resolve(Buffer.concat(data)));
+          }).on('error', reject);
+        });
+        doc.image(fotoBuffer, 40, y, { width: 100, height: 100, fit: [100, 100] });
+      } catch(e) { 
+        doc.rect(40, y, 100, 100).stroke('#e2e8f0'); 
+        doc.fillColor('#94a3b8').fontSize(10).text('Sem Foto', 60, y + 45);
+      }
     } else {
       doc.rect(40, y, 100, 100).stroke('#e2e8f0'); 
       doc.fillColor('#94a3b8').fontSize(10).text('Sem Foto', 60, y + 45);
@@ -207,14 +234,14 @@ async function gerarFichaMembroPDF(req, res) {
     doc.text(`Nascimento: ${membro.dataNascimento ? new Date(membro.dataNascimento).toLocaleDateString('pt-PT') : '-'}`, 160, y + 70);
     doc.text(`Batismo: ${membro.dataBatismo ? new Date(membro.dataBatismo).toLocaleDateString('pt-PT') : '-'}`, 160, y + 85);
 
-    // Departamento e Cargo
+    // ===== 4. DEPARTAMENTO E CARGO =====
     y += 130;
     doc.fillColor('#020617').rect(40, y, 520, 40).fill();
     doc.fillColor('#ffffff').font('Helvetica-Bold').fontSize(11);
     doc.text(`DEPARTAMENTO: ${membro.departamento ? membro.departamento.nome : 'Sem departamento'}`, 50, y + 15);
     doc.text(`CARGO: ${membro.cargo || 'Membro'}`, 350, y + 15);
 
-    // Documentos
+    // ===== 5. DOCUMENTOS =====
     y += 60;
     doc.fillColor('#020617').font('Helvetica-Bold').fontSize(12).text('DOCUMENTOS ANEXADOS', 40, y);
     y += 20;
@@ -224,7 +251,7 @@ async function gerarFichaMembroPDF(req, res) {
       doc.fillColor('#94a3b8').font('Helvetica').fontSize(10).text('Nenhum documento anexado.', 50, y); y += 15;
     }
 
-    // Presenças
+    // ===== 6. PRESENÇAS =====
     y += 20;
     doc.fillColor('#020617').font('Helvetica-Bold').fontSize(12).text('PRESENCAS RECENTES', 40, y);
     y += 20;
