@@ -187,17 +187,23 @@ async function gerarFichaMembroPDF(req, res) {
       : 'Nenhum';
     doc.text(`Sectores: ${nomesSectores}`, 160, y + 100);
 
-    // Sacramentos (4 linhas extra)
+       // Sacramentos (4 linhas extra)
     y += 130;
     doc.fillColor('#020617').font('Helvetica-Bold').fontSize(12).text('SACRAMENTOS', 40, y);
     y += 20;
     doc.font('Helvetica').fontSize(10).fillColor('#334155');
     doc.text(`Batismo: ${membro.dataBatismo ? new Date(membro.dataBatismo).toLocaleDateString('pt-PT') : '-'}`, 50, y); y += 15;
-    doc.text(`Primeira Comunhão: ${membro.dataPrimeiraComunhao ? new Date(membro.dataPrimeiraComunhao).toLocaleDateString('pt-PT') : '-'}`, 50, y); y += 15;
-    doc.text(`Crisma: ${membro.dataCrisma ? new Date(membro.dataCrisma).toLocaleDateString('pt-PT') : '-'}`, 50, y); y += 15;
+
+    // Só mostra Primeira Comunhão e Crisma se o membro tiver essas datas
+    if (membro.dataPrimeiraComunhao) {
+      doc.text(`Primeira Comunhão: ${new Date(membro.dataPrimeiraComunhao).toLocaleDateString('pt-PT')}`, 50, y); y += 15;
+    }
+    if (membro.dataCrisma) {
+      doc.text(`Crisma: ${new Date(membro.dataCrisma).toLocaleDateString('pt-PT')}`, 50, y); y += 15;
+    }
+
     doc.text(`Casamento: ${membro.dataCasamento ? new Date(membro.dataCasamento).toLocaleDateString('pt-PT') : '-'}`, 50, y); y += 15;
     doc.text(`Óbito: ${membro.dataObito ? new Date(membro.dataObito).toLocaleDateString('pt-PT') : '-'}`, 50, y); y += 15;
-
     // Departamento e Cargo
     y += 10;
     doc.fillColor('#020617').rect(40, y, 520, 40).fill();
