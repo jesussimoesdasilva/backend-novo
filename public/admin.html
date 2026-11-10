@@ -155,7 +155,7 @@ tr:hover td{background:rgba(255,255,255,0.02)}
     <div class="stat-card"><div class="stat-icon">🏛️</div><div class="stat-value" id="statIgrejas">0</div><div class="stat-label">Igrejas</div></div>
     <div class="stat-card"><div class="stat-icon">👥</div><div class="stat-value" id="statMembros">0</div><div class="stat-label">Membros</div></div>
     <div class="stat-card"><div class="stat-icon">📅</div><div class="stat-value" id="statEventos">0</div><div class="stat-label">Eventos</div></div>
-    <div class="stat-card"><div class="stat-icon">🏢</div><div class="stat-value" id="statDeptos">0</div><div class="stat-label">Departamentos</div></div>
+    <div class="stat-card"><div class="stat-icon">🏢</div><div class="stat-value" id="statDeptos">0</div><div class="stat-label">Grupos/Departamentos</div></div>
   </div>
 
   <div id="section-igrejas" class="section active">
@@ -331,7 +331,7 @@ async function carregarIgrejas() {
     if (!igrejas.length) return div.innerHTML = '<p style="color:var(--muted)">Nenhuma igreja registada.</p>';
     div.innerHTML = `
       <table>
-        <thead><tr><th>Nome da Igreja</th><th>Slug (Link)</th><th>Membros</th><th>Departamentos</th><th>Ações</th></tr></thead>
+        <thead><tr><th>Nome da Igreja</th><th>Slug (Link)</th><th>Membros</th><th>Grupos/Departamentos</th><th>Ações</th></tr></thead>
         <tbody>
           ${igrejas.map(ig => `
             <tr>
