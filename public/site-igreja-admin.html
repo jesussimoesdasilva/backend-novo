@@ -1491,6 +1491,11 @@ async function definirLiderSector(sectorId, membroId) {
 // --- MEMBROS ---
 async function carregarMembros() {
   try {
+    // 1. Carrega os departamentos primeiro (para preencher o select)
+    const rDeptos = await fetch(API + '/departamentos/igreja/' + igrejaAtual.id);
+    deptosListaGlobal = await rDeptos.json();
+
+    // 2. Carrega os membros e sectores
     const r = await fetch(API + '/membros/igreja/' + igrejaAtual.id);
     const lista = await r.json();
     membrosLista = lista;
@@ -1506,7 +1511,7 @@ async function carregarMembros() {
     
     div.innerHTML = `
       <table>
-        <thead><tr><th>Nome</th><th>Email</th><th>Cargo</th><th>Sectores</th><th>Ações</th></tr></thead>
+        <thead><tr><th>Nome</th><th>Email</th><th>Cargo</th><th>Grupo/Depto</th><th>Sectores</th><th>Ações</th></tr></thead>
         <tbody>
           ${lista.map(m => `
             <tr>
@@ -1527,6 +1532,14 @@ async function carregarMembros() {
     <option value="Outros" ${m.cargo && !['Membro','Diácono','Presbítero','Evangelista','Pastor','Secretário','Financeiro','Líder de Departamento','Líder de Sector','Madre'].includes(m.cargo) ? 'selected' : ''}>Outros (Escrever)</option>
   </select>
 </td>
+              <!-- AQUI ESTÁ A NOVA COLUNA DO DEPARTAMENTO -->
+              <td style="min-width: 140px;">
+                <select onchange="mudarDepartamentoMembro(${m.id}, this.value)" style="padding:6px; font-size:12px; background:rgba(2,6,23,.6); color:var(--text); border:1px solid var(--border); border-radius:6px; width:100%;">
+                  <option value="">Sem Depto</option>
+                  ${deptosListaGlobal.map(d => `<option value="${d.id}" ${m.departamentoId === d.id ? 'selected' : ''}>${d.nome}</option>`).join('')}
+                </select>
+              </td>
+              <!-- FIM DA NOVA COLUNA -->
               <td style="font-size:12px;color:var(--gold)">${(m.sectores || []).map(s=>s.nome).join(', ') || 'Nenhum'}</td>
               <td style="display:flex;gap:5px;flex-wrap:wrap;">
                 <button class="btn btn-outline" style="padding:5px 10px;font-size:12px" onclick="abrirModalSectores(${m.id}, '${m.nome.replace(/'/g,"\\'")}', [${(m.sectores||[]).map(s=>s.id)}])">Sectores</button>
@@ -2124,7 +2137,20 @@ async function apagarMidia(id) {
     carregarMidiaAdmin();
   } catch (e) { toast('Erro ao apagar', 'error'); }
 }
-
+async function mudarDepartamentoMembro(membroId, departamentoId) {
+  try {
+    const r = await fetch(API + '/membros/' + membroId + '/departamento', {
+      method: 'PUT',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ departamentoId: departamentoId || null })
+    });
+    if (!r.ok) throw new Error('Erro ao atualizar departamento');
+    toast('Grupo/Departamento atualizado!', 'success');
+    carregarMembros(); 
+  } catch (e) {
+    toast(e.message, 'error');
+  }
+}
 initLogin();
 </script>
 </body>

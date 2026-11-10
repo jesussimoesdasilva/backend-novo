@@ -502,8 +502,22 @@ async function editarMembroSecretario(req, res) {
   }
 }
 
+async function editarDepartamentoMembro(req, res) {
+  try {
+    const { id } = req.params;
+    const { departamentoId } = req.body;
+    const membro = await prisma.membro.update({
+      where: { id: Number(id) },
+      data: { departamentoId: departamentoId ? Number(departamentoId) : null }
+    });
+    res.json(membro);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+}
+
 module.exports = {
   publicRegister, login, verificarTelefone, verCodigo, redefinirSenhaComCodigo,
   list, create, aprovar, promover, setSectores, resetPassword, remove,
-  updatePerfil, updateFoto, gerarFichaMembroPDF, gerarPDFMembrosSecretario, gerarPDFBatismosSecretario, gerarPDFPresencasSecretario, editarMembroSecretario
+  updatePerfil, updateFoto, gerarFichaMembroPDF, gerarPDFMembrosSecretario, gerarPDFBatismosSecretario, gerarPDFPresencasSecretario, editarMembroSecretario, editarDepartamentoMembro
 };
