@@ -201,7 +201,7 @@ th{color:var(--gold);font-size:12px;text-transform:uppercase}
 </button>
       
       <button class="nav-item" onclick="section('pastor',this)"><span class="icon">👤</span> Pastor</button>
-      <button class="nav-item" onclick="section('departamentos',this)"><span class="icon">🏛️</span> Departamentos</button>
+      <button class="nav-item" onclick="section('departamentos',this)"><span class="icon">🏛️</span> Grupo/Departamento</button>
       <button class="nav-item" onclick="section('membros',this)"><span class="icon">👥</span> Membros</button>
       <button class="nav-item" onclick="section('eventos',this)"><span class="icon">📅</span> Eventos</button>
       <button class="nav-item" onclick="section('avisos',this)"><span class="icon">📢</span> Avisos</button>
@@ -272,14 +272,14 @@ th{color:var(--gold);font-size:12px;text-transform:uppercase}
     <div id="section-departamentos" class="section">
       <div class="grid-2">
         <div class="card">
-          <h3>➕ Novo Departamento</h3>
+          <h3>➕ Novo Grupo/Departamento</h3>
           <div class="field"><label>Nome *</label><input id="dNome" placeholder="Ex: Louvor"></div>
           <div class="field"><label>Ícone</label><input id="dIcone" placeholder="🎶"></div>
           <div class="field"><label>Líder do Departamento</label><select id="dLider"><option value="">A carregar membros...</option></select></div>
           <button class="btn btn-primary" onclick="adicionarDepartamento()" style="width:100%">Criar Departamento</button>
         </div>
         <div class="card">
-          <h3>🏛️ Departamentos</h3>
+          <h3>🏛️ Grupo/Departamentos</h3>
           <div id="listaDepartamentos" class="empty">A carregar...</div>
         </div>
       </div>
@@ -658,7 +658,7 @@ function section(name, btn) {
   document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
   document.getElementById('section-' + name).classList.add('active');
   btn.classList.add('active');
-  const titles = {sobre:['Sobre','Editar informação'],pastor:['Pastor','Gerir pastores'],departamentos:['Departamentos','Gerir departamentos e sectores'],membros:['Membros','Gerir todos os membros'],eventos:['Eventos','Agenda'],avisos:['Avisos','Comunicados'],galeria:['Galeria','Álbuns e Fotos'],ofertas:['Ofertas','Ver e validar'],contas:['Contas Bancárias','Gerir IBANs e Multicaixas'],relatorios:['Relatórios','Visão Global da Igreja'],chat:['Chat','Moderação de Mensagens'],midia:['Mídia','Gerir Vídeos, Áudios e Live'],tema:['Tema','Personalizar aparência']};
+  const titles = {sobre:['Sobre','Editar informação'],pastor:['Pastor','Gerir pastores'],departamentos:['Grupo/Departamento','Gerir grupos/departamentos e sectores'],membros:['Membros','Gerir todos os membros'],eventos:['Eventos','Agenda'],avisos:['Avisos','Comunicados'],galeria:['Galeria','Álbuns e Fotos'],ofertas:['Ofertas','Ver e validar'],contas:['Contas Bancárias','Gerir IBANs e Multicaixas'],relatorios:['Relatórios','Visão Global da Igreja'],chat:['Chat','Moderação de Mensagens'],midia:['Mídia','Gerir Vídeos, Áudios e Live'],tema:['Tema','Personalizar aparência']};
   document.getElementById('pageTitle').textContent = titles[name][0];
   document.getElementById('pageSub').textContent = titles[name][1];
 

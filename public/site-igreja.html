@@ -479,7 +479,7 @@ footer strong{color:#f2d27c}
         <button onclick="scrollToId('inicio')">Início</button>
         <button onclick="scrollToId('sobre')">Sobre</button>
         <button onclick="scrollToId('pastor')">Pastor</button>
-        <button onclick="scrollToId('departamentos')">Departamentos</button>
+        <button onclick="scrollToId('departamentos')">Grupo/Departamentos</button>
         <button onclick="scrollToId('agenda')">Agenda</button>
         <button onclick="scrollToId('midia')">Mídia</button>
         <button onclick="scrollToId('avisos')">Avisos</button>
@@ -1899,7 +1899,7 @@ async function carregar() {
 
         htmlDepartamentos = `
           <div class="depto-header-title">
-            <h3>Os nossos <span>Departamentos</span></h3>
+            <h3>Os nossos <span>Grupos/Departamentos</span></h3>
             <p>Juntos servindo a Deus e ao próximo</p>
           </div>
           <div class="carousel-wrapper">
@@ -1909,10 +1909,10 @@ async function carregar() {
           </div>
         `;
       } else {
-        htmlDepartamentos = '<p style="text-align:center;color:#64748b">Nenhum departamento registado.</p>';
+        htmlDepartamentos = '<p style="text-align:center;color:#64748b">Nenhum Grupo/departamento registado.</p>';
       }
     } catch(e) {
-      htmlDepartamentos = '<p style="text-align:center;color:#64748b">Erro ao carregar departamentos.</p>';
+      htmlDepartamentos = '<p style="text-align:center;color:#64748b">Erro ao carregar Grupo/departamentos.</p>';
     }
 
         let htmlEventos = '';
