@@ -71,6 +71,10 @@ model Membro {
   resetCode       String?
   dataNascimento  DateTime?
   dataBatismo     DateTime?
+  dataPrimeiraComunhao DateTime?  // <-- NOVO
+  dataCrisma      DateTime?       // <-- NOVO
+  dataCasamento   DateTime?       // <-- NOVO
+  dataObito       DateTime?       // <-- NOVO
   cargo           String   @default("Membro")
   status          String   @default("PENDENTE")
   role            String   @default("member")
@@ -85,9 +89,9 @@ model Membro {
   mensagensEnviadas  Mensagem[] @relation("MensagensEnviadas")
   mensagensRecebidas Mensagem[] @relation("MensagensRecebidas")
   mensagensGrupo  MensagemGrupo[]
-  documentos      Documento[]    // <-- NOVA RELAÇÃO
-  presencas       Presenca[]     // <-- NOVA RELAÇÃO
-  escalas         Escala[]       // <-- NOVA RELAÇÃO
+  documentos      Documento[]
+  presencas       Presenca[]
+  escalas         Escala[]
   
   criadoEm        DateTime @default(now())
   atualizadoEm    DateTime @updatedAt
@@ -337,4 +341,14 @@ model Escala {
   criadoEm    DateTime @default(now())
 
   @@index([igrejaId])
+}
+
+model AdminMaster {
+  id        Int      @id @default(autoincrement())
+  nome      String   @default("Admin Master")
+  email     String   @unique
+  senha     String
+  telefone  String?
+  bi        String?
+  criadoEm  DateTime @default(now())
 }

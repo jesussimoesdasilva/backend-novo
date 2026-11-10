@@ -130,6 +130,8 @@ async function gerarFichaMembroPDF(req, res) {
     res.setHeader('Content-Type', 'application/pdf');
     res.setHeader('Content-Disposition', `attachment; filename=ficha-${membro.nome.replace(/\s+/g, '-')}.pdf`);
     doc.pipe(res);
+
+    // Logotipo
     const logoUrl = membro.igreja.logoUrl || membro.igreja.icone;
     if (logoUrl && logoUrl.startsWith('http')) {
       try {
@@ -143,10 +145,14 @@ async function gerarFichaMembroPDF(req, res) {
         doc.image(logoBuffer, 40, 40, { width: 50, height: 50 });
       } catch (e) { console.log("Erro ao carregar logo", e.message); }
     }
+
+    // Cabeçalho
     doc.fillColor('#020617').font('Helvetica-Bold').fontSize(20).text(membro.igreja.nome.toUpperCase(), 100, 40);
     doc.fillColor('#64748b').font('Helvetica').fontSize(12).text('Ficha Individual do Membro', 100, 65);
     doc.fillColor('#facc15').rect(40, 95, 520, 3).fill();
     doc.fillColor('#94a3b8').fontSize(9).text(`Emitido em: ${new Date().toLocaleDateString('pt-PT')}`, 40, 105);
+
+    // Foto e Dados
     let y = 140;
     if (membro.foto && membro.foto.startsWith('http')) {
       try {
@@ -166,25 +172,40 @@ async function gerarFichaMembroPDF(req, res) {
       doc.rect(40, y, 100, 100).stroke('#e2e8f0'); 
       doc.fillColor('#94a3b8').fontSize(10).text('Sem Foto', 60, y + 45);
     }
+
     doc.fillColor('#020617').font('Helvetica-Bold').fontSize(16).text(membro.nome, 160, y);
     doc.font('Helvetica').fontSize(10).fillColor('#334155');
     doc.text(`Email: ${membro.email || '-'}`, 160, y + 25);
     doc.text(`Telefone: ${membro.telefone || '-'}`, 160, y + 40);
     doc.text(`BI: ${membro.bi || '-'}`, 160, y + 55);
     doc.text(`Nascimento: ${membro.dataNascimento ? new Date(membro.dataNascimento).toLocaleDateString('pt-PT') : '-'}`, 160, y + 70);
-    doc.text(`Batismo: ${membro.dataBatismo ? new Date(membro.dataBatismo).toLocaleDateString('pt-PT') : '-'}`, 160, y + 85);
-    doc.text(`Endereço: ${membro.endereco || '-'}`, 160, y + 100);
-    
-    // NOVO: Adiciona os Sectores
+    doc.text(`Endereço: ${membro.endereco || '-'}`, 160, y + 85);
+
+    // Sectores
     const nomesSectores = membro.sectores && membro.sectores.length > 0 
       ? membro.sectores.map(s => s.nome).join(', ') 
       : 'Nenhum';
-    doc.text(`Sectores: ${nomesSectores}`, 160, y + 115);
-        y += 160; // <-- AUMENTADO DE 145 PARA 160
+    doc.text(`Sectores: ${nomesSectores}`, 160, y + 100);
+
+    // Sacramentos (4 linhas extra)
+    y += 130;
+    doc.fillColor('#020617').font('Helvetica-Bold').fontSize(12).text('SACRAMENTOS', 40, y);
+    y += 20;
+    doc.font('Helvetica').fontSize(10).fillColor('#334155');
+    doc.text(`Batismo: ${membro.dataBatismo ? new Date(membro.dataBatismo).toLocaleDateString('pt-PT') : '-'}`, 50, y); y += 15;
+    doc.text(`Primeira Comunhão: ${membro.dataPrimeiraComunhao ? new Date(membro.dataPrimeiraComunhao).toLocaleDateString('pt-PT') : '-'}`, 50, y); y += 15;
+    doc.text(`Crisma: ${membro.dataCrisma ? new Date(membro.dataCrisma).toLocaleDateString('pt-PT') : '-'}`, 50, y); y += 15;
+    doc.text(`Casamento: ${membro.dataCasamento ? new Date(membro.dataCasamento).toLocaleDateString('pt-PT') : '-'}`, 50, y); y += 15;
+    doc.text(`Óbito: ${membro.dataObito ? new Date(membro.dataObito).toLocaleDateString('pt-PT') : '-'}`, 50, y); y += 15;
+
+    // Departamento e Cargo
+    y += 10;
     doc.fillColor('#020617').rect(40, y, 520, 40).fill();
     doc.fillColor('#ffffff').font('Helvetica-Bold').fontSize(11);
     doc.text(`DEPARTAMENTO: ${membro.departamento ? membro.departamento.nome : 'Sem departamento'}`, 50, y + 15);
     doc.text(`CARGO: ${membro.cargo || 'Membro'}`, 350, y + 15);
+
+    // Documentos
     y += 60;
     doc.fillColor('#020617').font('Helvetica-Bold').fontSize(12).text('DOCUMENTOS ANEXADOS', 40, y);
     y += 20;
@@ -193,6 +214,8 @@ async function gerarFichaMembroPDF(req, res) {
     } else {
       doc.fillColor('#94a3b8').font('Helvetica').fontSize(10).text('Nenhum documento anexado.', 50, y); y += 15;
     }
+
+    // Presenças
     y += 20;
     doc.fillColor('#020617').font('Helvetica-Bold').fontSize(12).text('PRESENCAS RECENTES', 40, y);
     y += 20;
@@ -201,8 +224,10 @@ async function gerarFichaMembroPDF(req, res) {
     } else {
       doc.fillColor('#94a3b8').font('Helvetica').fontSize(10).text('Nenhuma presenca registada.', 50, y); y += 15;
     }
+
+    // Finalidade e Assinatura
     const textoFinalidade = finalidade || 'Diversos Efeitos';
-    let footerY = 600; 
+    let footerY = 640; // desceu mais para caber os sacramentos
     doc.fillColor('#334155').font('Helvetica').fontSize(10);
     doc.text(`Certificamos, para os devidos efeitos, que a presente Ficha Individual se destina a comprovar a situação do membro para fins de ${textoFinalidade}.`, 40, footerY, { align: 'justify', width: 520 });
     const centroX = 40 + (520 / 2);
@@ -211,6 +236,7 @@ async function gerarFichaMembroPDF(req, res) {
     doc.moveTo(centroX - 100, footerY + 75).lineTo(centroX + 100, footerY + 75).stroke('#020617');
     doc.font('Helvetica-Bold').fontSize(11).text(pastor ? pastor.nome : 'Nome do Pastor', centroX - 100, footerY + 80, { width: 200, align: 'center' });
     doc.font('Helvetica').fontSize(9).fillColor('#64748b').text(pastor ? (pastor.cargo || 'Pastor') : 'Pastor', centroX - 100, footerY + 95, { width: 200, align: 'center' });
+
     doc.end();
   } catch (err) {
     console.error(err);
@@ -451,13 +477,17 @@ async function gerarPDFPresencasSecretario(req, res) {
 async function editarMembroSecretario(req, res) {
   try {
     const { id } = req.params;
-    const { departamentoId, dataBatismo } = req.body;
+    const { departamentoId, dataBatismo, dataPrimeiraComunhao, dataCrisma, dataCasamento, dataObito } = req.body;
 
     const membro = await prisma.membro.update({
       where: { id: Number(id) },
       data: {
         departamentoId: departamentoId ? Number(departamentoId) : null,
-        dataBatismo: dataBatismo ? new Date(dataBatismo) : null
+        dataBatismo: dataBatismo ? new Date(dataBatismo) : null,
+        dataPrimeiraComunhao: dataPrimeiraComunhao ? new Date(dataPrimeiraComunhao) : null,
+        dataCrisma: dataCrisma ? new Date(dataCrisma) : null,
+        dataCasamento: dataCasamento ? new Date(dataCasamento) : null,
+        dataObito: dataObito ? new Date(dataObito) : null
       }
     });
     res.json(membro);
