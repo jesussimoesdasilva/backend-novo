@@ -358,6 +358,7 @@ async function carregarIgrejas() {
               <td>
                 <a href="/igreja/${ig.slug}" target="_blank" class="btn btn-primary" style="padding:6px 12px; font-size:12px; text-decoration:none; width:auto; margin:0;">🌐 Abrir</a>
                 <button class="btn btn-primary" style="padding:6px 12px; font-size:12px; background:var(--green); color:#fff;" onclick="renovarAssinatura(${ig.id}, '${ig.nome.replace(/'/g, "\\'")}')">💳 Renovar</button>
+                <button class="btn btn-danger" style="padding:6px 12px; font-size:12px;" onclick="zerarFinancasAdmin(${ig.id}, '${ig.nome.replace(/'/g, "\\'")}')">🗑️ Zerar Finanças</button>
                 <button class="btn btn-outline" onclick="prepararEdicao(${ig.id}, '${ig.nome.replace(/'/g, "\\'")}', '${ig.slug}', '${ig.subadminEmail || ''}')">✏️ Editar</button>
                 <button class="btn btn-danger" onclick="eliminarIgreja(${ig.id}, '${ig.nome.replace(/'/g, "\\'")}')">🗑️</button>
               </td>
@@ -608,6 +609,7 @@ async function renovarAssinatura(id, nome) {
     toast(e.message, 'error');
   }
 }
+
 
 </script>
 </body>
