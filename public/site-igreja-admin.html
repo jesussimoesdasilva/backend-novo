@@ -1710,23 +1710,54 @@ async function carregarEventos() {
 async function adicionarEvento() {
   const title = document.getElementById('evTitle').value.trim();
   const startsAt = document.getElementById('evStartsAt').value;
+  const local = document.getElementById('evLocal').value;
+  const description = document.getElementById('evDescription').value;
+  const imagemFile = document.getElementById('evImagem').files[0]; // 1. Vai buscar o ficheiro
+  const btn = event.target;
+
   if (!title || !startsAt) return toast('Título e data são obrigatórios', 'error');
-  
+
+  btn.innerHTML = "⏳ A guardar..."; btn.disabled = true;
+
   try {
-    const r = await fetch(API + '/eventos/igreja/' + igrejaAtual.id, {
+    let imagemUrl = null;
+
+    // 2. Se houver imagem, faz upload para o Cloudinary
+    if (imagemFile) {
+      const formData = new FormData();
+      formData.append("file", imagemFile);
+      formData.append("upload_preset", "igreja_preset");
+
+      const resp = await fetch("https://api.cloudinary.com/v1_1/numjnf4g/image/upload", {
+        method: "POST", body: formData
+      });
+      const data = await resp.json();
+      
+      if (data.secure_url) {
+        imagemUrl = data.secure_url;
+      }
+    }
+
+    // 3. Envia os dados do evento (com o link da imagem) para o backend
+    await fetch(API + '/eventos/igreja/' + igrejaAtual.id, {
       method: 'POST', headers: {'Content-Type':'application/json'},
-      body: JSON.stringify({
-        title, startsAt,
-        description: document.getElementById('evDescription').value,
-        local: document.getElementById('evLocal').value,
-        imagem: null
+      body: JSON.stringify({ 
+        title, 
+        startsAt, 
+        local, 
+        description,
+        imagem: imagemUrl // 4. Guarda o link da imagem
       })
     });
-    if (!r.ok) throw new Error('Erro');
-    toast('Evento adicionado!', 'success');
-    ['evTitle','evStartsAt','evDescription','evLocal'].forEach(id => document.getElementById(id).value = '');
+
+    toast('Evento adicionado com sucesso!');
+    ['evTitle','evStartsAt','evDescription','evLocal','evImagem'].forEach(id => document.getElementById(id).value = '');
     carregarEventos();
-  } catch (e) { toast(e.message, 'error'); }
+  } catch (e) {
+    toast(e.message, 'error');
+  } finally {
+    btn.innerHTML = "💾 Adicionar Evento"; btn.disabled = false;
+  }
 }
 
 async function apagarEvento(id) {
