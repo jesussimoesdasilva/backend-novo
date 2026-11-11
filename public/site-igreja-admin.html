@@ -672,7 +672,10 @@ function section(name, btn) {
   if (name === 'ofertas') { carregarOfertas(); carregarEstatisticas(); }
   if (name === 'relatorios') document.getElementById('areaRelatorio').style.display = 'none';
   if (name === 'tema') { carregarTema(); carregarPreviewHero(); }
-  if (name === 'chat') { document.getElementById('listaMensagensModeracao').innerHTML = '<div class="empty">Nenhuma mensagem carregada.</div>'; }
+  if (name === 'chat') { 
+  document.getElementById('listaMensagensModeracao').innerHTML = '<div class="empty">Nenhuma mensagem carregada.</div>';
+  carregarDepartamentos(); // Carrega os departamentos para o dropdown do chat
+}
   if (name === 'midia') { carregarMidiaAdmin(); carregarEstadoLive(); }
 }
 
