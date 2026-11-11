@@ -144,8 +144,30 @@ async function redefinirSenhaAdmin(req, res) {
   }
 }
 
+async function renovarAssinatura(req, res) {
+  try {
+    const { id } = req.params;
+    const igreja = await prisma.igreja.findUnique({ where: { id: Number(id) } });
+    
+    // Se já tem data, soma mais 30 dias. Se não tem, começa de hoje.
+    const dataBase = igreja.dataExpiracao && igreja.dataExpiracao > new Date() 
+      ? new Date(igreja.dataExpiracao) 
+      : new Date();
+    
+    dataBase.setDate(dataBase.getDate() + 30);
+
+    const atualizada = await prisma.igreja.update({
+      where: { id: Number(id) },
+      data: { dataExpiracao: dataBase }
+    });
+    res.json(atualizada);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+}
+
 module.exports = { 
   listIgrejas, getIgreja, addIgreja, editIgreja, removeIgreja, 
   uploadLogo, uploadImagensHero, salvarCorFundo, salvarCorBarraTopo, login,
-  solicitarCodigoAdmin, redefinirSenhaAdmin // <-- ADICIONA ESTAS DUAS
+  solicitarCodigoAdmin, redefinirSenhaAdmin, renovarAssinatura 
 };

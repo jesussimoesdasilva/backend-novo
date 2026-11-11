@@ -55,6 +55,7 @@ model Igreja {
   
   criadoEm        DateTime @default(now())
   atualizadoEm    DateTime @updatedAt
+  dataExpiracao DateTime? // <-- NOVO CAMPO
 }
 
 model Membro {

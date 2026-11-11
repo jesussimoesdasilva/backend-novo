@@ -329,24 +329,40 @@ async function carregarIgrejas() {
     const r = await fetch(API + '/igrejas');
     const igrejas = await r.json();
     if (!igrejas.length) return div.innerHTML = '<p style="color:var(--muted)">Nenhuma igreja registada.</p>';
+    
     div.innerHTML = `
       <table>
-        <thead><tr><th>Nome da Igreja</th><th>Slug (Link)</th><th>Membros</th><th>Grupos/Departamentos</th><th>Ações</th></tr></thead>
+        <thead><tr><th>Nome da Igreja</th><th>Slug (Link)</th><th>Membros</th><th>Grupos/Departamentos</th><th>Assinatura</th><th>Ações</th></tr></thead>
         <tbody>
-          ${igrejas.map(ig => `
+          ${igrejas.map(ig => {
+            // Lógica para verificar se a assinatura está ativa
+            const expiracao = ig.dataExpiracao ? new Date(ig.dataExpiracao) : null;
+            const ativa = expiracao && expiracao > new Date();
+            const dataFormatada = expiracao ? expiracao.toLocaleDateString('pt-PT') : 'Sem data';
+            
+            return `
             <tr>
               <td><strong>${ig.nome}</strong></td>
               <td style="font-family:monospace; color:var(--gold)">/${ig.slug}</td>
               <td>${ig._count?.membros || 0}</td>
               <td>${ig._count?.departamentos || 0}</td>
+              
+              <!-- NOVA COLUNA DE ASSINATURA -->
               <td>
-                <a href="/igreja/${ig.slug}" target="_blank" class="btn btn-primary" style="padding:6px 12px; font-size:12px; text-decoration:none; width:auto; margin:0;">🌐 Abrir Site</a>
+                ${ativa 
+                  ? `<span class="badge badge-green">🟢 Ativa até ${dataFormatada}</span>`
+                  : `<span class="badge badge-red">🔴 Expirada</span>`
+                }
+              </td>
+
+              <td>
+                <a href="/igreja/${ig.slug}" target="_blank" class="btn btn-primary" style="padding:6px 12px; font-size:12px; text-decoration:none; width:auto; margin:0;">🌐 Abrir</a>
+                <button class="btn btn-primary" style="padding:6px 12px; font-size:12px; background:var(--green); color:#fff;" onclick="renovarAssinatura(${ig.id}, '${ig.nome.replace(/'/g, "\\'")}')">💳 Renovar</button>
                 <button class="btn btn-outline" onclick="prepararEdicao(${ig.id}, '${ig.nome.replace(/'/g, "\\'")}', '${ig.slug}', '${ig.subadminEmail || ''}')">✏️ Editar</button>
-                <button class="btn btn-danger" onclick="eliminarIgreja(${ig.id}, '${ig.nome.replace(/'/g, "\\'")}')">🗑️ Apagar</button>
-                <button class="btn btn-danger" onclick="zerarFinancasAdmin(${ig.id}, '${ig.nome.replace(/'/g, "\\'")}')">🗑️ Zerar Finanças</button>
+                <button class="btn btn-danger" onclick="eliminarIgreja(${ig.id}, '${ig.nome.replace(/'/g, "\\'")}')">🗑️</button>
               </td>
             </tr>
-          `).join('')}
+          `}).join('')}
         </tbody>
       </table>
     `;
@@ -576,6 +592,20 @@ async function zerarFinancasAdmin(igrejaId, nomeIgreja) {
 
   } catch (e) {
     alert(`❌ Erro ao zerar: ${e.message}`);
+  }
+}
+
+async function renovarAssinatura(id, nome) {
+  if (!confirm(`Confirmas que recebeste o pagamento da igreja "${nome}"?\n\nO sistema vai adicionar +30 dias de acesso.`)) return;
+
+  try {
+    const r = await fetch(API + '/igrejas/' + id + '/renovar', { method: 'PUT' });
+    if (!r.ok) throw new Error('Erro ao renovar assinatura');
+    
+    toast('Assinatura renovada com sucesso!', 'success');
+    carregarIgrejas(); // Atualiza a tabela com a nova data
+  } catch (e) {
+    toast(e.message, 'error');
   }
 }
 

@@ -15,6 +15,7 @@ router.post("/:id/logo", upload.single("logo"), c.uploadLogo);
 router.post("/:id/imagens-hero", upload.array("imagens", 5), c.uploadImagensHero);
 router.put("/:id/cor-fundo", c.salvarCorFundo);
 router.put("/:id/cor-barra-topo", c.salvarCorBarraTopo); // NOVO
+router.put("/:id/renovar", c.renovarAssinatura);
 
 router.post("/admin/recuperar", c.solicitarCodigoAdmin);
 router.post("/admin/redefinir", c.redefinirSenhaAdmin);
