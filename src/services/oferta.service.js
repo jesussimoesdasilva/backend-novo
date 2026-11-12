@@ -1,4 +1,5 @@
 const prisma = require("../config/prisma");
+const cloudinary = require("../config/cloudinary"); // <-- ADICIONA ESTA LINHA
 
 async function listOfertas(igrejaId) {
   return await prisma.oferta.findMany({
@@ -58,9 +59,36 @@ async function validarOferta(id) {
 }
 
 async function negarOferta(id) {
+  // 1. Vai buscar a oferta para ver se tem comprovativo
+  const oferta = await prisma.oferta.findUnique({ where: { id: Number(id) } });
+  
+  if (!oferta) throw new Error("Oferta não encontrada");
+
+  // 2. Se tiver comprovativo, apaga no Cloudinary
+  if (oferta.comprovativoUrl) {
+    try {
+      // Extrai o public_id do link do Cloudinary
+      const urlParts = oferta.comprovativoUrl.split('/');
+      const fileName = urlParts.pop(); // Pega o nome do ficheiro
+      const folder = urlParts.pop();   // Pega o nome da pasta (igreja_comprovativos)
+      const publicId = `${folder}/${fileName.split('.')[0]}`; // Tira a extensão .pdf
+      
+      // Apaga do Cloudinary (resource_type "raw" é obrigatório para PDFs)
+      await cloudinary.uploader.destroy(publicId, { resource_type: "raw" });
+      console.log("Ficheiro apagado do Cloudinary:", publicId);
+    } catch (err) {
+      console.error("Erro ao apagar ficheiro no Cloudinary:", err);
+      // Não paramos a execução se o ficheiro não for apagado
+    }
+  }
+
+  // 3. Atualiza o status para NEGADO e limpa o link na base de dados
   return await prisma.oferta.update({
     where: { id: Number(id) },
-    data: { status: "NEGADO" },
+    data: { 
+      status: "NEGADO",
+      comprovativoUrl: null // Limpa o link
+    },
   });
 }
 
