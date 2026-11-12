@@ -24,14 +24,15 @@ async function createOferta(igrejaId, data) {
       igrejaId: Number(igrejaId),
       membroId: membroId,
       codigo: codigo,
-      nomeDoador: data.nomeDoador || data.descricao || null, // Aceita nomeDoador ou descricao
+      nomeDoador: data.nomeDoador || data.descricao || null,
       bi: data.bi || null,
       telefone: data.telefone || null,
       finalidade: data.finalidade,
       valor: Number(data.valor),
-      metodo: data.metodo || 'N/A', // <-- Se não vier método (SAIDA), grava N/A
+      metodo: data.metodo || 'N/A',
       referencia: data.referencia || null,
-      status: status // <-- AQUI está a correção
+      status: status,
+      comprovativoUrl: data.comprovativoUrl || null // <-- A NOVA LINHA AQUI
     },
   });
 }

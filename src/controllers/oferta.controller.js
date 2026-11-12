@@ -18,9 +18,26 @@ async function create(req, res, next) {
       return res.status(400).json({ error: true, message: "Método é obrigatório para ofertas/dízimos" });
     }
 
-    const oferta = await service.createOferta(req.params.igrejaId, req.body);
+    // NOVO: Pega o link do PDF gerado pelo Cloudinary
+    let comprovativoUrl = null;
+    if (req.file) {
+      comprovativoUrl = req.file.path;
+    }
+
+    const oferta = await service.createOferta(req.params.igrejaId, {
+      ...req.body,
+      comprovativoUrl
+    });
+    
     res.status(201).json({ message: "Registo efetuado", oferta });
   } catch (err) { 
+    // Tratamento de erro se o ficheiro for maior que 50KB
+    if (err.code === 'LIMIT_FILE_SIZE') {
+      return res.status(400).json({ error: true, message: "O comprovativo não pode ter mais de 50KB." });
+    }
+    if (err.message === "Apenas ficheiros PDF são permitidos.") {
+      return res.status(400).json({ error: true, message: err.message });
+    }
     console.error("ERRO AO CRIAR:", err);
     next(err); 
   }

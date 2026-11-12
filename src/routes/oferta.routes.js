@@ -1,12 +1,13 @@
 const express = require("express");
 const router = express.Router();
 const c = require("../controllers/oferta.controller");
+const uploadComprovativo = require("../middlewares/uploadComprovativo");
 
 router.get("/igreja/:igrejaId", c.list);
 router.get("/estatisticas/:igrejaId", c.estatisticas);
 router.get("/relatorio-dizimistas/:igrejaId", c.relatorioDizimistas);
 
-router.post("/igreja/:igrejaId", c.create);
+router.post("/igreja/:igrejaId", uploadComprovativo.single('comprovativo'), c.create);
 router.get("/consultar/:igrejaId/:codigo", c.consultar);
 router.get("/comprovativo/:igrejaId/:codigo", c.gerarComprovativoPDF);
 router.get("/pdf/membros/:igrejaId", c.gerarPDFMembros); // <-- NOVA ROTA AQUI

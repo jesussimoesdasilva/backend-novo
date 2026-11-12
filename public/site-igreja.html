@@ -1026,15 +1026,43 @@ async function submeterOferta(e) {
   const finalidade = document.getElementById('oFinalidade').value;
   const metodo = document.getElementById('oMetodo').value;
   const referencia = document.getElementById('oReferencia').value;
+  const comprovativoFile = document.getElementById('oComprovativo').files[0];
 
   if (!finalidade) return alerta.className = "alert error", alerta.textContent = "❌ Escolha a finalidade";
+  if (!comprovativoFile) return alerta.className = "alert error", alerta.textContent = "❌ Anexe o comprovativo em PDF.";
 
   try {
+    // 1. Upload para o Cloudinary
+    const formData = new FormData();
+    formData.append("file", comprovativoFile);
+    formData.append("upload_preset", "igreja_preset");
+
+    const resp = await fetch("https://api.cloudinary.com/v1_1/numjnf4g/raw/upload", {
+      method: "POST", body: formData
+    });
+    const data = await resp.json();
+    
+    if (!data.secure_url) throw new Error("Erro ao fazer upload do PDF. Verifique se é menor que 50KB.");
+
+    // 2. Envia os dados para o backend
     const r = await fetch('/api/ofertas/igreja/' + igrejaIdAtual, {
       method: 'POST', headers: {'Content-Type':'application/json'},
-      body: JSON.stringify({ nomeDoador: nome, telefone, valor, finalidade, metodo, referencia })
+      body: JSON.stringify({ 
+        nomeDoador: nome, 
+        telefone, 
+        valor, 
+        finalidade, 
+        metodo, 
+        referencia,
+        comprovativoUrl: data.secure_url // <-- Envia o link do PDF
+      })
     });
-    if (!r.ok) throw new Error('Erro ao registar');
+    
+    if (!r.ok) {
+      const erroServidor = await r.json();
+      throw new Error(erroServidor.message || 'Erro ao registar');
+    }
+    
     const d = await r.json();
     
     alerta.className = "alert success";
@@ -1986,33 +2014,37 @@ async function carregar() {
             <h3>Registar Oferta</h3>
             <div id="msgAlertaOferta" class="alert"></div>
             <form id="formOferta" onsubmit="submeterOferta(event)">
-              <div class="form-grid">
-                <div class="input-group"><label>Nome</label><input id="oNome" placeholder="Opcional"></div>
-                <div class="input-group"><label>Telefone</label><input id="oTelefone" placeholder="Opcional"></div>
-                <div class="input-group"><label>Valor (Kz) *</label><input type="number" id="oValor" required min="1" placeholder="Ex: 5000"></div>
-                <div class="input-group"><label>Finalidade *</label>
-                  <select id="oFinalidade" required>
-                    <option value="">Selecione</option>
-                    <option value="Oferta">Oferta</option>
-                    <option value="Missões">Missões</option>
-                    <option value="Construção">Construção</option>
-                    <option value="Ação de Graça">Ação de Graça</option>
-                    <option value="Ação Social">Ação Social</option>
-                  </select>
-                </div>
-                <div class="input-group"><label>Método *</label>
-                  <select id="oMetodo" required>
-                    <option value="">Selecione</option>
-                    <option value="Transferência">Transferência Bancária</option>
-                    <option value="Multicaixa">Multicaixa Express</option>
-                    <option value="Unitel Money">Unitel Money</option>
-                    <option value="PayPay">PayPay AO</option>
-                  </select>
-                </div>
-                <div class="input-group"><label>Referência</label><input id="oReferencia" placeholder="Ex: Nº do talão"></div>
-              </div>
-              <button type="submit" class="btn-submit" id="btnEnviarOferta" style="background:var(--gold); color:#020617;">Enviar para validação</button>
-            </form>
+  <div class="form-grid">
+    <div class="input-group"><label>Nome</label><input id="oNome" placeholder="Opcional"></div>
+    <div class="input-group"><label>Telefone</label><input id="oTelefone" placeholder="Opcional"></div>
+    <div class="input-group"><label>Valor (Kz) *</label><input type="number" id="oValor" required min="1" placeholder="Ex: 5000"></div>
+    <div class="input-group"><label>Finalidade *</label>
+      <select id="oFinalidade" required>
+        <option value="">Selecione</option>
+        <option value="Oferta">Oferta</option>
+        <option value="Missões">Missões</option>
+        <option value="Construção">Construção</option>
+        <option value="Ação de Graça">Ação de Graça</option>
+        <option value="Ação Social">Ação Social</option>
+      </select>
+    </div>
+    <div class="input-group"><label>Método *</label>
+      <select id="oMetodo" required>
+        <option value="">Selecione</option>
+        <option value="Transferência">Transferência Bancária</option>
+        <option value="Multicaixa">Multicaixa Express</option>
+        <option value="Unitel Money">Unitel Money</option>
+        <option value="PayPay">PayPay AO</option>
+      </select>
+    </div>
+    <div class="input-group"><label>Referência</label><input id="oReferencia" placeholder="Ex: Nº do talão"></div>
+    <div class="input-group full">
+      <label>Anexar Comprovativo (Apenas PDF, máx 50KB)</label>
+      <input type="file" id="oComprovativo" accept=".pdf" style="padding:10px; background:#fff; border:1px solid #cbd5e1; border-radius:10px;">
+    </div>
+  </div>
+  <button type="submit" class="btn-submit" id="btnEnviarOferta" style="background:var(--gold); color:#020617;">Enviar para validação</button>
+</form>
           </div>
 
           <div class="oferta-card">

@@ -196,7 +196,8 @@ model Oferta {
   finalidade  String   
   valor       Float    
   metodo      String   
-  referencia  String?  
+  referencia  String?
+  comprovativoUrl String?  
   
   status      String   @default("PENDENTE") 
   criadoEm    DateTime @default(now())
