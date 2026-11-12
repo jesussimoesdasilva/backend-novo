@@ -924,7 +924,7 @@ async function carregarOfertas() {
     
     if (!lista.length) return div.innerHTML = '<div class="empty">Nenhuma oferta registada.</div>';
     
-    div.innerHTML = `
+    let tabelaHtml = `
       <table>
         <thead>
           <tr>
@@ -938,42 +938,50 @@ async function carregarOfertas() {
           </tr>
         </thead>
         <tbody>
-          ${lista.map(o => {
-            let bgColor = o.status === 'VALIDADO' ? 'rgba(16,185,129,0.1)' : (o.status === 'AGUARDANDO_PASTOR' ? 'rgba(250,204,21,0.1)' : 'transparent');
-            let statusTxt = o.status === 'VALIDADO' ? '✅ Validado' : (o.status === 'AGUARDANDO_PASTOR' ? '⏳ Aguarda Pastor' : (o.status === 'NEGADO' ? '❌ Negado' : '🕒 Pendente'));
-            
-            let valorTxt = o.finalidade === 'SAIDA' 
-              ? `<span style="color:var(--red)">- ${o.valor.toLocaleString('pt-AO')} Kz</span>` 
-              : `<strong>${o.valor.toLocaleString('pt-AO')} Kz</strong>`;
-
-            let acoes = '';
-            if (o.status === 'PENDENTE') {
-              if (o.finalidade === 'Dízimo') {
-                acoes = `<button class="btn btn-primary" style="padding:4px 8px;font-size:11px" onclick="preValidar(${o.id})">Pré-Validar</button>`;
-              } else {
-                acoes = `<button class="btn btn-success" style="padding:4px 8px;font-size:11px" onclick="validarOferta(${o.id})">Validar</button>`;
-              }
-              acoes += ` <button class="btn btn-danger" style="padding:4px 8px;font-size:11px" onclick="negarOferta(${o.id})">Negar</button>`;
-            }
-            
-            return `
-              <tr style="background:${bgColor}">
-                <td style="font-family:monospace">${o.codigo || '-'}</td>
-                <td>${o.membro ? o.membro.nome : (o.nomeDoador || 'Anónimo')}</td>
-                <td style="font-family:monospace; color:var(--muted);">
-                  ${o.referencia || '-'}
-                  ${o.comprovativoUrl ? `<br><a href="${o.comprovativoUrl}" target="_blank" style="color:var(--gold); font-size:11px; text-decoration:underline; font-weight:bold;">📄 Ver Comprovativo</a>` : ''}
-                </td>
-                <td>${o.finalidade}</td>
-                <td>${valorTxt}</td>
-                <td>${statusTxt}</td>
-                <td>${acoes}</td>
-              </tr>
-            `;
-          }).join('')}
-        </tbody>
-      </table>
     `;
+
+    lista.forEach(o => {
+      let bgColor = o.status === 'VALIDADO' ? 'rgba(16,185,129,0.1)' : (o.status === 'AGUARDANDO_PASTOR' ? 'rgba(250,204,21,0.1)' : 'transparent');
+      let statusTxt = o.status === 'VALIDADO' ? '✅ Validado' : (o.status === 'AGUARDANDO_PASTOR' ? '⏳ Aguarda Pastor' : (o.status === 'NEGADO' ? '❌ Negado' : '🕒 Pendente'));
+      
+      let valorTxt = o.finalidade === 'SAIDA' 
+        ? `<span style="color:var(--red)">- ${o.valor.toLocaleString('pt-AO')} Kz</span>` 
+        : `<strong>${o.valor.toLocaleString('pt-AO')} Kz</strong>`;
+
+      let acoes = '';
+      if (o.status === 'PENDENTE') {
+        if (o.finalidade === 'Dízimo') {
+          acoes = `<button class="btn btn-primary" style="padding:4px 8px;font-size:11px" onclick="preValidar(${o.id})">Pré-Validar</button>`;
+        } else {
+          acoes = `<button class="btn btn-success" style="padding:4px 8px;font-size:11px" onclick="validarOferta(${o.id})">Validar</button>`;
+        }
+        acoes += ` <button class="btn btn-danger" style="padding:4px 8px;font-size:11px" onclick="negarOferta(${o.id})">Negar</button>`;
+      }
+
+      // AQUI ESTÁ A CORREÇÃO DO FRONTEND
+      let linkComprovativo = o.comprovativoUrl 
+        ? `<br><a href="${o.comprovativoUrl}" target="_blank" style="color:var(--gold); font-size:11px; text-decoration:underline; font-weight:bold;">📄 Ver Comprovativo</a>` 
+        : `<br><span style="color:var(--red); font-size:10px;">📄 Sem ficheiro</span>`; // <-- ADICIONEI ISTO PARA VERES SE O CAMPO VEM
+
+      tabelaHtml += `
+        <tr style="background:${bgColor}">
+          <td style="font-family:monospace">${o.codigo || '-'}</td>
+          <td>${o.membro ? o.membro.nome : (o.nomeDoador || 'Anónimo')}</td>
+          <td style="font-family:monospace; color:var(--muted);">
+            ${o.referencia || '-'}
+            ${linkComprovativo}
+          </td>
+          <td>${o.finalidade}</td>
+          <td>${valorTxt}</td>
+          <td>${statusTxt}</td>
+          <td>${acoes}</td>
+        </tr>
+      `;
+    });
+
+    tabelaHtml += `</tbody></table>`;
+    div.innerHTML = tabelaHtml;
+
   } catch (e) { 
     document.getElementById('listaOfertas').innerHTML = '<div class="empty" style="color:var(--red)">Erro ao carregar ofertas</div>'; 
   }
