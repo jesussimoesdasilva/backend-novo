@@ -926,7 +926,7 @@ async function carregarOfertas() {
     
     div.innerHTML = `
       <table>
-        <thead><tr><th>Código</th><th>Doador / Descrição</th><th>Finalidade</th><th>Valor</th><th>Estado</th><th>Ações</th></tr></thead>
+        <th>Código</th><th>Doador / Descrição</th><th>Referência</th><th>Finalidade</th><th>Valor</th><th>Estado</th><th>Ações</th>
         <tbody>
           ${lista.map(o => {
             let bgColor = o.status === 'VALIDADO' ? 'rgba(16,185,129,0.1)' : (o.status === 'AGUARDANDO_PASTOR' ? 'rgba(250,204,21,0.1)' : 'transparent');
@@ -950,6 +950,8 @@ async function carregarOfertas() {
               <tr style="background:${bgColor}">
                 <td style="font-family:monospace">${o.codigo || '-'}</td>
                 <td>${o.membro ? o.membro.nome : (o.nomeDoador || 'Anónimo')}</td>
+                <td style="font-family:monospace; color:var(--muted);">${o.referencia || '-'}</td>
+                <td>${o.finalidade}</td>
                 <td>${o.finalidade}</td>
                 <td>${valorTxt}</td>
                 <td>${statusTxt}</td>
