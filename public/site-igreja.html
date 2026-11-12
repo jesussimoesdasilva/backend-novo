@@ -568,7 +568,7 @@ footer strong{color:#f2d27c}
           <div class="input-group full"><label>Referência (Nº do talão)</label><input id="dReferencia" placeholder="Opcional"></div>
 	<div class="input-group full">
   	   <label>Anexar Comprovativo (Apenas PDF, máx 50KB)</label>
- 	   <input type="file" id="dComprovativo" accept=".pdf" style="padding:10px; background:#fff; border:1px solid #cbd5e1; border-radius:10px;">
+ 	   <input type="file" id="dComprovativo" accept=".pdf" required style="padding:10px; background:#fff; border:1px solid #cbd5e1; border-radius:10px;">
 	</div>
         </div>
         <button type="submit" class="btn-submit" id="btnEnviarDizimo" style="background:linear-gradient(135deg,#d4a017,#facc15); color:#020617;">💾 Registar Dízimo</button>
@@ -2068,7 +2068,7 @@ async function carregar() {
     <div class="input-group"><label>Referência</label><input id="oReferencia" placeholder="Ex: Nº do talão"></div>
     <div class="input-group full">
       <label>Anexar Comprovativo (Apenas PDF, máx 50KB)</label>
-      <input type="file" id="oComprovativo" accept=".pdf" style="padding:10px; background:#fff; border:1px solid #cbd5e1; border-radius:10px;">
+      <input type="file" id="oComprovativo" accept=".pdf" required style="padding:10px; background:#fff; border:1px solid #cbd5e1; border-radius:10px;">
     </div>
   </div>
   <button type="submit" class="btn-submit" id="btnEnviarOferta" style="background:var(--gold); color:#020617;">Enviar para validação</button>
