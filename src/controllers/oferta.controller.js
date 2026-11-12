@@ -18,10 +18,11 @@ async function create(req, res, next) {
       return res.status(400).json({ error: true, message: "Método é obrigatório para ofertas/dízimos" });
     }
 
-    // NOVO: Pega o link do PDF gerado pelo Cloudinary
+        // NOVO: Pega o link do PDF gerado pelo Cloudinary
     let comprovativoUrl = null;
     if (req.file) {
-      comprovativoUrl = req.file.path;
+      // O Cloudinary devolve o link na propriedade 'secure_url' (ou 'url')
+      comprovativoUrl = req.file.secure_url || req.file.url || req.file.path;
     }
 
     const oferta = await service.createOferta(req.params.igrejaId, {
