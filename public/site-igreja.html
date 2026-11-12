@@ -1414,14 +1414,14 @@ async function abrirConversa(id, nome, foto) {
   const nomeSeguro = JSON.stringify(nome);
   
   document.getElementById('chatHeaderNome').innerHTML = `
-    <div onclick='event.stopPropagation(); abrirFotoMembro(${fotoSegura}, ${nomeSeguro})' style="display:flex; align-items:center; gap:8px; cursor:pointer; width:100%;">
-      ${foto 
-        ? `<img src="${foto}" class="chat-avatar" style="width:30px;height:30px;">` 
-        : `<div class="chat-avatar" style="width:30px;height:30px;">${nome.charAt(0)}</div>`
-      }
-      <strong>${nome}</strong>
-    </div>
-  `;
+  <div onclick='event.stopPropagation(); abrirFotoMembro(${fotoSegura}, ${nomeSeguro})' style="display:flex; align-items:center; gap:12px; cursor:pointer; width:100%;">
+    ${foto 
+      ? `<img src="${foto}" class="chat-avatar" style="width:45px;height:45px; border: 2px solid var(--gold);">` 
+      : `<div class="chat-avatar" style="width:45px;height:45px; font-size:18px;">${nome.charAt(0)}</div>`
+    }
+    <strong style="font-size: 18px;">${nome}</strong>
+  </div>
+`;
   
   document.getElementById('chatInputArea').style.display = 'flex';
   document.getElementById('chatInput').focus();
@@ -1447,6 +1447,25 @@ function voltarListaChat() {
   document.getElementById('chatMessages').innerHTML = "";
   document.getElementById('chatInputArea').style.display = 'none';
 }
+
+function abrirFotoMembro(foto, nome) {
+  if (!foto || foto === 'null' || foto === '') return; // Se não tiver foto, não faz nada
+  
+  const modal = document.getElementById('modalFotoMembro');
+  const img = document.getElementById('fotoAmpliadaMembro');
+  const nomeEl = document.getElementById('nomeAmpliadoMembro');
+  
+  if (modal && img && nomeEl) {
+    img.src = foto;
+    nomeEl.textContent = nome;
+    modal.style.display = 'flex';
+  }
+}
+
+function fecharFotoMembro() {
+  document.getElementById('modalFotoMembro').style.display = 'none';
+}
+
 
 async function marcarComoLidas(deId, paraId) {
   try {
