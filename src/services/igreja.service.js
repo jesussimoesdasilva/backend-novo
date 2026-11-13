@@ -1,5 +1,6 @@
 const prisma = require("../config/prisma");
 const bcrypt = require("bcrypt");
+const cloudinary = require("../config/cloudinary");
 
 async function getAllIgrejas() {
   return await prisma.igreja.findMany({
@@ -47,6 +48,9 @@ async function createIgreja(data) {
 }
 
 async function updateIgreja(id, data) {
+  // 1. Vai buscar a igreja antiga para comparar as imagens
+  const igrejaAntiga = await prisma.igreja.findUnique({ where: { id: Number(id) } });
+
   const updateData = {
     nome: data.nome,
     slug: data.slug,
@@ -66,20 +70,49 @@ async function updateIgreja(id, data) {
     ativo: data.ativo,
   };
 
-  // 1. Guarda o email do subadmin (se vier no pedido)
-  if (data.subadminEmail) {
-    updateData.subadminEmail = data.subadminEmail;
-  }
+  if (data.subadminEmail) updateData.subadminEmail = data.subadminEmail;
 
-  // 2. Guarda a senha do subadmin (se vier no pedido)
   if (data.subadminSenha) {
-    // Verifica se a senha já está encriptada (ex: se vier do getIgrejaById ao fazer upload de imagem)
     const isJaEncriptada = data.subadminSenha.startsWith('$2a$') || data.subadminSenha.startsWith('$2b$');
-    
     if (isJaEncriptada) {
       updateData.subadminSenha = data.subadminSenha;
     } else {
       updateData.subadminSenha = await bcrypt.hash(data.subadminSenha, 10);
+    }
+  }
+
+  // --- LÓGICA DE APAGAR IMAGENS DO CLOUDINARY ---
+  const apagarDoCloudinary = async (url) => {
+    if (!url) return;
+    try {
+      const urlParts = url.split('/upload/');
+      if (urlParts.length > 1) {
+        let publicId = urlParts[1].replace(/^v\d+\//, '');
+        publicId = publicId.split('.')[0];
+        await cloudinary.uploader.destroy(publicId);
+      }
+    } catch (err) {
+      console.error("Erro ao apagar imagem do Cloudinary:", err);
+    }
+  };
+
+  if (igrejaAntiga) {
+    // Apaga Logo antigo se mudou
+    if (data.logoUrl && igrejaAntiga.logoUrl && data.logoUrl !== igrejaAntiga.logoUrl) {
+      await apagarDoCloudinary(igrejaAntiga.logoUrl);
+    }
+
+    // Apaga imagens do Hero que foram removidas
+    if (data.imagensHero && igrejaAntiga.imagensHero) {
+      try {
+        const antigas = JSON.parse(igrejaAntiga.imagensHero);
+        const novas = JSON.parse(data.imagensHero);
+        for (const urlAntiga of antigas) {
+          if (!novas.includes(urlAntiga)) {
+            await apagarDoCloudinary(urlAntiga);
+          }
+        }
+      } catch (e) { console.error("Erro ao processar JSON do Hero:", e); }
     }
   }
 
