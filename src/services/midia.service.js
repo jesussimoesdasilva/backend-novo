@@ -47,4 +47,4 @@ async function deleteMidia(id) {
   return await prisma.midia.delete({ where: { id: Number(id) } });
 }
 
-module.exports = { listarMidias, criarMidia, deletarMidia };
+module.exports = { listarMidias, criarMidia, deleteMidia };
