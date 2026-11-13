@@ -89,14 +89,14 @@ async function apagarFotoAtividade(fotoId) {
 
   if (foto.url) {
     try {
-      const urlParts = foto.url.split('/');
-      const fileName = urlParts.pop();
-      const folder = urlParts.pop();
-      const publicId = `${folder}/${fileName.split('.')[0]}`;
-      await cloudinary.uploader.destroy(publicId);
-      console.log("Foto de atividade apagada:", publicId);
+      const urlParts = foto.url.split('/upload/');
+      if (urlParts.length > 1) {
+        let publicId = urlParts[1].replace(/^v\d+\//, ''); 
+        publicId = publicId.split('.')[0]; 
+        await cloudinary.uploader.destroy(publicId);
+      }
     } catch (err) {
-      console.error("Erro ao apagar foto da atividade no Cloudinary:", err);
+      console.error("Erro ao apagar foto do Cloudinary:", err);
     }
   }
 
@@ -136,13 +136,14 @@ async function apagarFotoDepartamento(fotoId) {
 
   if (foto.url) {
     try {
-      const urlParts = foto.url.split('/');
-      const fileName = urlParts.pop();
-      const folder = urlParts.pop();
-      const publicId = `${folder}/${fileName.split('.')[0]}`;
-      await cloudinary.uploader.destroy(publicId);
+      const urlParts = foto.url.split('/upload/');
+      if (urlParts.length > 1) {
+        let publicId = urlParts[1].replace(/^v\d+\//, '');
+        publicId = publicId.split('.')[0];
+        await cloudinary.uploader.destroy(publicId);
+      }
     } catch (err) {
-      console.error("Erro ao apagar foto do departamento no Cloudinary:", err);
+      console.error("Erro ao apagar foto do Cloudinary:", err);
     }
   }
 
