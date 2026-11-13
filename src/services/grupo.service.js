@@ -1,4 +1,5 @@
 const prisma = require("../config/prisma");
+const cloudinary = require("../config/cloudinary");
 
 // ===== CHAT DO DEPARTAMENTO =====
 async function obterMensagensDepto(deptoId) {
@@ -74,8 +75,30 @@ async function criarFotoAtividade(igrejaId, sectorId, url, legenda) {
   });
 }
 
+async function apagarFotoAtividade(fotoId) {
+  // 1. Vai buscar a foto
+  const foto = await prisma.fotoAtividade.findUnique({ where: { id: Number(fotoId) } });
+  if (!foto) throw new Error("Foto não encontrada");
+
+  // 2. Apaga no Cloudinary
+  if (foto.url) {
+    try {
+      const urlParts = foto.url.split('/');
+      const fileName = urlParts.pop();
+      const folder = urlParts.pop();
+      const publicId = `${folder}/${fileName.split('.')[0]}`;
+      await cloudinary.uploader.destroy(publicId);
+    } catch (err) {
+      console.error("Erro ao apagar foto da atividade no Cloudinary:", err);
+    }
+  }
+
+  // 3. Apaga da base de dados
+  return await prisma.fotoAtividade.delete({ where: { id: Number(fotoId) } });
+}
+
 module.exports = {
   obterMensagensDepto, verificarMembroDoDepto, criarMensagemDepto,
   obterMensagensSector, verificarMembroDoSector, criarMensagemSector,
-  esconderMensagem, obterFotosDoSector, criarFotoAtividade
+  esconderMensagem, obterFotosDoSector, criarFotoAtividade, apagarFotoAtividade
 };
