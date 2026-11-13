@@ -51,16 +51,15 @@ async function listarFotosSector(req, res) {
 
 async function uploadFotoAtividade(req, res) {
   try {
-    if (!req.file) return res.status(400).json({ message: "Nenhuma foto enviada" });
     const { sectorId } = req.params;
-    const { legenda, igrejaId } = req.body;
-    const url = '/logos/' + req.file.filename;
-    
+    const { legenda, igrejaId, url } = req.body;
+
+    if (!url) return res.status(400).json({ message: "Link da imagem não enviado." });
+
     const foto = await grupoService.criarFotoAtividade(igrejaId, sectorId, url, legenda);
     res.status(201).json(foto);
   } catch (err) { 
-    // Se for o erro de limite de tamanho ou tipo, devolve JSON em vez de HTML
-    if (err.message.includes('Limite de') || err.code === 'LIMIT_FILE_SIZE' || err.message.includes('Apenas')) {
+    if (err.message.includes('Limite de')) {
       return res.status(400).json({ message: err.message });
     }
     res.status(500).json({ message: err.message }); 
@@ -83,15 +82,15 @@ async function obterFotosDoDepartamento(req, res) {
 
 async function criarFotoDepartamento(req, res) {
   try {
-    if (!req.file) return res.status(400).json({ message: "Nenhuma foto enviada" });
     const { deptoId } = req.params;
-    const { legenda, igrejaId } = req.body;
-    const url = '/logos/' + req.file.filename;
-    
+    const { legenda, igrejaId, url } = req.body;
+
+    if (!url) return res.status(400).json({ message: "Link da imagem não enviado." });
+
     const foto = await grupoService.criarFotoDepartamento(igrejaId, deptoId, url, legenda);
     res.status(201).json(foto);
   } catch (err) {
-    if (err.message.includes('Limite de') || err.code === 'LIMIT_FILE_SIZE' || err.message.includes('Apenas')) {
+    if (err.message.includes('Limite de')) {
       return res.status(400).json({ message: err.message });
     }
     res.status(500).json({ message: err.message });
