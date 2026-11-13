@@ -55,10 +55,12 @@ async function uploadFotoAtividade(req, res) {
     const { sectorId } = req.params;
     const { legenda, igrejaId } = req.body;
     const url = '/logos/' + req.file.filename;
-    res.status(201).json(await grupoService.criarFotoAtividade(igrejaId, sectorId, url, legenda));
+    
+    const foto = await grupoService.criarFotoAtividade(igrejaId, sectorId, url, legenda);
+    res.status(201).json(foto);
   } catch (err) { 
-    // Se for o erro do limite, devolve 400 com a mensagem
-    if (err.message.includes('Limite de')) {
+    // Se for o erro de limite de tamanho ou tipo, devolve JSON em vez de HTML
+    if (err.message.includes('Limite de') || err.code === 'LIMIT_FILE_SIZE' || err.message.includes('Apenas')) {
       return res.status(400).json({ message: err.message });
     }
     res.status(500).json({ message: err.message }); 
@@ -89,7 +91,7 @@ async function criarFotoDepartamento(req, res) {
     const foto = await grupoService.criarFotoDepartamento(igrejaId, deptoId, url, legenda);
     res.status(201).json(foto);
   } catch (err) {
-    if (err.message.includes('Limite de')) {
+    if (err.message.includes('Limite de') || err.code === 'LIMIT_FILE_SIZE' || err.message.includes('Apenas')) {
       return res.status(400).json({ message: err.message });
     }
     res.status(500).json({ message: err.message });
