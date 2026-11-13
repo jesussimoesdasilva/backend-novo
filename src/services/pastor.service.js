@@ -1,5 +1,6 @@
 const prisma = require("../config/prisma");
 const bcrypt = require("bcryptjs");
+const cloudinary = require("../config/cloudinary");
 
 async function listPastores(igrejaId) {
   return await prisma.pastor.findMany({
@@ -52,6 +53,21 @@ async function updatePastor(id, data) {
 }
 
 async function deletePastor(id) {
+  const pastor = await prisma.pastor.findUnique({ where: { id: Number(id) } });
+  if (!pastor) throw new Error("Pastor não encontrado");
+
+  if (pastor.foto) {
+    try {
+      const urlParts = pastor.foto.split('/');
+      const fileName = urlParts.pop();
+      const folder = urlParts.pop();
+      const publicId = `${folder}/${fileName.split('.')[0]}`;
+      await cloudinary.uploader.destroy(publicId);
+    } catch (err) {
+      console.error("Erro ao apagar foto do pastor:", err);
+    }
+  }
+
   return await prisma.pastor.delete({ where: { id: Number(id) } });
 }
 

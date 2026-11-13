@@ -1,4 +1,5 @@
 const prisma = require("../config/prisma");
+const cloudinary = require("../config/cloudinary");
 
 async function listAlbuns(igrejaId) {
   return await prisma.album.findMany({
@@ -47,6 +48,37 @@ async function setCapaAlbum(id, capaUrl) {
 }
 
 async function deleteAlbum(id) {
+  const album = await prisma.album.findUnique({ 
+    where: { id: Number(id) },
+    include: { fotos: true } // Vai buscar todas as fotos do álbum
+  });
+  if (!album) throw new Error("Álbum não encontrado");
+
+  // 1. Apaga a capa (se existir)
+  if (album.capaUrl) {
+    try {
+      const urlParts = album.capaUrl.split('/');
+      const fileName = urlParts.pop();
+      const folder = urlParts.pop();
+      const publicId = `${folder}/${fileName.split('.')[0]}`;
+      await cloudinary.uploader.destroy(publicId);
+    } catch (err) { console.error("Erro ao apagar capa:", err); }
+  }
+
+  // 2. Apaga todas as fotos do álbum no Cloudinary
+  for (const foto of album.fotos) {
+    if (foto.url) {
+      try {
+        const urlParts = foto.url.split('/');
+        const fileName = urlParts.pop();
+        const folder = urlParts.pop();
+        const publicId = `${folder}/${fileName.split('.')[0]}`;
+        await cloudinary.uploader.destroy(publicId);
+      } catch (err) { console.error("Erro ao apagar foto:", err); }
+    }
+  }
+
+  // 3. Apaga o álbum (e as fotos associadas) da base de dados
   return await prisma.album.delete({ where: { id: Number(id) } });
 }
 
@@ -69,6 +101,21 @@ async function createFoto(igrejaId, albumId, data) {
 }
 
 async function deleteFoto(id) {
+  const foto = await prisma.foto.findUnique({ where: { id: Number(id) } });
+  if (!foto) throw new Error("Foto não encontrada");
+
+  if (foto.url) {
+    try {
+      const urlParts = foto.url.split('/');
+      const fileName = urlParts.pop();
+      const folder = urlParts.pop();
+      const publicId = `${folder}/${fileName.split('.')[0]}`;
+      await cloudinary.uploader.destroy(publicId);
+    } catch (err) {
+      console.error("Erro ao apagar foto da galeria:", err);
+    }
+  }
+
   return await prisma.foto.delete({ where: { id: Number(id) } });
 }
 

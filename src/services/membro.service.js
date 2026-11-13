@@ -1,5 +1,6 @@
 const prisma = require("../config/prisma");
 const bcrypt = require("bcryptjs");
+const cloudinary = require("../config/cloudinary");
 
 // ===== FUNÇÕES ORIGINAIS DO SERVICE =====
 
@@ -27,6 +28,21 @@ async function redefinirSenha(id) {
 }
 
 async function deleteMembro(id) {
+  const membro = await prisma.membro.findUnique({ where: { id: Number(id) } });
+  if (!membro) throw new Error("Membro não encontrado");
+
+  if (membro.foto) {
+    try {
+      const urlParts = membro.foto.split('/');
+      const fileName = urlParts.pop();
+      const folder = urlParts.pop();
+      const publicId = `${folder}/${fileName.split('.')[0]}`;
+      await cloudinary.uploader.destroy(publicId);
+    } catch (err) {
+      console.error("Erro ao apagar foto do membro:", err);
+    }
+  }
+
   return await prisma.membro.delete({ where: { id: Number(id) } });
 }
 
