@@ -1,4 +1,5 @@
 const prisma = require("../config/prisma");
+const cloudinary = require("../config/cloudinary");
 
 async function listEventos(igrejaId) {
   return await prisma.evento.findMany({
@@ -34,6 +35,24 @@ async function updateEvento(id, data) {
 }
 
 async function deleteEvento(id) {
+  // 1. Vai buscar o evento para ver se tem imagem
+  const evento = await prisma.evento.findUnique({ where: { id: Number(id) } });
+  if (!evento) throw new Error("Evento não encontrado");
+
+  // 2. Se tiver imagem, apaga no Cloudinary
+  if (evento.imagem) {
+    try {
+      const urlParts = evento.imagem.split('/');
+      const fileName = urlParts.pop();
+      const folder = urlParts.pop();
+      const publicId = `${folder}/${fileName.split('.')[0]}`;
+      await cloudinary.uploader.destroy(publicId);
+    } catch (err) {
+      console.error("Erro ao apagar imagem do evento:", err);
+    }
+  }
+
+  // 3. Apaga o registo da base de dados
   return await prisma.evento.delete({ where: { id: Number(id) } });
 }
 
