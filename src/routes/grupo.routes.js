@@ -16,12 +16,12 @@ router.put("/mensagens/:msgId/silenciar", c.silenciarMensagem);
 
 // GALERIA DO SECTOR
 router.get("/galeria/:sectorId", c.listarFotosSector);
-router.post("/galeria/:sectorId", upload.single("foto"), c.uploadFotoAtividade);
-router.delete("/fotos-atividade/:id", c.apagarFotoAtividade); // <-- NOVA ROTA (apagar foto do sector)
+router.post("/galeria/:sectorId", c.uploadFotoAtividade); // <-- sem upload
+router.delete("/fotos-atividade/:id", c.apagarFotoAtividade);
 
-// GALERIA DO DEPARTAMENTO (NOVAS)
+// GALERIA DO DEPARTAMENTO
 router.get("/galeria-departamento/:deptoId", c.obterFotosDoDepartamento);
-router.post("/galeria-departamento/:deptoId", upload.single("foto"), c.criarFotoDepartamento);
+router.post("/galeria-departamento/:deptoId", c.criarFotoDepartamento); // <-- sem upload
 router.delete("/galeria-departamento/:fotoId", c.apagarFotoDepartamento);
 
 module.exports = router;
