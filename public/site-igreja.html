@@ -2762,23 +2762,35 @@ async function uploadFotoAtividade() {
   }
 
   const formData = new FormData();
-  formData.append('foto', fileInput.files[0]);
-  formData.append('legenda', legendaInput.value);
-  formData.append('igrejaId', igrejaIdAtual);
+  formData.append("file", fileInput.files[0]);
+  formData.append("upload_preset", "igreja_preset");
 
   try {
+    // 1. Envia a foto para o Cloudinary
+    const resp = await fetch("https://api.cloudinary.com/v1_1/numjnf4g/image/upload", {
+      method: "POST", body: formData
+    });
+    const data = await resp.json();
+    
+    if (!data.secure_url) throw new Error("Erro no upload para o Cloudinary");
+
+    // 2. Envia o link para o backend
     const r = await fetch(`/api/grupos/galeria/${sectorGaleriaAtual}`, {
       method: 'POST',
-      body: formData
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({
+        legenda: legendaInput.value,
+        igrejaId: igrejaIdAtual,
+        url: data.secure_url
+      })
     });
-    
+
     const dados = await r.json();
-    if (!r.ok) throw new Error(dados.message || "Erro ao fazer upload da foto.");
-    
+    if (!r.ok) throw new Error(dados.message || "Erro ao guardar a foto.");
+
     fileInput.value = '';
     legendaInput.value = '';
     await carregarFotosAtividade();
-    await atualizarFormularioGaleriaSector(sectorGaleriaAtual);
     alert("✅ Foto publicada com sucesso!");
   } catch (err) {
     alert("❌ " + err.message);
@@ -2904,19 +2916,32 @@ async function uploadFotoDepartamento() {
   }
 
   const formData = new FormData();
-  formData.append('foto', fileInput.files[0]);
-  formData.append('legenda', legendaInput.value);
-  formData.append('igrejaId', igrejaIdAtual);
+  formData.append("file", fileInput.files[0]);
+  formData.append("upload_preset", "igreja_preset");
 
   try {
+    // 1. Envia a foto para o Cloudinary
+    const resp = await fetch("https://api.cloudinary.com/v1_1/numjnf4g/image/upload", {
+      method: "POST", body: formData
+    });
+    const data = await resp.json();
+    
+    if (!data.secure_url) throw new Error("Erro no upload para o Cloudinary");
+
+    // 2. Envia o link para o backend
     const r = await fetch(`/api/grupos/galeria-departamento/${deptoGaleriaAtual}`, {
       method: 'POST',
-      body: formData
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({
+        legenda: legendaInput.value,
+        igrejaId: igrejaIdAtual,
+        url: data.secure_url
+      })
     });
-    
+
     const dados = await r.json();
-    if (!r.ok) throw new Error(dados.message || "Erro ao fazer upload da foto.");
-    
+    if (!r.ok) throw new Error(dados.message || "Erro ao guardar a foto.");
+
     fileInput.value = '';
     legendaInput.value = '';
     await carregarFotosDepartamento();
