@@ -937,6 +937,24 @@ footer strong{color:#f2d27c}
   </div>
 </div>
 
+<!-- MODAL DE CONFIRMAÇÃO DE APAGAR FOTO -->
+<div class="modal-overlay" id="modalConfirmarApagar">
+  <div class="modal" style="max-width: 400px; text-align: center;">
+    <div class="modal-header" style="justify-content: center; flex-direction: column; background: linear-gradient(135deg, #7f1d1d, #dc2626);">
+      <h2 style="color: white; margin: 0;">🗑️ Apagar Foto</h2>
+    </div>
+    <div class="modal-body">
+      <p style="color: #334155; font-size: 16px; margin-bottom: 25px; line-height: 1.5;">
+        Tem a certeza que deseja apagar esta foto?<br>Esta ação não pode ser desfeita.
+      </p>
+      <div style="display: flex; gap: 10px;">
+        <button class="btn" onclick="fecharModal('modalConfirmarApagar')" style="flex: 1; background: #e2e8f0; color: #334155; border-radius: 8px; padding: 12px;">Cancelar</button>
+        <button class="btn" id="btnConfirmarApagar" style="flex: 1; background: #dc2626; color: white; border-radius: 8px; padding: 12px;">Sim, Apagar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <script>
 const pathParts = window.location.pathname.split('/');
 const slug = pathParts[pathParts.length - 1];
@@ -2845,21 +2863,29 @@ async function uploadFotoAtividade() {
   }
 }
 
-async function apagarFotoAtividade(fotoId) {
-  if (!confirm('Tem a certeza que deseja apagar esta foto? Esta ação não pode ser desfeita.')) return;
-  
-  try {
-    const r = await fetch(`/api/grupos/fotos-atividade/${fotoId}`, {
-      method: 'DELETE'
-    });
-    if (!r.ok) throw new Error('Erro ao apagar a foto');
-    alert('✅ Foto apagada com sucesso!');
-    await carregarFotosAtividade();
-    await atualizarFormularioGaleriaSector(sectorGaleriaAtual);
-  } catch (err) {
-    alert('❌ ' + err.message);
-  }
+let apagarFotoCallback = null;
+
+function abrirConfirmacaoApagar(callback) {
+  apagarFotoCallback = callback;
+  document.getElementById('modalConfirmarApagar').style.display = 'flex';
 }
+
+document.addEventListener('DOMContentLoaded', () => {
+  const btn = document.getElementById('btnConfirmarApagar');
+  if(btn) {
+    btn.onclick = async function() {
+      if (apagarFotoCallback) {
+        this.innerHTML = "⏳ A apagar...";
+        this.disabled = true;
+        await apagarFotoCallback();
+        this.innerHTML = "Sim, Apagar";
+        this.disabled = false;
+      }
+      fecharModal('modalConfirmarApagar');
+      apagarFotoCallback = null;
+    };
+  }
+});
 
 // ===== GALERIA DO DEPARTAMENTO (NOVAS FUNÇÕES) =====
 let deptoGaleriaAtual = null;
@@ -3001,19 +3027,16 @@ async function uploadFotoDepartamento() {
 }
 
 async function apagarFotoDepartamento(fotoId) {
-  if (!confirm('Tem a certeza que deseja apagar esta foto? Esta ação não pode ser desfeita.')) return;
-  
-  try {
-    const r = await fetch(`/api/grupos/galeria-departamento/${fotoId}`, {
-      method: 'DELETE'
-    });
-    if (!r.ok) throw new Error('Erro ao apagar a foto');
-    alert('✅ Foto apagada com sucesso!');
-    await carregarFotosDepartamento();
-    await atualizarFormularioGaleriaDepartamento(deptoGaleriaAtual);
-  } catch (err) {
-    alert('❌ ' + err.message);
-  }
+  abrirConfirmacaoApagar(async () => {
+    try {
+      const r = await fetch(`/api/grupos/galeria-departamento/${fotoId}`, { method: 'DELETE' });
+      if (!r.ok) throw new Error('Erro ao apagar a foto');
+      await carregarFotosDepartamento();
+      await atualizarFormularioGaleriaDepartamento(deptoGaleriaAtual);
+    } catch (err) {
+      alert('❌ ' + err.message);
+    }
+  });
 }
 
 carregar();
