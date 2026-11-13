@@ -61,7 +61,7 @@ async function esconderMensagem(msgId) {
   });
 }
 
-// ===== GALERIA DE ATIVIDADES =====
+// ===== GALERIA DE ATIVIDADES (SECTOR) =====
 async function obterFotosDoSector(sectorId) {
   return await prisma.fotoAtividade.findMany({
     where: { sectorId: Number(sectorId) },
@@ -70,17 +70,70 @@ async function obterFotosDoSector(sectorId) {
 }
 
 async function criarFotoAtividade(igrejaId, sectorId, url, legenda) {
+  // Limite de 10 fotos por sector
+  const LIMITE_FOTOS = 10;
+  const totalAtual = await prisma.fotoAtividade.count({ where: { sectorId: Number(sectorId) } });
+  
+  if (totalAtual >= LIMITE_FOTOS) {
+    throw new Error(`Limite de ${LIMITE_FOTOS} fotos atingido neste sector. Apague algumas para adicionar novas.`);
+  }
+
   return await prisma.fotoAtividade.create({
     data: { igrejaId: Number(igrejaId), sectorId: Number(sectorId), url, legenda }
   });
 }
 
 async function apagarFotoAtividade(fotoId) {
-  // 1. Vai buscar a foto
   const foto = await prisma.fotoAtividade.findUnique({ where: { id: Number(fotoId) } });
   if (!foto) throw new Error("Foto não encontrada");
 
-  // 2. Apaga no Cloudinary
+  if (foto.url) {
+    try {
+      const urlParts = foto.url.split('/');
+      const fileName = urlParts.pop();
+      const folder = urlParts.pop();
+      const publicId = `${folder}/${fileName.split('.')[0]}`;
+      await cloudinary.uploader.destroy(publicId);
+      console.log("Foto de atividade apagada:", publicId);
+    } catch (err) {
+      console.error("Erro ao apagar foto da atividade no Cloudinary:", err);
+    }
+  }
+
+  return await prisma.fotoAtividade.delete({ where: { id: Number(fotoId) } });
+}
+
+// ===== GALERIA DO DEPARTAMENTO (NOVO) =====
+async function obterFotosDoDepartamento(deptoId) {
+  return await prisma.fotoDepartamento.findMany({
+    where: { departamentoId: Number(deptoId) },
+    orderBy: { criadoEm: 'desc' }
+  });
+}
+
+async function contarFotosDoDepartamento(deptoId) {
+  return await prisma.fotoDepartamento.count({
+    where: { departamentoId: Number(deptoId) }
+  });
+}
+
+async function criarFotoDepartamento(igrejaId, deptoId, url, legenda) {
+  const LIMITE_FOTOS = 10;
+  
+  const totalAtual = await contarFotosDoDepartamento(deptoId);
+  if (totalAtual >= LIMITE_FOTOS) {
+    throw new Error(`Limite de ${LIMITE_FOTOS} fotos atingido neste departamento. Apague algumas para adicionar novas.`);
+  }
+
+  return await prisma.fotoDepartamento.create({
+    data: { igrejaId: Number(igrejaId), departamentoId: Number(deptoId), url, legenda }
+  });
+}
+
+async function apagarFotoDepartamento(fotoId) {
+  const foto = await prisma.fotoDepartamento.findUnique({ where: { id: Number(fotoId) } });
+  if (!foto) throw new Error("Foto não encontrada");
+
   if (foto.url) {
     try {
       const urlParts = foto.url.split('/');
@@ -89,16 +142,19 @@ async function apagarFotoAtividade(fotoId) {
       const publicId = `${folder}/${fileName.split('.')[0]}`;
       await cloudinary.uploader.destroy(publicId);
     } catch (err) {
-      console.error("Erro ao apagar foto da atividade no Cloudinary:", err);
+      console.error("Erro ao apagar foto do departamento no Cloudinary:", err);
     }
   }
 
-  // 3. Apaga da base de dados
-  return await prisma.fotoAtividade.delete({ where: { id: Number(fotoId) } });
+  return await prisma.fotoDepartamento.delete({ where: { id: Number(fotoId) } });
 }
 
+// ===== EXPORTS =====
 module.exports = {
   obterMensagensDepto, verificarMembroDoDepto, criarMensagemDepto,
   obterMensagensSector, verificarMembroDoSector, criarMensagemSector,
-  esconderMensagem, obterFotosDoSector, criarFotoAtividade, apagarFotoAtividade
+  esconderMensagem, obterFotosDoSector, criarFotoAtividade,
+  apagarFotoAtividade,
+  // NOVAS:
+  obterFotosDoDepartamento, contarFotosDoDepartamento, criarFotoDepartamento, apagarFotoDepartamento
 };

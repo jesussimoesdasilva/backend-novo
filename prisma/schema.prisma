@@ -48,6 +48,7 @@ model Igreja {
   pedidosOracao   PedidoOracao[]
   mensagensGrupo  MensagemGrupo[]
   fotosAtividade  FotoAtividade[]
+  fotosDepartamento FotoDepartamento[]
   midias          Midia[]
   documentos      Documento[]       // <-- NOVA RELAÇÃO
   presencas       Presenca[]        // <-- NOVA RELAÇÃO
@@ -110,6 +111,7 @@ model Departamento {
   membros     Membro[] @relation("MembrosDoDepartamento")
   sectores    Sector[]
   mensagensGrupo MensagemGrupo[]
+  fotosDepartamento FotoDepartamento[]
   criadoEm    DateTime @default(now())
   atualizadoEm DateTime @updatedAt
   @@unique([igrejaId, nome])
@@ -343,6 +345,17 @@ model Escala {
   criadoEm    DateTime @default(now())
 
   @@index([igrejaId])
+}
+
+model FotoDepartamento {
+  id            Int      @id @default(autoincrement())
+  igrejaId      Int
+  igreja        Igreja   @relation(fields: [igrejaId], references: [id], onDelete: Cascade)
+  departamentoId Int
+  departamento  Departamento @relation(fields: [departamentoId], references: [id], onDelete: Cascade)
+  url           String
+  legenda       String?
+  criadoEm      DateTime @default(now())
 }
 
 model AdminMaster {

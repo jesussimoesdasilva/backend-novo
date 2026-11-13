@@ -813,6 +813,9 @@ footer strong{color:#f2d27c}
       <button class="btn-chat-geral" id="btnChatGeralDepto" onclick="abrirChatGrupo('depto', 0, '')">
         💬 Chat Geral do Departamento
       </button>
+      <button class="btn-chat-geral" style="background:transparent; border:2px solid var(--gold); color:var(--gold); margin-top:10px;" onclick="abrirGaleriaDepartamento(deptoAtual.id, deptoAtual.nome)">
+        📸 Galeria do Departamento
+      </button>
 
       <div class="sector-list-title">Sectores</div>
 
@@ -2711,6 +2714,7 @@ async function abrirGaleriaAtividade(sectorId, nomeSector) {
   await carregarFotosAtividade();
 }
 
+// ===== GALERIA DO SECTOR (CORRIGIDA) =====
 async function carregarFotosAtividade() {
   const container = document.getElementById('galeriaAtividadesContainer');
   container.innerHTML = '<p style="text-align:center; color:#64748b; grid-column: 1 / -1;">A carregar fotos...</p>';
@@ -2729,10 +2733,18 @@ async function carregarFotosAtividade() {
       return;
     }
 
+    const isLider = membroLogado && membroLogado.lideraSetores && membroLogado.lideraSetores.some(s => s.id === Number(sectorGaleriaAtual));
+
     container.innerHTML = fotos.map(f => `
-      <div class="galeria-atividade-item" onclick="window.open('${f.url}', '_blank')">
-        <img src="${f.url}" alt="${f.legenda || 'Foto'}">
+      <div class="galeria-atividade-item" style="position:relative; display:flex; flex-direction:column;">
+        <img src="${f.url}" alt="${f.legenda || 'Foto'}" onclick="window.open('${f.url}', '_blank')" style="cursor:pointer;">
         ${f.legenda ? `<div class="galeria-atividade-legenda">${f.legenda}</div>` : ''}
+        ${isLider ? `
+          <button onclick="event.stopPropagation(); apagarFotoAtividade(${f.id})" 
+            style="width:100%; padding:8px; background:#dc2626; color:white; border:none; font-size:12px; font-weight:700; cursor:pointer; border-radius:0 0 12px 12px; display:flex; justify-content:center; align-items:center; gap:5px;">
+            🗑️ Apagar Foto
+          </button>
+        ` : ''}
       </div>
     `).join('');
   } catch (e) {
@@ -2759,14 +2771,174 @@ async function uploadFotoAtividade() {
       body: formData
     });
     
-    if (!r.ok) throw new Error("Erro ao fazer upload da foto.");
+    const dados = await r.json();
+    if (!r.ok) throw new Error(dados.message || "Erro ao fazer upload da foto.");
     
     fileInput.value = '';
     legendaInput.value = '';
     await carregarFotosAtividade();
+    await atualizarFormularioGaleriaSector(sectorGaleriaAtual);
     alert("✅ Foto publicada com sucesso!");
   } catch (err) {
     alert("❌ " + err.message);
+  }
+}
+
+async function apagarFotoAtividade(fotoId) {
+  if (!confirm('Tem a certeza que deseja apagar esta foto? Esta ação não pode ser desfeita.')) return;
+  
+  try {
+    const r = await fetch(`/api/grupos/fotos-atividade/${fotoId}`, {
+      method: 'DELETE'
+    });
+    if (!r.ok) throw new Error('Erro ao apagar a foto');
+    alert('✅ Foto apagada com sucesso!');
+    await carregarFotosAtividade();
+    await atualizarFormularioGaleriaSector(sectorGaleriaAtual);
+  } catch (err) {
+    alert('❌ ' + err.message);
+  }
+}
+
+// ===== GALERIA DO DEPARTAMENTO (NOVAS FUNÇÕES) =====
+let deptoGaleriaAtual = null;
+
+async function abrirGaleriaDepartamento(deptoId, nomeDepto) {
+  fecharModal('modalSectores');
+  deptoGaleriaAtual = deptoId;
+  
+  document.getElementById('galeriaSectorTitulo').textContent = `📸 Galeria: ${nomeDepto}`;
+  document.getElementById('modalGaleriaAtividade').style.display = 'flex';
+  
+  const areaUpload = document.getElementById('areaUploadFoto');
+  const isLiderDepto = membroLogado && membroLogado.lideraDeptos && membroLogado.lideraDeptos.some(d => d.id === Number(deptoId));
+  
+  if (isLiderDepto) {
+    await atualizarFormularioGaleriaDepartamento(deptoId);
+    areaUpload.style.display = 'block';
+  } else {
+    areaUpload.style.display = 'none';
+  }
+
+  await carregarFotosDepartamento();
+}
+
+async function atualizarFormularioGaleriaDepartamento(deptoId) {
+  const areaUpload = document.getElementById('areaUploadFoto');
+  
+  try {
+    const r = await fetch(`/api/grupos/galeria-departamento/${deptoId}`);
+    const fotos = await r.json();
+    const totalFotos = Array.isArray(fotos) ? fotos.length : 0;
+    const LIMITE_FOTOS = 10;
+    
+    const infoLimite = document.getElementById('infoLimiteFotos');
+    if (infoLimite) {
+      infoLimite.textContent = `📊 ${totalFotos} / ${LIMITE_FOTOS} fotos`;
+      infoLimite.style.color = totalFotos >= LIMITE_FOTOS ? '#dc2626' : '#64748b';
+    }
+
+    if (totalFotos >= LIMITE_FOTOS) {
+      areaUpload.innerHTML = `<p style="color:#dc2626; text-align:center; font-weight:bold; padding:10px;">⚠️ Limite de ${LIMITE_FOTOS} fotos atingido. Apague alguma foto para adicionar novas.</p>`;
+    } else {
+      areaUpload.innerHTML = `
+        <h4 style="font-size:14px; margin-bottom:10px; color:#071b36;">➕ Adicionar Nova Foto</h4>
+        <div class="form-grid">
+          <div class="input-group full">
+            <input type="file" id="fotoAtividadeInput" accept="image/*" style="padding:10px; background:#fff;">
+          </div>
+          <div class="input-group full">
+            <input type="text" id="legendaAtividadeInput" placeholder="Legenda (ex: Ensaio de Sábado)" style="padding:10px;">
+          </div>
+        </div>
+        <button class="btn gold" style="width:100%; margin-top:10px; padding:10px;" onclick="uploadFotoDepartamento()">Publicar Foto</button>
+      `;
+    }
+  } catch (e) { console.error(e); }
+}
+
+async function carregarFotosDepartamento() {
+  const container = document.getElementById('galeriaAtividadesContainer');
+  container.innerHTML = '<p style="text-align:center; color:#64748b; grid-column: 1 / -1;">A carregar fotos...</p>';
+  
+  try {
+    const r = await fetch(`/api/grupos/galeria-departamento/${deptoGaleriaAtual}`);
+    const fotos = await r.json();
+    
+    if (!Array.isArray(fotos)) {
+      container.innerHTML = `<p style="text-align:center; color:#dc2626; grid-column: 1 / -1;">${fotos.message || 'Erro ao carregar fotos.'}</p>`;
+      return;
+    }
+
+    if (fotos.length === 0) {
+      container.innerHTML = '<p style="text-align:center; color:#64748b; grid-column: 1 / -1;">Nenhuma foto publicada ainda.</p>';
+      return;
+    }
+
+    const isLiderDepto = membroLogado && membroLogado.lideraDeptos && membroLogado.lideraDeptos.some(d => d.id === Number(deptoGaleriaAtual));
+
+    container.innerHTML = fotos.map(f => `
+      <div class="galeria-atividade-item" style="position:relative; display:flex; flex-direction:column;">
+        <img src="${f.url}" alt="${f.legenda || 'Foto'}" onclick="window.open('${f.url}', '_blank')" style="cursor:pointer;">
+        ${f.legenda ? `<div class="galeria-atividade-legenda">${f.legenda}</div>` : ''}
+        ${isLiderDepto ? `
+          <button onclick="event.stopPropagation(); apagarFotoDepartamento(${f.id})" 
+            style="width:100%; padding:8px; background:#dc2626; color:white; border:none; font-size:12px; font-weight:700; cursor:pointer; border-radius:0 0 12px 12px; display:flex; justify-content:center; align-items:center; gap:5px;">
+            🗑️ Apagar Foto
+          </button>
+        ` : ''}
+      </div>
+    `).join('');
+  } catch (e) {
+    container.innerHTML = '<p style="text-align:center; color:#dc2626; grid-column: 1 / -1;">Erro de ligação.</p>';
+  }
+}
+
+async function uploadFotoDepartamento() {
+  const fileInput = document.getElementById('fotoAtividadeInput');
+  const legendaInput = document.getElementById('legendaAtividadeInput');
+  
+  if (!fileInput.files || !fileInput.files[0]) {
+    return alert("Por favor, selecione uma foto primeiro.");
+  }
+
+  const formData = new FormData();
+  formData.append('foto', fileInput.files[0]);
+  formData.append('legenda', legendaInput.value);
+  formData.append('igrejaId', igrejaIdAtual);
+
+  try {
+    const r = await fetch(`/api/grupos/galeria-departamento/${deptoGaleriaAtual}`, {
+      method: 'POST',
+      body: formData
+    });
+    
+    const dados = await r.json();
+    if (!r.ok) throw new Error(dados.message || "Erro ao fazer upload da foto.");
+    
+    fileInput.value = '';
+    legendaInput.value = '';
+    await carregarFotosDepartamento();
+    await atualizarFormularioGaleriaDepartamento(deptoGaleriaAtual);
+    alert("✅ Foto publicada com sucesso!");
+  } catch (err) {
+    alert("❌ " + err.message);
+  }
+}
+
+async function apagarFotoDepartamento(fotoId) {
+  if (!confirm('Tem a certeza que deseja apagar esta foto? Esta ação não pode ser desfeita.')) return;
+  
+  try {
+    const r = await fetch(`/api/grupos/galeria-departamento/${fotoId}`, {
+      method: 'DELETE'
+    });
+    if (!r.ok) throw new Error('Erro ao apagar a foto');
+    alert('✅ Foto apagada com sucesso!');
+    await carregarFotosDepartamento();
+    await atualizarFormularioGaleriaDepartamento(deptoGaleriaAtual);
+  } catch (err) {
+    alert('❌ ' + err.message);
   }
 }
 
