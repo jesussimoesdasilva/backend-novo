@@ -585,6 +585,15 @@ footer strong{color:#f2d27c}
       <p><b>BI:</b> <span id="infoBi"></span></p>
       <p><b>Endereço:</b> <span id="infoEndereco"></span></p>
       <p><b>Igreja:</b> <span id="infoIgreja"></span></p>
+<p><b>Cargo:</b> <span id="infoCargo">-</span></p>
+
+<div id="areaSacramentos" style="display:none; margin-top:15px; border-top:1px dashed #e2e8f0; padding-top:15px;">
+  <p id="tituloSacramentos" style="font-weight:bold; color:#64748b; font-size:12px; text-transform:uppercase; margin-bottom:10px;">✝️ Sacramentos</p>
+  <p style="font-size:13px; margin-bottom:5px;"><b>Batismo:</b> <span id="infoBatismo">-</span></p>
+  <p id="linhaComunhao" style="font-size:13px; margin-bottom:5px;"><b>1ª Comunhão:</b> <span id="infoComunhao">-</span></p>
+  <p id="linhaCrisma" style="font-size:13px; margin-bottom:5px;"><b>Crisma:</b> <span id="infoCrisma">-</span></p>
+  <p style="font-size:13px; margin-bottom:5px;"><b>Casamento:</b> <span id="infoCasamento">-</span></p>
+</div>
     </div>
     
     <div class="member-card">
@@ -2572,7 +2581,36 @@ function mostrarAreaMembro() {
   document.getElementById('infoTelefone').textContent = membroLogado.telefone || '-';
   document.getElementById('infoBi').textContent = membroLogado.bi || '-';
   document.getElementById('infoEndereco').textContent = membroLogado.endereco || '-';
-  document.getElementById('infoIgreja').textContent = document.getElementById('igrejaNome').textContent;
+  // Mostra o Cargo
+document.getElementById('infoCargo').textContent = membroLogado.cargo || 'Membro';
+
+// Lógica: Se tiver 1ª Comunhão ou Crisma, é Católico. Senão, é Evangélico.
+const temSacramentos = membroLogado.dataPrimeiraComunhao || membroLogado.dataCrisma;
+const areaSac = document.getElementById('areaSacramentos');
+const tituloSac = document.getElementById('tituloSacramentos');
+const linhaComunhao = document.getElementById('linhaComunhao');
+const linhaCrisma = document.getElementById('linhaCrisma');
+
+if (membroLogado.cargo) {
+  areaSac.style.display = 'block';
+  
+  if (temSacramentos) {
+    tituloSac.textContent = '✝️ Sacramentos';
+    linhaComunhao.style.display = 'block';
+    linhaCrisma.style.display = 'block';
+  } else {
+    tituloSac.textContent = '✝️ Ordenanças';
+    linhaComunhao.style.display = 'none';
+    linhaCrisma.style.display = 'none';
+  }
+  
+  document.getElementById('infoBatismo').textContent = membroLogado.dataBatismo ? new Date(membroLogado.dataBatismo).toLocaleDateString('pt-PT') : '-';
+  document.getElementById('infoComunhao').textContent = membroLogado.dataPrimeiraComunhao ? new Date(membroLogado.dataPrimeiraComunhao).toLocaleDateString('pt-PT') : '-';
+  document.getElementById('infoCrisma').textContent = membroLogado.dataCrisma ? new Date(membroLogado.dataCrisma).toLocaleDateString('pt-PT') : '-';
+  document.getElementById('infoCasamento').textContent = membroLogado.dataCasamento ? new Date(membroLogado.dataCasamento).toLocaleDateString('pt-PT') : '-';
+} else {
+  areaSac.style.display = 'none';
+}
 
   // --- A CORREÇÃO AQUI: Lógica para mostrar o departamento do sector se o departamento direto for nulo ---
   let nomeDepto = 'Ainda não alocado';

@@ -42,6 +42,7 @@ async function createIgreja(data) {
       email: data.email || null, sobre: data.sobre || null,
       heroSmall: data.heroSmall || null, heroTitulo: data.heroTitulo || null, heroDestaque: data.heroDestaque || null,
       subadminEmail: data.subadminEmail, subadminSenha: senhaHash,
+      isCatolica: data.isCatolica === true || data.isCatolica === 'true',
     },
     select: { id: true, nome: true, slug: true, descricao: true, icone: true, subadminEmail: true, criadoEm: true }
   });

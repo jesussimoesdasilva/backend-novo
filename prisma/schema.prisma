@@ -29,6 +29,7 @@ model Igreja {
   subadminSenha   String
   adminTelefone   String?
   adminBi         String?
+  isCatolica Boolean @default(false)
 
   // NOVOS CAMPOS DA LIVE
   liveAtiva       Boolean  @default(false)

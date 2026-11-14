@@ -167,6 +167,13 @@ tr:hover td{background:rgba(255,255,255,0.02)}
           <div class="field"><label>Link (Slug) *</label><input type="text" id="subSlug" required placeholder="Ex: ieca-betania" oninput="limparSlug(this)"></div>
           <div class="field"><label>Email de Acesso (Subadmin) *</label><input type="email" id="subEmail" required placeholder="admin@igreja.com"></div>
           <div class="field"><label>Palavra-passe *</label><input type="text" id="subSenha" required value="123456" placeholder="Mínimo 6 caracteres"></div>
+    <div class="field">
+      <label>Tipo de Igreja *</label>
+      <select id="subIsCatolica" required style="width:100%; padding:14px; background:rgba(2,6,23,0.8); border:1px solid var(--border); border-radius:10px; color:white; font-size:15px;">
+        <option value="false">Evangélica (Ordenanças)</option>
+        <option value="true">Católica (Sacramentos)</option>
+      </select>
+    </div>
         </div>
         <button type="submit" class="btn btn-primary" id="btnSalvarSubadmin">🚀 Criar Igreja e Ativar Painel</button>
         <button type="button" class="btn btn-cancelar" id="btnCancelarEdicao" style="display:none;" onclick="cancelarEdicao()">Cancelar Edição</button>
@@ -464,7 +471,8 @@ async function salvarSubadmin(e) {
     btn.innerHTML = txtOriginal; btn.disabled = false;
     return;
   }
-  const payload = { nome, slug, subadminEmail, subadminSenha };
+  const isCatolica = document.getElementById('subIsCatolica').value === 'true';
+  const payload = { nome, slug, subadminEmail, subadminSenha, isCatolica };
   try {
     const url = subadminEditandoId ? `${API}/igrejas/${subadminEditandoId}` : `${API}/igrejas`;
     const method = subadminEditandoId ? 'PUT' : 'POST';
