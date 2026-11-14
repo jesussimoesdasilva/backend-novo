@@ -1,5 +1,5 @@
 const prisma = require("../config/prisma");
-const cloudinary = require("../config/cloudinary"); // <-- ADICIONA ESTA LINHA
+const cloudinary = require("../config/cloudinary");
 
 async function listOfertas(igrejaId) {
   return await prisma.oferta.findMany({
@@ -33,7 +33,7 @@ async function createOferta(igrejaId, data) {
       metodo: data.metodo || 'N/A',
       referencia: data.referencia || null,
       status: status,
-      comprovativoUrl: data.comprovativoUrl || null // <-- A NOVA LINHA AQUI
+      comprovativoUrl: data.comprovativoUrl || null
     },
   });
 }
@@ -67,18 +67,15 @@ async function negarOferta(id) {
   // 2. Se tiver comprovativo, apaga no Cloudinary
   if (oferta.comprovativoUrl) {
     try {
-      // Extrai o public_id do link do Cloudinary
-      const urlParts = oferta.comprovativoUrl.split('/');
-      const fileName = urlParts.pop(); // Pega o nome do ficheiro
-      const folder = urlParts.pop();   // Pega o nome da pasta (igreja_comprovativos)
-      const publicId = `${folder}/${fileName.split('.')[0]}`; // Tira a extensão .pdf
-      
-      // Apaga do Cloudinary (resource_type "raw" é obrigatório para PDFs)
-      await cloudinary.uploader.destroy(publicId, { resource_type: "raw" });
-      console.log("Ficheiro apagado do Cloudinary:", publicId);
+      const urlParts = oferta.comprovativoUrl.split('/upload/');
+      if (urlParts.length > 1) {
+        let publicId = urlParts[1].replace(/^v\d+\//, '');
+        publicId = publicId.split('.')[0];
+        await cloudinary.uploader.destroy(publicId, { resource_type: "raw" });
+        console.log("Ficheiro apagado do Cloudinary:", publicId);
+      }
     } catch (err) {
       console.error("Erro ao apagar ficheiro no Cloudinary:", err);
-      // Não paramos a execução se o ficheiro não for apagado
     }
   }
 
@@ -87,7 +84,7 @@ async function negarOferta(id) {
     where: { id: Number(id) },
     data: { 
       status: "NEGADO",
-      comprovativoUrl: null // Limpa o link
+      comprovativoUrl: null
     },
   });
 }
@@ -107,7 +104,7 @@ async function getEstatisticas(igrejaId) {
       if (o.finalidade === "Dízimo") {
         totalDizimos += o.valor;
       } else if (o.finalidade === "SAIDA") {
-        totalSaidas += o.valor; // <-- Soma as saídas
+        totalSaidas += o.valor;
       } else {
         totalOfertas += o.valor;
       }
@@ -116,7 +113,6 @@ async function getEstatisticas(igrejaId) {
     }
   });
 
-  // O Saldo Real é: Entradas - Saídas
   const saldoReal = (totalDizimos + totalOfertas) - totalSaidas;
 
   return { totalDizimos, totalOfertas, totalSaidas, totalPendente, saldoReal };
@@ -187,8 +183,26 @@ async function getRelatorioDizimistas(igrejaId, mes, ano) {
   };
 }
 
+// ===== FUNÇÃO NOVA: O MEU DÍZIMO (HISTÓRICO ANUAL) =====
+async function meusDizimos(membroId, ano) {
+  const inicioAno = new Date(ano, 0, 1, 0, 0, 0);
+  const fimAno = new Date(ano, 11, 31, 23, 59, 59);
+
+  const dizimos = await prisma.oferta.findMany({
+    where: {
+      membroId: Number(membroId),
+      finalidade: 'Dízimo',
+      criadoEm: { gte: inicioAno, lte: fimAno }
+    },
+    orderBy: { criadoEm: 'asc' }
+  });
+
+  return dizimos;
+}
+
 module.exports = { 
   listOfertas, createOferta, consultarOferta, 
   preValidarOferta, validarOferta, negarOferta, 
-  getEstatisticas, getRelatorioDizimistas 
+  getEstatisticas, getRelatorioDizimistas,
+  meusDizimos
 };

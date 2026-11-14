@@ -1,7 +1,7 @@
 const prisma = require("../config/prisma");
 const service = require("../services/oferta.service");
 const PDFDocument = require('pdfkit');
-const https = require('https'); // Necessário para o logotipo
+const https = require('https');
 
 async function list(req, res, next) {
   try { res.json(await service.listOfertas(req.params.igrejaId)); } catch (err) { next(err); }
@@ -11,7 +11,6 @@ async function create(req, res, next) {
   try {
     const { finalidade, valor, metodo } = req.body;
     
-    // Validações obrigatórias
     if (!finalidade || !valor) {
       return res.status(400).json({ error: true, message: "Finalidade e valor são obrigatórios" });
     }
@@ -19,10 +18,8 @@ async function create(req, res, next) {
       return res.status(400).json({ error: true, message: "Método é obrigatório para ofertas/dízimos" });
     }
 
-    // Pega o link do PDF que o frontend já enviou no JSON
     const comprovativoUrl = req.body.comprovativoUrl || null;
 
-    // Cria a oferta no banco de dados
     const oferta = await service.createOferta(req.params.igrejaId, {
       ...req.body,
       comprovativoUrl
@@ -63,6 +60,16 @@ async function relatorioDizimistas(req, res, next) {
   try {
     const { mes, ano } = req.query;
     res.json(await service.getRelatorioDizimistas(req.params.igrejaId, mes, ano));
+  } catch (err) { next(err); }
+}
+
+// ===== FUNÇÃO NOVA: O MEU DÍZIMO (HISTÓRICO ANUAL) =====
+async function meusDizimos(req, res, next) {
+  try {
+    const { membroId } = req.params;
+    const { ano } = req.query;
+    const resultado = await service.meusDizimos(membroId, Number(ano));
+    res.json(resultado);
   } catch (err) { next(err); }
 }
 
@@ -128,7 +135,6 @@ async function gerarPDFMembros(req, res) {
     res.setHeader('Content-Disposition', `attachment; filename="relatorio-membros-${igreja.slug}.pdf"`);
     doc.pipe(res);
 
-    // --- LOGOTIPO (Corrigido para o Cloudinary) ---
     if (igreja.logoUrl) {
       await new Promise((resolve) => {
         https.get(igreja.logoUrl, (response) => {
@@ -143,18 +149,15 @@ async function gerarPDFMembros(req, res) {
       });
     }
 
-    // Cabeçalho
     doc.fontSize(20).fillColor('#020617').text(igreja.nome, { align: 'center' });
     doc.fontSize(12).fillColor('#64748b').text('Relatório Oficial de Membros', { align: 'center' });
     doc.moveDown(1);
     doc.moveTo(40, doc.y).lineTo(555, doc.y).strokeColor('#facc15').lineWidth(2).stroke();
     doc.moveDown(1);
 
-    // Data
     doc.fontSize(10).fillColor('#94a3b8').text(`Emitido em: ${new Date().toLocaleString('pt-PT')}`, { align: 'right' });
     doc.moveDown(1);
 
-    // Tabela
     const tableTop = doc.y;
     doc.rect(40, tableTop, 515, 20).fill('#020617');
     doc.fillColor('#ffffff').fontSize(10).text('Nome', 45, tableTop + 5);
@@ -196,7 +199,6 @@ async function gerarPDFDepartamentos(req, res) {
     res.setHeader('Content-Disposition', `attachment; filename="relatorio-departamentos-${igreja.slug}.pdf"`);
     doc.pipe(res);
 
-    // LOGOTIPO (a mesma lógica do Cloudinary)
     if (igreja.logoUrl) {
       await new Promise((resolve) => {
         https.get(igreja.logoUrl, (response) => {
@@ -259,7 +261,6 @@ async function gerarPDFSectores(req, res) {
     res.setHeader('Content-Disposition', `attachment; filename="relatorio-sectores-${igreja.slug}.pdf"`);
     doc.pipe(res);
 
-    // LOGOTIPO
     if (igreja.logoUrl) {
       await new Promise((resolve) => {
         https.get(igreja.logoUrl, (response) => {
@@ -312,5 +313,6 @@ async function gerarPDFSectores(req, res) {
 
 module.exports = { 
   list, create, consultar, preValidar, validar, negar, estatisticas, 
-  relatorioDizimistas, gerarComprovativoPDF, zerarFinancas, gerarPDFMembros, gerarPDFDepartamentos, gerarPDFSectores 
+  relatorioDizimistas, meusDizimos, gerarComprovativoPDF, zerarFinancas, 
+  gerarPDFMembros, gerarPDFDepartamentos, gerarPDFSectores 
 };

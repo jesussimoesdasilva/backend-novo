@@ -6,6 +6,9 @@ router.get("/igreja/:igrejaId", c.list);
 router.get("/estatisticas/:igrejaId", c.estatisticas);
 router.get("/relatorio-dizimistas/:igrejaId", c.relatorioDizimistas);
 
+// NOVA ROTA: Histórico de dízimos de um membro
+router.get("/meus-dizimos/:membroId", c.meusDizimos);
+
 // A rota de criar oferta já não tem o Multer
 router.post("/igreja/:igrejaId", c.create);
 router.get("/consultar/:igrejaId/:codigo", c.consultar);

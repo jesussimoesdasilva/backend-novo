@@ -588,10 +588,39 @@ footer strong{color:#f2d27c}
     </div>
     
     <div class="member-card">
-      <h3>⛪ Onde Sirvo</h3>
-      <p><b>Departamento:</b> <span id="infoDepto"></span></p>
-      <div id="infoSectores"></div>
+  <h3>⛪ Onde Sirvo</h3>
+  <p><b>Departamento:</b> <span id="infoDepto"></span></p>
+  <div id="infoSectores" style="margin-bottom: 20px;"></div>
+
+  <!-- NOVO: GRELHA DE DÍZIMOS -->
+  <div style="border-top: 1px solid #e2e8f0; padding-top: 20px;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+      <h4 style="margin: 0; font-size: 16px; color: #071b36;">📊 O Meu Dízimo (Ano <span id="anoDizimoAtual"></span>)</h4>
+      <button class="btn gold" style="padding: 6px 12px; font-size: 12px; border-radius: 8px;" onclick="scrollToId('formDizimoMembro')">➕ Registar</button>
     </div>
+    
+    <p style="font-size: 13px; color: #64748b; margin-bottom: 15px;">
+      Resumo: Já pagaste <strong id="qtdMesesPagos">0</strong> meses. Total: <strong id="totalPagoAno">0 Kz</strong>
+    </p>
+    
+    <!-- A Grelha de 12 Meses vai ser preenchida pelo JavaScript -->
+    <div id="grelhaDizimos" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px;">
+      <!-- Exemplo estático para veres o design -->
+      <div onclick="abrirDetalheDizimo('Janeiro', 5000, 'VALIDADO', 'https://res.cloudinary.com/demo.pdf')" style="background: #dcfce7; color: #166534; padding: 10px; text-align: center; border-radius: 8px; font-size: 12px; font-weight: bold; cursor: pointer; border: 1px solid #bbf7d0;">Jan ✅</div>
+      <div onclick="abrirDetalheDizimo('Fevereiro', 5000, 'VALIDADO', 'https://res.cloudinary.com/demo.pdf')" style="background: #dcfce7; color: #166534; padding: 10px; text-align: center; border-radius: 8px; font-size: 12px; font-weight: bold; cursor: pointer; border: 1px solid #bbf7d0;">Fev ✅</div>
+      <div onclick="abrirDetalheDizimo('Março', 5000, 'PENDENTE', 'https://res.cloudinary.com/demo.pdf')" style="background: #fef3c7; color: #92400e; padding: 10px; text-align: center; border-radius: 8px; font-size: 12px; font-weight: bold; cursor: pointer; border: 1px solid #fde68a;">Mar ⏳</div>
+      <div onclick="abrirDetalheDizimo('Abril', 0, 'FALTA', null)" style="background: #fee2e2; color: #991b1b; padding: 10px; text-align: center; border-radius: 8px; font-size: 12px; font-weight: bold; cursor: pointer; border: 1px solid #fecaca;">Abr ❌</div>
+      <div style="background: #f1f5f9; color: #94a3b8; padding: 10px; text-align: center; border-radius: 8px; font-size: 12px; border: 1px dashed #cbd5e1;">Mai</div>
+      <div style="background: #f1f5f9; color: #94a3b8; padding: 10px; text-align: center; border-radius: 8px; font-size: 12px; border: 1px dashed #cbd5e1;">Jun</div>
+      <div style="background: #f1f5f9; color: #94a3b8; padding: 10px; text-align: center; border-radius: 8px; font-size: 12px; border: 1px dashed #cbd5e1;">Jul</div>
+      <div style="background: #f1f5f9; color: #94a3b8; padding: 10px; text-align: center; border-radius: 8px; font-size: 12px; border: 1px dashed #cbd5e1;">Ago</div>
+      <div style="background: #f1f5f9; color: #94a3b8; padding: 10px; text-align: center; border-radius: 8px; font-size: 12px; border: 1px dashed #cbd5e1;">Set</div>
+      <div style="background: #f1f5f9; color: #94a3b8; padding: 10px; text-align: center; border-radius: 8px; font-size: 12px; border: 1px dashed #cbd5e1;">Out</div>
+      <div style="background: #f1f5f9; color: #94a3b8; padding: 10px; text-align: center; border-radius: 8px; font-size: 12px; border: 1px dashed #cbd5e1;">Nov</div>
+      <div style="background: #f1f5f9; color: #94a3b8; padding: 10px; text-align: center; border-radius: 8px; font-size: 12px; border: 1px dashed #cbd5e1;">Dez</div>
+    </div>
+  </div>
+</div>
 
     <div class="member-card" style="grid-column: 1 / -1; border: 2px solid var(--gold);">
       <h3 style="color:var(--gold2);">💰 Registar Dízimo</h3>
@@ -950,6 +979,24 @@ footer strong{color:#f2d27c}
       <div style="display: flex; gap: 10px;">
         <button class="btn" onclick="fecharModal('modalConfirmarApagar')" style="flex: 1; background: #e2e8f0; color: #334155; border-radius: 8px; padding: 12px;">Cancelar</button>
         <button class="btn" id="btnConfirmarApagar" style="flex: 1; background: #dc2626; color: white; border-radius: 8px; padding: 12px;">Sim, Apagar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL DE DETALHE DO DÍZIMO -->
+<div class="modal-overlay" id="modalDetalheDizimo">
+  <div class="modal modal-premium" style="max-width: 450px;">
+    <div class="modal-header">
+      <div>
+        <h2 id="detalheDizimoTitulo" style="color: var(--gold);">📄 Dízimo de Janeiro</h2>
+        <p id="detalheDizimoSubtitulo">Detalhes do pagamento</p>
+      </div>
+      <button class="close-btn" onclick="fecharModal('modalDetalheDizimo')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div id="conteudoDetalheDizimo">
+        <!-- O JavaScript vai preencher isto -->
       </div>
     </div>
   </div>
@@ -2549,6 +2596,7 @@ function mostrarAreaMembro() {
   document.getElementById('dTelefone').value = membroLogado.telefone || 'Não registado';
 
   scrollToId('areaMembro');
+  carregarGrelhaDizimos();
 }
 
 function sairMembro() {
@@ -3038,6 +3086,138 @@ async function apagarFotoDepartamento(fotoId) {
     }
   });
 }
+
+// Função para abrir a caixinha premium
+function abrirDetalheDizimo(mes, valor, estado, linkPdf) {
+  document.getElementById('detalheDizimoTitulo').textContent = `📄 Dízimo de ${mes}`;
+  const subtitulo = document.getElementById('detalheDizimoSubtitulo');
+  const conteudo = document.getElementById('conteudoDetalheDizimo');
+
+  if (estado === 'VALIDADO') {
+    subtitulo.textContent = 'Pagamento Confirmado';
+    conteudo.innerHTML = `
+      <div style="background: rgba(5, 150, 105, 0.1); border: 1px solid #059669; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+        <p style="color: #059669; margin: 0; font-weight: bold;">✅ Validado pela Tesouraria</p>
+      </div>
+      <p style="color: #94a3b8; font-size: 14px;">Valor Pago:</p>
+      <h3 style="color: white; margin-bottom: 20px;">${valor.toLocaleString('pt-AO')} Kz</h3>
+      
+      <p style="color: #94a3b8; font-size: 14px; margin-bottom: 10px;">Comprovativo:</p>
+      <a href="${linkPdf}" target="_blank" class="btn gold" style="width: 100%; display: block; text-align: center; text-decoration: none; padding: 12px; border-radius: 8px;">
+        📄 Abrir Comprovativo Original
+      </a>
+    `;
+  } else if (estado === 'PENDENTE') {
+    subtitulo.textContent = 'A aguardar verificação';
+    conteudo.innerHTML = `
+      <div style="background: rgba(212, 160, 23, 0.1); border: 1px solid #d4a017; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+        <p style="color: #d4a017; margin: 0; font-weight: bold;">⏳ A aguardar validação da tesouraria</p>
+      </div>
+      <p style="color: #94a3b8; font-size: 14px;">O teu comprovativo foi recebido e está a ser verificado.</p>
+    `;
+  } else if (estado === 'FALTA') {
+    subtitulo.textContent = 'Pagamento em Falta';
+    conteudo.innerHTML = `
+      <div style="background: rgba(220, 38, 38, 0.1); border: 1px solid #dc2626; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+        <p style="color: #dc2626; margin: 0; font-weight: bold;">❌ Não pagaste este mês</p>
+      </div>
+      <p style="color: #94a3b8; font-size: 14px; margin-bottom: 20px;">
+        O dízimo é um ato de fidelidade. Se ainda não regularizaste, podes fazê-lo agora.
+      </p>
+      <button class="btn gold" style="width: 100%; padding: 12px; border-radius: 8px;" onclick="fecharModal('modalDetalheDizimo'); scrollToId('formDizimoMembro');">
+        💰 Pagar Agora
+      </button>
+    `;
+  }
+
+  document.getElementById('modalDetalheDizimo').style.display = 'flex';
+}
+
+// Função para carregar a grelha de dízimos do membro
+async function carregarGrelhaDizimos() {
+  if (!membroLogado) return;
+  
+  const anoAtual = new Date().getFullYear();
+  document.getElementById('anoDizimoAtual').textContent = anoAtual;
+  
+  try {
+    // Vai buscar todos os dízimos do membro neste ano
+    const r = await fetch(`/api/ofertas/meus-dizimos/${membroLogado.id}?ano=${anoAtual}`);
+    const dizimos = await r.json();
+    
+    // Se a rota não existir ainda, mostra a grelha estática (para não dar erro)
+    if (!Array.isArray(dizimos)) {
+      console.log("A rota /meus-dizimos ainda não existe no backend. A usar dados de exemplo.");
+      return;
+    }
+    
+    // Calcula o resumo
+    let totalPago = 0;
+    let mesesPagos = 0;
+    
+    // Mapeia os dízimos por mês
+    const mapDizimos = {};
+    dizimos.forEach(d => {
+      const mes = new Date(d.criadoEm).getMonth() + 1; // 1 a 12
+      if (!mapDizimos[mes]) {
+        mapDizimos[mes] = d; // Guarda o último dízimo desse mês
+      }
+      if (d.status === 'VALIDADO') {
+        totalPago += Number(d.valor);
+        mesesPagos++;
+      }
+    });
+    
+    // Atualiza o resumo
+    document.getElementById('qtdMesesPagos').textContent = mesesPagos;
+    document.getElementById('totalPagoAno').textContent = totalPago.toLocaleString('pt-AO') + ' Kz';
+    
+    // Limpa a grelha
+    const container = document.getElementById('grelhaDizimos');
+    container.innerHTML = '';
+    
+    const nomesMeses = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
+    const abrevMeses = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
+    
+    // Preenche a grelha para os 12 meses
+    for (let i = 1; i <= 12; i++) {
+      const dizimoDoMes = mapDizimos[i];
+      const nomeMes = nomesMeses[i-1];
+      const abrevMes = abrevMeses[i-1];
+      
+      let html = '';
+      if (dizimoDoMes) {
+        if (dizimoDoMes.status === 'VALIDADO') {
+          // Mês pago
+          html = `<div onclick="abrirDetalheDizimo('${nomeMes}', ${dizimoDoMes.valor}, 'VALIDADO', '${dizimoDoMes.comprovativoUrl}')" style="background: #dcfce7; color: #166534; padding: 10px; text-align: center; border-radius: 8px; font-size: 12px; font-weight: bold; cursor: pointer; border: 1px solid #bbf7d0;">${abrevMes} ✅</div>`;
+        } else if (dizimoDoMes.status === 'AGUARDANDO_PASTOR' || dizimoDoMes.status === 'PENDENTE') {
+          // Mês pendente
+          html = `<div onclick="abrirDetalheDizimo('${nomeMes}', ${dizimoDoMes.valor}, 'PENDENTE', '${dizimoDoMes.comprovativoUrl}')" style="background: #fef3c7; color: #92400e; padding: 10px; text-align: center; border-radius: 8px; font-size: 12px; font-weight: bold; cursor: pointer; border: 1px solid #fde68a;">${abrevMes} ⏳</div>`;
+        } else if (dizimoDoMes.status === 'NEGADO') {
+          // Mês negado (aparece como falta)
+          html = `<div onclick="abrirDetalheDizimo('${nomeMes}', 0, 'FALTA', null)" style="background: #fee2e2; color: #991b1b; padding: 10px; text-align: center; border-radius: 8px; font-size: 12px; font-weight: bold; cursor: pointer; border: 1px solid #fecaca;">${abrevMes} ❌</div>`;
+        }
+      } else {
+        // Não há dízimo para este mês
+        // Se o mês já passou, marca como falta
+        const hoje = new Date();
+        if (i < hoje.getMonth() + 1) {
+          html = `<div onclick="abrirDetalheDizimo('${nomeMes}', 0, 'FALTA', null)" style="background: #fee2e2; color: #991b1b; padding: 10px; text-align: center; border-radius: 8px; font-size: 12px; font-weight: bold; cursor: pointer; border: 1px solid #fecaca;">${abrevMes} ❌</div>`;
+        } else {
+          // Mês futuro
+          html = `<div style="background: #f1f5f9; color: #94a3b8; padding: 10px; text-align: center; border-radius: 8px; font-size: 12px; border: 1px dashed #cbd5e1;">${abrevMes}</div>`;
+        }
+      }
+      
+      container.innerHTML += html;
+    }
+    
+  } catch (e) {
+    console.error("Erro ao carregar dízimos:", e);
+  }
+}
+
+
 
 carregar();
 </script>
