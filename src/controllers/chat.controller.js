@@ -12,7 +12,32 @@ async function listContactos(req, res, next) {
       contactos.forEach(c => {
         c.naoLidas = contagem.find(x => x.deId === c.id)?.count || 0;
       });
+    } else {
+      contactos.forEach(c => { c.naoLidas = 0; });
     }
+
+    // ORDENAÇÃO: 4 grupos
+    // 0º - Tem SMS + Online (mais SMS primeiro)
+    // 1º - Tem SMS + Offline (mais SMS primeiro)
+    // 2º - Sem SMS + Online (alfabético)
+    // 3º - Sem SMS + Offline (alfabético)
+    contactos.sort((a, b) => {
+      const temSMS_A = a.naoLidas > 0;
+      const temSMS_B = b.naoLidas > 0;
+
+      const grupoA = temSMS_A ? (a.isOnline ? 0 : 1) : (a.isOnline ? 2 : 3);
+      const grupoB = temSMS_B ? (b.isOnline ? 0 : 1) : (b.isOnline ? 2 : 3);
+
+      if (grupoA !== grupoB) return grupoA - grupoB;
+
+      // Dentro do mesmo grupo:
+      if (temSMS_A) {
+        // Grupos 0 e 1: mais SMS primeiro
+        if (a.naoLidas !== b.naoLidas) return b.naoLidas - a.naoLidas;
+      }
+      // Grupos 2 e 3 (e empate de SMS nos grupos 0 e 1): alfabético
+      return a.nome.localeCompare(b.nome);
+    });
     
     res.json(contactos);
   } catch (err) { next(err); }

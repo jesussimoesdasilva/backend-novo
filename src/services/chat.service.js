@@ -30,32 +30,21 @@ async function listContactos(igrejaId, meuId) {
   const agora = new Date();
   const DOIS_MINUTOS = 2 * 60 * 1000;
 
-  const contactosComData = membros.map(m => {
+  return membros.map(m => {
     const ultima = ultimasMensagens.find(u => u.deId === m.id);
     const isOnline = m.ultimaAtividade 
       ? (agora - new Date(m.ultimaAtividade)) < DOIS_MINUTOS 
       : false;
 
     return {
-      ...m,
+      id: m.id,
+      nome: m.nome,
+      foto: m.foto,
+      cargo: m.cargo,
       isOnline,
       ultimaMensagem: ultima ? ultima._max.criadoEm : null
     };
   });
-
-  // Ordena: online primeiro (alfabético), depois offline (alfabético)
-  contactosComData.sort((a, b) => {
-    if (a.isOnline !== b.isOnline) return a.isOnline ? -1 : 1;
-    return a.nome.localeCompare(b.nome);
-  });
-
-  return contactosComData.map(c => ({
-    id: c.id,
-    nome: c.nome,
-    foto: c.foto,
-    cargo: c.cargo,
-    isOnline: c.isOnline
-  }));
 }
 
 async function listMensagens(deId, paraId) {
