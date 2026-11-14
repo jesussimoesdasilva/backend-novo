@@ -2635,6 +2635,7 @@ if (membroLogado.cargo) {
 
   scrollToId('areaMembro');
   carregarGrelhaDizimos();
+  iniciarHeartbeat();   // <-- A ÚNICA COISA QUE MUDOU
 }
 
 function sairMembro() {
@@ -3255,7 +3256,28 @@ async function carregarGrelhaDizimos() {
   }
 }
 
+// ===== SINAL DE VIDA (HEARTBEAT) =====
+let heartbeatInterval = null;
 
+function iniciarHeartbeat() {
+  // Limpa qualquer intervalo anterior
+  if (heartbeatInterval) clearInterval(heartbeatInterval);
+  
+  // Envia o primeiro sinal imediatamente
+  enviarSinalVida();
+  
+  // Depois envia a cada 30 segundos
+  heartbeatInterval = setInterval(enviarSinalVida, 30000);
+}
+
+async function enviarSinalVida() {
+  if (!membroLogado) return;
+  try {
+    await fetch(`/api/membros/${membroLogado.id}/atividade`, { method: 'POST' });
+  } catch (e) {
+    console.log("Heartbeat falhou (ignorar):", e.message);
+  }
+}
 
 carregar();
 </script>

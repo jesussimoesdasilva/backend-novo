@@ -30,6 +30,7 @@ router.delete("/:id", c.remove);
 
 // NOVO: Edição do próprio perfil
 router.put("/:id/perfil", c.updatePerfil);
+router.post("/:id/atividade", c.atualizarAtividade);
 router.post("/:id/foto", c.updateFoto);
 
 module.exports = router;
