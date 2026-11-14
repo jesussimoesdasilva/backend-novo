@@ -100,6 +100,13 @@ async function buscarDadosParaRelatorioPresencas(igrejaId) {
   return { presencas, igreja, pastor };
 }
 
+async function atualizarAtividade(membroId) {
+  return await prisma.membro.update({
+    where: { id: Number(membroId) },
+    data: { ultimaAtividade: new Date() }
+  });
+}
+
 // ===== EXPORTAR TODAS AS FUNÇÕES =====
 module.exports = { 
   listMembros, 
@@ -110,5 +117,6 @@ module.exports = {
   buscarMembroCompletoParaPDF,
   buscarDadosParaRelatorioMembros,
   buscarDadosParaRelatorioBatismos,
-  buscarDadosParaRelatorioPresencas
+  buscarDadosParaRelatorioPresencas,
+  atualizarAtividade
 };

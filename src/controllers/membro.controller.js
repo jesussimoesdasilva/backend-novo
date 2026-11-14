@@ -516,8 +516,16 @@ async function editarDepartamentoMembro(req, res) {
   }
 }
 
+async function atualizarAtividade(req, res, next) {
+  try {
+    await membroService.atualizarAtividade(req.params.id);
+    res.json({ ok: true });
+  } catch (err) { next(err); }
+}
+
 module.exports = {
   publicRegister, login, verificarTelefone, verCodigo, redefinirSenhaComCodigo,
   list, create, aprovar, promover, setSectores, resetPassword, remove,
-  updatePerfil, updateFoto, gerarFichaMembroPDF, gerarPDFMembrosSecretario, gerarPDFBatismosSecretario, gerarPDFPresencasSecretario, editarMembroSecretario, editarDepartamentoMembro
+  updatePerfil, updateFoto, gerarFichaMembroPDF, gerarPDFMembrosSecretario, gerarPDFBatismosSecretario,
+ gerarPDFPresencasSecretario, editarMembroSecretario, editarDepartamentoMembro, atualizarAtividade
 };

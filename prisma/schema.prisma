@@ -81,6 +81,7 @@ model Membro {
   cargo           String   @default("Membro")
   status          String   @default("PENDENTE")
   role            String   @default("member")
+  ultimaAtividade DateTime?
   
   departamentoId  Int?
   departamento    Departamento? @relation("MembrosDoDepartamento", fields: [departamentoId], references: [id])
