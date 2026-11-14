@@ -3260,7 +3260,6 @@ async function carregarGrelhaDizimos() {
 let heartbeatInterval = null;
 
 function iniciarHeartbeat() {
-  // Limpa qualquer intervalo anterior
   if (heartbeatInterval) clearInterval(heartbeatInterval);
   
   // Envia o primeiro sinal imediatamente
@@ -3271,11 +3270,25 @@ function iniciarHeartbeat() {
 }
 
 async function enviarSinalVida() {
-  if (!membroLogado) return;
+  // SE NÃO HOUVER UTILIZADOR, AVISA NO CONSOLE E PARA AQUI
+  if (!membroLogado || !membroLogado.id) {
+    console.warn("⚠️ Heartbeat cancelado: membroLogado não existe ou não tem ID.");
+    return;
+  }
+
   try {
-    await fetch(`/api/membros/${membroLogado.id}/atividade`, { method: 'POST' });
+    const url = `/api/membros/${membroLogado.id}/atividade`;
+    console.log(`📡 A enviar sinal de vida para: ${url}`);
+    
+    const r = await fetch(url, { method: 'POST' });
+    
+    if (!r.ok) {
+      console.error(`❌ Erro no Heartbeat! Status: ${r.status}`);
+    } else {
+      console.log("✅ Sinal de vida enviado com sucesso!");
+    }
   } catch (e) {
-    console.log("Heartbeat falhou (ignorar):", e.message);
+    console.error("❌ Falha de rede no Heartbeat:", e.message);
   }
 }
 
