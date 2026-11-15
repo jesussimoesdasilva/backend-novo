@@ -223,13 +223,13 @@ th{color:var(--gold);font-size:12px;text-transform:uppercase}
       </div>
     </div>
 
-    <!-- RELATÓRIOS -->
+   <!-- RELATÓRIOS -->
 <div id="section-relatorios" class="section">
   <div class="card no-print" style="background: #071b36; border: 1px solid rgba(212,160,23,.3);">
     <h3 style="color: #facc15;">📊 Central de Relatórios</h3>
     <p style="color: #94a3b8; font-size: 13px; margin-bottom: 20px;">Selecione o relatório que deseja visualizar e imprimir.</p>
     
-    <div class="grid-4">
+    <div class="grid-4" style="grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));">
       <!-- Botão Membros -->
       <button onclick="gerarRelatorioPastor('membros')" style="background: #facc15; color: #020617; border: none; padding: 20px; border-radius: 15px; font-weight: 900; font-size: 16px; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 10px;">
         <span style="font-size: 30px;">👥</span>
@@ -252,6 +252,12 @@ th{color:var(--gold);font-size:12px;text-transform:uppercase}
       <button onclick="gerarRelatorioPastor('financeiro')" style="background: #059669; color: white; border: none; padding: 20px; border-radius: 15px; font-weight: 900; font-size: 16px; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 10px;">
         <span style="font-size: 30px;">💰</span>
         Extrato Financeiro
+      </button>
+
+      <!-- NOVO BOTÃO: Mapa de Fidelidade -->
+      <button onclick="gerarMapaFidelidade()" style="background: #7c3aed; color: white; border: none; padding: 20px; border-radius: 15px; font-weight: 900; font-size: 16px; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 10px;">
+        <span style="font-size: 30px;">📊</span>
+        Mapa de Fidelidade
       </button>
     </div>
   </div>
@@ -812,6 +818,104 @@ async function salvarPerfilPastor() {
   } catch (e) {
     toast(e.message, 'error');
   }
+}
+
+// ===== MAPA DE FIDELIDADE =====
+async function gerarMapaFidelidade() {
+  const area = document.getElementById('areaRelatorio');
+  const conteudo = document.getElementById('conteudoRelatorio');
+  area.style.display = 'block';
+  conteudo.innerHTML = '<div class="empty">A carregar dados...</div>';
+
+  const hoje = new Date();
+  const mesAtual = hoje.getMonth() + 1;
+  const anoAtual = hoje.getFullYear();
+
+  try {
+    const igrejaId = igrejaAtual.igrejaId;
+    const r = await fetch(API + '/ofertas/relatorio-fidelidade/' + igrejaId + '?mes=' + mesAtual + '&ano=' + anoAtual);
+    const lista = await r.json();
+
+    if (!Array.isArray(lista)) {
+      conteudo.innerHTML = '<div class="empty" style="color:red">Erro ao carregar o relatório. Verifica se o backend está atualizado.</div>';
+      return;
+    }
+
+    const pagaram = lista.filter(m => m.statusMes === 'PAGO').length;
+    const faltaram = lista.filter(m => m.statusMes === 'FALTA').length;
+
+    conteudo.innerHTML = `
+      <div style="background: #ffffff; color: #000000; padding: 40px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); margin-top: 20px;">
+        <div class="print-header">
+          <h1>${igrejaAtual.nomeIgreja || 'Mapa de Fidelidade'}</h1>
+          <p>Mapa de Fidelidade - ${mesAtual}/${anoAtual}</p>
+          <div class="print-date">Emitido em: ${new Date().toLocaleDateString('pt-PT')}</div>
+        </div>
+
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 30px;">
+          <div style="background: #dcfce7; border: 1px solid #86efac; border-radius: 12px; padding: 20px; text-align: center;">
+            <p style="font-size: 14px; color: #166534; margin: 0 0 5px 0;">✅ Pagaram este mês</p>
+            <p style="font-size: 32px; font-weight: 900; color: #166534; margin: 0;">${pagaram}</p>
+          </div>
+          <div style="background: #fee2e2; border: 1px solid #fca5a5; border-radius: 12px; padding: 20px; text-align: center;">
+            <p style="font-size: 14px; color: #991b1b; margin: 0 0 5px 0;">⚠️ Em Falta este mês</p>
+            <p style="font-size: 32px; font-weight: 900; color: #991b1b; margin: 0;">${faltaram}</p>
+          </div>
+        </div>
+
+        <table style="width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 14px; color: #000;">
+          <thead>
+            <tr>
+              <th style="background: #020617; color: #ffffff; padding: 12px; text-align: left; font-size: 12px; text-transform: uppercase;">Nome</th>
+              <th style="background: #020617; color: #ffffff; padding: 12px; text-align: left; font-size: 12px; text-transform: uppercase;">Telefone</th>
+              <th style="background: #020617; color: #ffffff; padding: 12px; text-align: center; font-size: 12px; text-transform: uppercase;">Mês Atual</th>
+              <th style="background: #020617; color: #ffffff; padding: 12px; text-align: right; font-size: 12px; text-transform: uppercase;">Total Ano</th>
+              <th style="background: #020617; color: #ffffff; padding: 12px; text-align: center; font-size: 12px; text-transform: uppercase;">Ação</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${lista.map(m => {
+              const isPago = m.statusMes === 'PAGO';
+              const statusBadge = isPago 
+                ? '<span style="background: #dcfce7; color: #166534; padding: 4px 10px; border-radius: 20px; font-weight: bold; font-size: 12px;">✅ Pago</span>' 
+                : '<span style="background: #fee2e2; color: #991b1b; padding: 4px 10px; border-radius: 20px; font-weight: bold; font-size: 12px;">❌ Falta</span>';
+              
+              const botaoWhatsApp = !isPago && m.telefone 
+                ? `<button onclick="contactarWhatsApp('${m.nome.replace(/'/g, "\\'")}', '${m.telefone}')" style="background: #25d366; color: white; border: none; padding: 6px 12px; border-radius: 8px; font-weight: bold; font-size: 12px; cursor: pointer;">📞 WhatsApp</button>`
+                : (isPago ? '' : '<span style="color: #94a3b8; font-size: 12px;">Sem telefone</span>');
+
+              return `
+                <tr style="border-bottom: 1px solid #e2e8f0;">
+                  <td style="padding: 12px;"><strong>${m.nome}</strong></td>
+                  <td style="padding: 12px;">${m.telefone || '-'}</td>
+                  <td style="padding: 12px; text-align: center;">${statusBadge}</td>
+                  <td style="padding: 12px; text-align: right; font-weight: bold;">${m.totalPagoAno.toLocaleString('pt-AO')} Kz</td>
+                  <td style="padding: 12px; text-align: center;">${botaoWhatsApp}</td>
+                </tr>
+              `;
+            }).join('')}
+          </tbody>
+        </table>
+
+        ${lista.length === 0 ? '<div class="empty" style="margin-top:20px;">Nenhum dizimista registado.</div>' : ''}
+
+        <button class="btn btn-primary no-print" style="margin-top:30px; width:100%;" onclick="window.print()">🖨️ Imprimir / Exportar PDF</button>
+      </div>
+    `;
+    area.scrollIntoView({ behavior: 'smooth' });
+
+  } catch (e) {
+    conteudo.innerHTML = `<div class="empty" style="color:red">Erro: ${e.message}</div>`;
+  }
+}
+
+// ===== BOTÃO WHATSAPP =====
+function contactarWhatsApp(nome, telefone) {
+  const telefoneLimpo = telefone.replace(/\D/g, '');
+  const mensagem = encodeURIComponent(
+    `Olá ${nome}, sentimos a sua falta na igreja. Estamos a orar por si. Que Deus abençoe a sua semana. - Pastor ${igrejaAtual.nome || ''}`
+  );
+  window.open(`https://wa.me/244${telefoneLimpo}?text=${mensagem}`, '_blank');
 }
 
 initLogin();

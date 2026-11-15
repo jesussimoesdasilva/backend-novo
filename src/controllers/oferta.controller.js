@@ -311,8 +311,16 @@ async function gerarPDFSectores(req, res) {
   } catch (err) { res.status(500).json({ message: err.message }); }
 }
 
+async function relatorioFidelidade(req, res, next) {
+  try {
+    const { igrejaId } = req.params;
+    const { mes, ano } = req.query;
+    res.json(await service.getRelatorioFidelidade(igrejaId, mes, ano));
+  } catch (err) { next(err); }
+}
+
 module.exports = { 
   list, create, consultar, preValidar, validar, negar, estatisticas, 
   relatorioDizimistas, meusDizimos, gerarComprovativoPDF, zerarFinancas, 
-  gerarPDFMembros, gerarPDFDepartamentos, gerarPDFSectores 
+  gerarPDFMembros, gerarPDFDepartamentos, gerarPDFSectores, relatorioFidelidade  
 };

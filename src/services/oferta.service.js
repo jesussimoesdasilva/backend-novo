@@ -200,9 +200,57 @@ async function meusDizimos(membroId, ano) {
   return dizimos;
 }
 
+async function getRelatorioFidelidade(igrejaId, mes, ano) {
+  // Define o intervalo do mês
+  const start = new Date(Date.UTC(Number(ano), Number(mes) - 1, 1));
+  const end = new Date(Date.UTC(Number(ano), Number(mes), 0, 23, 59, 59));
+
+  // 1. Vai buscar todos os membros da igreja
+  const membros = await prisma.membro.findMany({
+    where: { igrejaId: Number(igrejaId) },
+    select: { id: true, nome: true, telefone: true, foto: true }
+  });
+
+  // 2. Vai buscar todos os dízimos desta igreja (histórico completo)
+  const todasOfertas = await prisma.oferta.findMany({
+    where: { igrejaId: Number(igrejaId), finalidade: 'Dízimo' }
+  });
+
+  // 3. Calcula a fidelidade de cada membro
+  const relatorio = membros.map(membro => {
+    const ofertasMembro = todasOfertas.filter(o => o.membroId === membro.id);
+    
+    // Regra: Se nunca teve nenhum dízimo VALIDADO, é isento.
+    const isDizimista = ofertasMembro.some(o => o.status === 'VALIDADO');
+    if (!isDizimista) return null;
+
+    // Verifica se pagou no mês atual (VALIDADO ou AGUARDANDO_PASTOR)
+    const pagouEsteMes = ofertasMembro.some(o => {
+      const d = new Date(o.criadoEm);
+      return d >= start && d <= end && (o.status === 'VALIDADO' || o.status === 'AGUARDANDO_PASTOR');
+    });
+
+    // Calcula o total pago no ano
+    const totalPagoAno = ofertasMembro.filter(o => 
+      new Date(o.criadoEm).getFullYear() === Number(ano) && o.status === 'VALIDADO'
+    ).reduce((acc, o) => acc + o.valor, 0);
+
+    return {
+      id: membro.id,
+      nome: membro.nome,
+      telefone: membro.telefone,
+      foto: membro.foto,
+      statusMes: pagouEsteMes ? 'PAGO' : 'FALTA',
+      totalPagoAno
+    };
+  }).filter(m => m !== null); // Remove os isentos
+
+  return relatorio;
+}
+
 module.exports = { 
   listOfertas, createOferta, consultarOferta, 
   preValidarOferta, validarOferta, negarOferta, 
   getEstatisticas, getRelatorioDizimistas,
-  meusDizimos
+  meusDizimos, getRelatorioFidelidade
 };
