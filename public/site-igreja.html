@@ -1011,6 +1011,28 @@ footer strong{color:#f2d27c}
   </div>
 </div>
 
+<!-- BOTÃO VOLTAR AO TOPO -->
+<button id="btnTopo" onclick="window.scrollTo({top: 0, behavior: 'smooth'})" style="
+  display: none;
+  position: fixed;
+  bottom: 25px;
+  right: 25px;
+  z-index: 99;
+  background: #d4a017;
+  color: #020617;
+  border: none;
+  border-radius: 50%;
+  width: 45px;
+  height: 45px;
+  font-size: 22px;
+  font-weight: bold;
+  cursor: pointer;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+  transition: opacity 0.3s;
+  line-height: 45px;
+  text-align: center;
+">^</button>
+
 <script>
 const pathParts = window.location.pathname.split('/');
 const slug = pathParts[pathParts.length - 1];
@@ -3298,6 +3320,20 @@ async function enviarSinalVida() {
     console.error("❌ Falha de rede no Heartbeat:", e.message);
   }
 }
+
+// ===== BOTÃO VOLTAR AO TOPO =====
+window.addEventListener('scroll', function() {
+  const btn = document.getElementById('btnTopo');
+  if (!btn) return;
+  if (window.scrollY > 300) {
+    btn.style.display = 'block';
+  } else {
+    btn.style.display = 'none';
+  }
+});
+
+carregar();
+</script>
 
 carregar();
 </script>
