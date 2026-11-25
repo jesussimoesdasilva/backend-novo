@@ -233,16 +233,22 @@ async function gerarFichaMembroPDF(req, res) {
     }
 
     // Finalidade e Assinatura
-    const textoFinalidade = finalidade || 'Diversos Efeitos';
+       const textoFinalidade = finalidade || 'Diversos Efeitos';
     let footerY = 640; // desceu mais para caber os sacramentos
     doc.fillColor('#334155').font('Helvetica').fontSize(10);
     doc.text(`Certificamos, para os devidos efeitos, que a presente Ficha Individual se destina a comprovar a situação do membro para fins de ${textoFinalidade}.`, 40, footerY, { align: 'justify', width: 520 });
+    
+    // Define o título com base no tipo de igreja
+    const isCatolica = membro.igreja.isCatolica;
+    const tituloAssinatura = isCatolica ? 'O Padre' : 'O Pastor';
+    const tituloCargo = isCatolica ? 'Padre' : 'Pastor';
+
     const centroX = 40 + (520 / 2);
     doc.fillColor('#020617').font('Helvetica-Bold').fontSize(11);
-    doc.text('O Pastor', centroX - 30, footerY + 60);
+    doc.text(tituloAssinatura, centroX - 30, footerY + 60);
     doc.moveTo(centroX - 100, footerY + 75).lineTo(centroX + 100, footerY + 75).stroke('#020617');
-    doc.font('Helvetica-Bold').fontSize(11).text(pastor ? pastor.nome : 'Nome do Pastor', centroX - 100, footerY + 80, { width: 200, align: 'center' });
-    doc.font('Helvetica').fontSize(9).fillColor('#64748b').text(pastor ? (pastor.cargo || 'Pastor') : 'Pastor', centroX - 100, footerY + 95, { width: 200, align: 'center' });
+    doc.font('Helvetica-Bold').fontSize(11).text(pastor ? pastor.nome : 'Nome do ' + tituloCargo, centroX - 100, footerY + 80, { width: 200, align: 'center' });
+    doc.font('Helvetica').fontSize(9).fillColor('#64748b').text(pastor ? (pastor.cargo || tituloCargo) : tituloCargo, centroX - 100, footerY + 95, { width: 200, align: 'center' });
 
     doc.end();
   } catch (err) {
@@ -336,14 +342,20 @@ async function gerarPDFMembrosSecretario(req, res) {
       tableY += 20;
     });
 
-    // Assinatura com MUITO espaço
+        // Assinatura com MUITO espaço
     let footerY = 680; // <-- Aumentado para descer a assinatura
+    
+    // Define o título com base no tipo de igreja
+    const isCatolica = igreja.isCatolica;
+    const tituloAssinatura = isCatolica ? 'O Padre' : 'O Pastor';
+    const tituloCargo = isCatolica ? 'Padre' : 'Pastor';
+
     const centroX = 40 + (520 / 2);
     doc.fillColor('#020617').font('Helvetica-Bold').fontSize(11);
-    doc.text('O Pastor', centroX - 30, footerY);
+    doc.text(tituloAssinatura, centroX - 30, footerY);
     doc.moveTo(centroX - 100, footerY + 20).lineTo(centroX + 100, footerY + 20).stroke('#020617'); // <-- Linha mais abaixo
-    doc.font('Helvetica-Bold').fontSize(11).text(pastor ? pastor.nome : 'Nome do Pastor', centroX - 100, footerY + 25, { width: 200, align: 'center' });
-    doc.font('Helvetica').fontSize(9).fillColor('#64748b').text(pastor ? (pastor.cargo || 'Pastor') : 'Pastor', centroX - 100, footerY + 40, { width: 200, align: 'center' });
+    doc.font('Helvetica-Bold').fontSize(11).text(pastor ? pastor.nome : 'Nome do ' + tituloCargo, centroX - 100, footerY + 25, { width: 200, align: 'center' });
+    doc.font('Helvetica').fontSize(9).fillColor('#64748b').text(pastor ? (pastor.cargo || tituloCargo) : tituloCargo, centroX - 100, footerY + 40, { width: 200, align: 'center' });
 
     doc.end();
   } catch (err) { res.status(500).json({ message: err.message }); }
@@ -403,13 +415,19 @@ async function gerarPDFBatismosSecretario(req, res) {
       tableY += 20;
     });
 
-    let footerY = 680;
+        let footerY = 680;
+    
+    // Define o título com base no tipo de igreja
+    const isCatolica = igreja.isCatolica;
+    const tituloAssinatura = isCatolica ? 'O Padre' : 'O Pastor';
+    const tituloCargo = isCatolica ? 'Padre' : 'Pastor';
+
     const centroX = 40 + (520 / 2);
     doc.fillColor('#020617').font('Helvetica-Bold').fontSize(11);
-    doc.text('O Pastor', centroX - 30, footerY);
+    doc.text(tituloAssinatura, centroX - 30, footerY);
     doc.moveTo(centroX - 100, footerY + 20).lineTo(centroX + 100, footerY + 20).stroke('#020617');
-    doc.font('Helvetica-Bold').fontSize(11).text(pastor ? pastor.nome : 'Nome do Pastor', centroX - 100, footerY + 25, { width: 200, align: 'center' });
-    doc.font('Helvetica').fontSize(9).fillColor('#64748b').text(pastor ? (pastor.cargo || 'Pastor') : 'Pastor', centroX - 100, footerY + 40, { width: 200, align: 'center' });
+    doc.font('Helvetica-Bold').fontSize(11).text(pastor ? pastor.nome : 'Nome do ' + tituloCargo, centroX - 100, footerY + 25, { width: 200, align: 'center' });
+    doc.font('Helvetica').fontSize(9).fillColor('#64748b').text(pastor ? (pastor.cargo || tituloCargo) : tituloCargo, centroX - 100, footerY + 40, { width: 200, align: 'center' });
 
     doc.end();
   } catch (err) { res.status(500).json({ message: err.message }); }
@@ -469,13 +487,19 @@ async function gerarPDFPresencasSecretario(req, res) {
       tableY += 20;
     });
 
-    let footerY = 680;
+        let footerY = 680;
+    
+    // Define o título com base no tipo de igreja
+    const isCatolica = igreja.isCatolica;
+    const tituloAssinatura = isCatolica ? 'O Padre' : 'O Pastor';
+    const tituloCargo = isCatolica ? 'Padre' : 'Pastor';
+
     const centroX = 40 + (520 / 2);
     doc.fillColor('#020617').font('Helvetica-Bold').fontSize(11);
-    doc.text('O Pastor', centroX - 30, footerY);
+    doc.text(tituloAssinatura, centroX - 30, footerY);
     doc.moveTo(centroX - 100, footerY + 20).lineTo(centroX + 100, footerY + 20).stroke('#020617');
-    doc.font('Helvetica-Bold').fontSize(11).text(pastor ? pastor.nome : 'Nome do Pastor', centroX - 100, footerY + 25, { width: 200, align: 'center' });
-    doc.font('Helvetica').fontSize(9).fillColor('#64748b').text(pastor ? (pastor.cargo || 'Pastor') : 'Pastor', centroX - 100, footerY + 40, { width: 200, align: 'center' });
+    doc.font('Helvetica-Bold').fontSize(11).text(pastor ? pastor.nome : 'Nome do ' + tituloCargo, centroX - 100, footerY + 25, { width: 200, align: 'center' });
+    doc.font('Helvetica').fontSize(9).fillColor('#64748b').text(pastor ? (pastor.cargo || tituloCargo) : tituloCargo, centroX - 100, footerY + 40, { width: 200, align: 'center' });
 
     doc.end();
   } catch (err) { res.status(500).json({ message: err.message }); }
