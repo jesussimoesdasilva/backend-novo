@@ -178,6 +178,21 @@ async function gerarPDFMembros(req, res) {
       if (y > 750) { doc.addPage(); y = 40; }
     });
 
+    // ===== ASSINATURA =====
+    const isCatolica = igreja.isCatolica;
+    const tituloAssinatura = isCatolica ? 'O Padre' : 'O Pastor';
+    const tituloCargo = isCatolica ? 'Padre' : 'Pastor';
+    
+    const pastor = await prisma.pastor.findFirst({ where: { igrejaId } });
+    const footerY = 680;
+    const centroX = 40 + (515 / 2);
+    
+    doc.fillColor('#020617').font('Helvetica-Bold').fontSize(11);
+    doc.text(tituloAssinatura, centroX - 30, footerY);
+    doc.moveTo(centroX - 100, footerY + 20).lineTo(centroX + 100, footerY + 20).stroke('#020617');
+    doc.font('Helvetica-Bold').fontSize(11).text(pastor ? pastor.nome : 'Nome do ' + tituloCargo, centroX - 100, footerY + 25, { width: 200, align: 'center' });
+    doc.font('Helvetica').fontSize(9).fillColor('#64748b').text(pastor ? (pastor.cargo || tituloCargo) : tituloCargo, centroX - 100, footerY + 40, { width: 200, align: 'center' });
+
     doc.end();
   } catch (err) {
     res.status(500).json({ message: err.message });
@@ -241,6 +256,21 @@ async function gerarPDFDepartamentos(req, res) {
       y += 22;
       if (y > 750) { doc.addPage(); y = 40; }
     });
+
+    // ===== ASSINATURA =====
+    const isCatolica = igreja.isCatolica;
+    const tituloAssinatura = isCatolica ? 'O Padre' : 'O Pastor';
+    const tituloCargo = isCatolica ? 'Padre' : 'Pastor';
+    
+    const pastor = await prisma.pastor.findFirst({ where: { igrejaId } });
+    const footerY = 680;
+    const centroX = 40 + (515 / 2);
+    
+    doc.fillColor('#020617').font('Helvetica-Bold').fontSize(11);
+    doc.text(tituloAssinatura, centroX - 30, footerY);
+    doc.moveTo(centroX - 100, footerY + 20).lineTo(centroX + 100, footerY + 20).stroke('#020617');
+    doc.font('Helvetica-Bold').fontSize(11).text(pastor ? pastor.nome : 'Nome do ' + tituloCargo, centroX - 100, footerY + 25, { width: 200, align: 'center' });
+    doc.font('Helvetica').fontSize(9).fillColor('#64748b').text(pastor ? (pastor.cargo || tituloCargo) : tituloCargo, centroX - 100, footerY + 40, { width: 200, align: 'center' });
 
     doc.end();
   } catch (err) { res.status(500).json({ message: err.message }); }
@@ -306,6 +336,21 @@ async function gerarPDFSectores(req, res) {
         if (y > 750) { doc.addPage(); y = 40; }
       });
     });
+
+    // ===== ASSINATURA =====
+    const isCatolica = igreja.isCatolica;
+    const tituloAssinatura = isCatolica ? 'O Padre' : 'O Pastor';
+    const tituloCargo = isCatolica ? 'Padre' : 'Pastor';
+    
+    const pastor = await prisma.pastor.findFirst({ where: { igrejaId } });
+    const footerY = 680;
+    const centroX = 40 + (515 / 2);
+    
+    doc.fillColor('#020617').font('Helvetica-Bold').fontSize(11);
+    doc.text(tituloAssinatura, centroX - 30, footerY);
+    doc.moveTo(centroX - 100, footerY + 20).lineTo(centroX + 100, footerY + 20).stroke('#020617');
+    doc.font('Helvetica-Bold').fontSize(11).text(pastor ? pastor.nome : 'Nome do ' + tituloCargo, centroX - 100, footerY + 25, { width: 200, align: 'center' });
+    doc.font('Helvetica').fontSize(9).fillColor('#64748b').text(pastor ? (pastor.cargo || tituloCargo) : tituloCargo, centroX - 100, footerY + 40, { width: 200, align: 'center' });
 
     doc.end();
   } catch (err) { res.status(500).json({ message: err.message }); }
