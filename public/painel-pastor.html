@@ -153,6 +153,7 @@ th{color:var(--gold);font-size:12px;text-transform:uppercase}
       <button class="nav-item" onclick="section('tesouraria',this)"><span class="icon">💰</span> Tesouraria</button>
       <button class="nav-item" onclick="section('relatorios',this)"><span class="icon">📊</span> Relatórios</button>
       <button class="nav-item" onclick="section('oracao',this)"><span class="icon">🙏</span> Oração & Testemunhos</button>
+      <button class="nav-item" onclick="section('patrimonio',this)"><span class="icon">🏛️</span> Património</button>
     </div>
     <div class="sidebar-footer"><button onclick="logout()">🚪 Sair</button></div>
   </aside>
@@ -276,8 +277,39 @@ th{color:var(--gold);font-size:12px;text-transform:uppercase}
           <button class="btn btn-primary" style="flex:1" onclick="mudarAbaAdmin('PEDIDO')" id="btnAdminPedido">Pedidos de Oração</button>
           <button class="btn btn-outline" style="flex:1;color:var(--text);border-color:var(--text)" onclick="mudarAbaAdmin('TESTEMUNHO')" id="btnAdminTestemunho">Testemunhos Pendentes</button>
         </div>
-
         <div id="listaOracaoAdmin" class="empty">A carregar...</div>
+      </div>
+    </div>
+
+    <!-- PATRIMÓNIO (LEITURA E APROVAÇÕES DO PASTOR) -->
+    <div id="section-patrimonio" class="section">
+      <div class="grid-4">
+        <div class="card" style="text-align:center; padding:15px; border-left:4px solid var(--green); margin-bottom:0;">
+          <h4 style="color:var(--muted); font-size:11px; text-transform:uppercase;">Bens Ativos</h4>
+          <p style="font-size:20px; font-weight:800; color:var(--green)" id="pasPatAtivos">0</p>
+        </div>
+        <div class="card" style="text-align:center; padding:15px; border-left:4px solid var(--gold); margin-bottom:0;">
+          <h4 style="color:var(--muted); font-size:11px; text-transform:uppercase;">Valor Patrimonial</h4>
+          <p style="font-size:20px; font-weight:800; color:var(--gold)" id="pasPatValor">0 Kz</p>
+        </div>
+        <div class="card" style="text-align:center; padding:15px; border-left:4px solid var(--cyan); margin-bottom:0;">
+          <h4 style="color:var(--muted); font-size:11px; text-transform:uppercase;">Emprestados</h4>
+          <p style="font-size:20px; font-weight:800; color:var(--cyan)" id="pasPatEmp">0</p>
+        </div>
+        <div class="card" style="text-align:center; padding:15px; border-left:4px solid var(--red); margin-bottom:0;">
+          <h4 style="color:var(--muted); font-size:11px; text-transform:uppercase;">Aguardam Aprovação</h4>
+          <p style="font-size:20px; font-weight:800; color:var(--red)" id="pasPatPend">0</p>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>⏳ Pedidos de Aprovação Pendentes (Movimentação, Empréstimo e Abate)</h3>
+        <div id="listaPedidosPastor" class="empty">A carregar pedidos...</div>
+      </div>
+
+      <div class="card">
+        <h3>🏛️ Inventário Geral da Igreja (Consulta)</h3>
+        <div id="listaInventarioPastor" class="empty">A carregar bens...</div>
       </div>
     </div>
 
@@ -367,11 +399,12 @@ function section(name, btn) {
   document.getElementById('section-' + name).classList.add('active');
   btn.classList.add('active');
   
-  const titles = {
+    const titles = {
     perfil:['O Meu Perfil','Editar dados pastorais'],
     tesouraria:['Tesouraria','Validar dízimos e registar saídas'],
     relatorios:['Relatórios','Visão Global Financeira'],
-    oracao:['Oração & Testemunhos','Gerir pedidos e testemunhos']
+    oracao:['Oração & Testemunhos','Gerir pedidos e testemunhos'],
+    patrimonio:['Património','Consulta de bens e aprovação de pedidos']
   };
   document.getElementById('pageTitle').textContent = titles[name][0];
   document.getElementById('pageSub').textContent = titles[name][1];
@@ -379,6 +412,7 @@ function section(name, btn) {
   if (name === 'tesouraria') { carregarEstatisticas(); carregarDizimos(); }
   if (name === 'relatorios') { carregarRelatorios(); document.getElementById('areaRelatorio').style.display = 'none'; }
   if (name === 'oracao') carregarOracaoAdmin();
+  if (name === 'patrimonio') carregarPatrimonioPastor();
 }
 
 function logout() {
@@ -917,6 +951,89 @@ function contactarWhatsApp(nome, telefone) {
   );
   window.open(`https://wa.me/244${telefoneLimpo}?text=${mensagem}`, '_blank');
 }
+
+// ===== PATRIMÓNIO (CONSULTA E APROVAÇÕES DO PASTOR) =====
+async function carregarPatrimonioPastor() {
+  const igrejaId = igrejaAtual.igrejaId;
+  const divPed = document.getElementById('listaPedidosPastor');
+  const divInv = document.getElementById('listaInventarioPastor');
+  divPed.innerHTML = 'A carregar pedidos...';
+  divInv.innerHTML = 'A carregar bens...';
+
+  try {
+    const [resBens, resPed] = await Promise.all([
+      fetch(API + '/patrimonio/igreja/' + igrejaId),
+      fetch(API + '/patrimonio/igreja/' + igrejaId + '/pedidos?status=PENDENTE')
+    ]);
+    const bens = await resBens.json();
+    const pedidos = await resPed.json();
+
+    const ativos = bens.filter(b => b.status === 'ATIVO');
+    const emprestados = bens.filter(b => b.status === 'EMPRESTADO');
+    const valorTotal = bens.filter(b => b.status !== 'ABATIDO').reduce((acc, b) => acc + (b.valor || 0), 0);
+
+    document.getElementById('pasPatAtivos').textContent = ativos.length;
+    document.getElementById('pasPatValor').textContent = valorTotal.toLocaleString('pt-AO') + ' Kz';
+    document.getElementById('pasPatEmp').textContent = emprestados.length;
+    document.getElementById('pasPatPend').textContent = pedidos.length;
+
+    // 1. Pedidos Pendentes
+    if (!pedidos.length) {
+      divPed.innerHTML = '<div class="empty">Nenhum pedido de património pendente de aprovação.</div>';
+    } else {
+      divPed.innerHTML = pedidos.map(p => {
+        let detalhe = '';
+        if (p.tipo === 'MOVIMENTACAO') detalhe = 'Mover de <strong>' + (p.patrimonio ? p.patrimonio.localizacao : '') + '</strong> para <strong>' + p.novaLocalizacao + '</strong>';
+        if (p.tipo === 'EMPRESTIMO') detalhe = 'Emprestar a <strong>' + (p.membro ? p.membro.nome : 'Membro') + '</strong> (Devolução: ' + (p.dataDevolucaoPrev ? new Date(p.dataDevolucaoPrev).toLocaleDateString('pt-PT') : '-') + ')';
+        if (p.tipo === 'ABATE') detalhe = 'Solicitação de <strong>ABATE DEFINITIVO</strong>';
+
+        return '<div class="depto-item" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">' +
+          '<div style="flex:1;">' +
+            '<strong style="color:var(--gold);font-size:15px;">[' + p.tipo + '] ' + (p.patrimonio ? p.patrimonio.nome : 'Bem') + '</strong>' +
+            '<p style="color:var(--text);font-size:13px;margin-top:4px;">' + detalhe + '</p>' +
+            '<p style="color:var(--muted);font-size:12px;margin-top:2px;">Motivo: ' + (p.motivo || '-') + ' • Pedido por: ' + p.solicitadoPor + '</p>' +
+          '</div>' +
+          '<div style="display:flex;gap:8px;">' +
+            '<button class="btn btn-success" onclick="responderPedidoPatPastor(' + p.id + ', \'APROVADO\')">✅ Aprovar</button>' +
+            '<button class="btn btn-danger" onclick="responderPedidoPatPastor(' + p.id + ', \'NEGADO\')">❌ Negar</button>' +
+          '</div>' +
+        '</div>';
+      }).join('');
+    }
+
+    // 2. Inventário em Modo Leitura
+    if (!bens.length) {
+      divInv.innerHTML = '<div class="empty">Nenhum bem registado.</div>';
+    } else {
+      let rows = bens.map(b => {
+        let st = b.status === 'ATIVO' ? 'Ativo' : (b.status === 'EMPRESTADO' ? 'Emprestado (' + (b.emprestadoPara ? b.emprestadoPara.nome : '') + ')' : 'Abatido');
+        return '<tr><td><strong>' + b.nome + '</strong></td><td>' + b.categoria + '</td><td>' + b.localizacao + '</td><td>' + (b.valor || 0).toLocaleString('pt-AO') + ' Kz</td><td>' + st + '</td></tr>';
+      }).join('');
+      divInv.innerHTML = '<table><thead><tr><th>Bem</th><th>Categoria</th><th>Localização</th><th>Valor</th><th>Estado</th></tr></thead><tbody>' + rows + '</tbody></table>';
+    }
+  } catch (e) {
+    toast('Erro ao carregar dados de património', 'error');
+  }
+}
+
+async function responderPedidoPatPastor(pedidoId, acao) {
+  const texto = acao === 'APROVADO' ? 'APROVAR' : 'NEGAR';
+  if (!confirm('Tem a certeza que deseja ' + texto + ' este pedido?')) return;
+
+  try {
+    const r = await fetch(API + '/patrimonio/pedidos/' + pedidoId + '/responder', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ acao: acao, pastorNome: igrejaAtual.nome || 'Pastor' })
+    });
+    if (!r.ok) throw new Error('Erro ao responder ao pedido');
+    toast('Pedido ' + acao.toLowerCase() + ' com sucesso!', 'success');
+    carregarPatrimonioPastor();
+  } catch (e) {
+    toast(e.message, 'error');
+  }
+}
+
 
 initLogin();
 </script>
