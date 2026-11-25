@@ -48,9 +48,61 @@ async function login(req, res) {
     res.status(500).json({ message: err.message }); 
   }
 }
-async function verificarTelefone(req, res) { res.json({ ok: true }); }
-async function verCodigo(req, res) { res.json({ ok: true }); }
-async function redefinirSenhaComCodigo(req, res) { res.json({ ok: true }); }
+const codigosRecuperacao = new Map();
+
+async function verificarTelefone(req, res) {
+  try {
+    const { email, telefone } = req.body;
+    const membro = await prisma.membro.findUnique({ where: { email } });
+    if (!membro) return res.status(404).json({ message: "Email não encontrado." });
+
+    const telLimpoDb = (membro.telefone || "").replace(/\D/g, "");
+    const telLimpoReq = (telefone || "").replace(/\D/g, "");
+    if (!telLimpoDb || telLimpoDb !== telLimpoReq) {
+      return res.status(400).json({ message: "O telefone não corresponde ao cadastro deste email." });
+    }
+
+    const codigo = Math.floor(100000 + Math.random() * 900000).toString();
+    codigosRecuperacao.set(email, { codigo, expira: Date.now() + 10 * 60 * 1000 });
+
+    res.json({ ok: true, codigo });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+}
+
+async function verCodigo(req, res) {
+  const registo = codigosRecuperacao.get(req.body.email);
+  if (!registo) return res.status(404).json({ message: "Nenhum código gerado." });
+  res.json({ codigo: registo.codigo });
+}
+
+async function redefinirSenhaComCodigo(req, res) {
+  try {
+    const { email, codigo, novaSenha } = req.body;
+    const registo = codigosRecuperacao.get(email);
+
+    if (!registo || registo.codigo !== String(codigo).trim()) {
+      return res.status(400).json({ message: "Código inválido." });
+    }
+    if (Date.now() > registo.expira) {
+      codigosRecuperacao.delete(email);
+      return res.status(400).json({ message: "O código expirou. Gere um novo." });
+    }
+    if (!novaSenha || novaSenha.length < 6) {
+      return res.status(400).json({ message: "A nova senha deve ter pelo menos 6 caracteres." });
+    }
+
+    const hash = await bcrypt.hash(novaSenha, 10);
+    await prisma.membro.update({ where: { email }, data: { password: hash } });
+    codigosRecuperacao.delete(email);
+
+    res.json({ ok: true, message: "Senha redefinida com sucesso!" });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+}
+
 
 async function list(req, res) {
   try {
