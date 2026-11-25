@@ -78,6 +78,7 @@ async function promover(req, res) {
     let role = 'member';
     if (cargo === 'Pastor') role = 'pastor';
     else if (cargo === 'Secretário') role = 'secretario';
+    else if (cargo === 'Gestor de Património') role = 'patrimonio';
     const m = await prisma.membro.update({ where: { id: Number(req.params.id) }, data: { cargo, role } });
     res.json(m);
   } catch (err) { res.status(500).json({ message: err.message }); }

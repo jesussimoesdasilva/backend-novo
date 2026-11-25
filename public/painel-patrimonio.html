@@ -339,8 +339,13 @@
 
     async function init() {
       try {
-        const res = await fetch(`${API}/igrejas/slug/${slug}`);
-        igrejaAtual = await res.json();
+        const res = await fetch(`${API}/igrejas`);
+        const lista = await res.json();
+        igrejaAtual = lista.find(i => i.slug === slug);
+        if (!igrejaAtual) {
+          document.getElementById('loginIgrejaNome').textContent = 'Igreja não encontrada';
+          return;
+        }
         document.getElementById('loginIgrejaNome').textContent = igrejaAtual.nome || 'Igreja';
         document.getElementById('topIgrejaNome').textContent = igrejaAtual.nome || 'Igreja';
 
@@ -356,11 +361,11 @@
 
     async function fazerLogin() {
       const email = document.getElementById('loginEmail').value.trim();
-      const password = document.getElementById('loginSenha').value.trim();
+      const senha = document.getElementById('loginSenha').value.trim();
       const erroEl = document.getElementById('loginErro');
       erroEl.style.display = 'none';
 
-      if (!email || !password) {
+      if (!email || !senha) {
         erroEl.textContent = 'Preencha email e senha.';
         erroEl.style.display = 'block';
         return;
@@ -371,7 +376,7 @@
         const resMembro = await fetch(`${API}/membros/login`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email, password, igrejaId: igrejaAtual.id })
+          body: JSON.stringify({ email, senha, igrejaSlug: slug })
         });
 
         if (resMembro.ok) {
@@ -382,18 +387,23 @@
             localStorage.setItem('patrimonio_user_' + slug, JSON.stringify(utilizadorAtual));
             entrarNoPainel();
             return;
+          } else {
+            erroEl.textContent = 'Este membro ainda não tem permissão de Gestor de Património.';
+            erroEl.style.display = 'block';
+            return;
           }
         }
 
         // 2. Verifica se é o Subadmin da Igreja
-        if (igrejaAtual.subadminEmail === email && igrejaAtual.subadminSenha === password) {
+        if (igrejaAtual && igrejaAtual.subadminEmail === email && igrejaAtual.subadminSenha === senha) {
           utilizadorAtual = { nome: 'Subadmin (' + igrejaAtual.nome + ')', email, tipo: 'Subadmin' };
           localStorage.setItem('patrimonio_user_' + slug, JSON.stringify(utilizadorAtual));
           entrarNoPainel();
           return;
         }
 
-        erroEl.textContent = 'Acesso negado. Apenas Subadmin ou Membro promovido a Gestor de Património.';
+        const errData = await resMembro.json().catch(() => ({}));
+        erroEl.textContent = errData.message || 'Email ou senha incorretos.';
         erroEl.style.display = 'block';
       } catch (e) {
         erroEl.textContent = 'Erro de ligação ao servidor.';
