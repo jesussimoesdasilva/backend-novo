@@ -2701,7 +2701,7 @@ async function pedirCodigo() {
     const dados = await r.json();
     if (!r.ok) throw new Error(dados.message || 'Erro ao verificar');
 
-    alerta.className = "alert success"; alerta.innerHTML = "✅ Código gerado: <strong style='font-size:18px;letter-spacing:2px;'>" + data.codigo + "</strong>";
+    alerta.className = "alert success"; alerta.textContent = "✅ Código gerado! Verifique abaixo.";  
     document.getElementById('recuperarForm').style.display = 'none';
     document.getElementById('codigoForm').style.display = 'block';
 
