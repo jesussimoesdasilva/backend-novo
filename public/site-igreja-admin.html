@@ -199,6 +199,12 @@ th{color:var(--gold);font-size:12px;text-transform:uppercase}
       <button class="nav-item" onclick="window.open('/igreja/' + slug + '/secretario', '_blank')">
   <span class="icon">📝</span> Painel do Secretário
 </button>
+
+      <button class="nav-item" onclick="window.open('/igreja/' + slug + '/patrimonio', '_blank')">
+        <span class="icon">🏛️</span> Painel do Património
+      </button>
+      <button class="nav-item" onclick="section('patrimonio',this)"><span class="icon">📦</span> Gerir Património</button>
+
       
       <button class="nav-item" onclick="section('pastor',this)"><span class="icon">👤</span> Pastor</button>
       <button class="nav-item" onclick="section('departamentos',this)"><span class="icon">🏛️</span> Grupo/Departamento</button>
@@ -556,6 +562,73 @@ th{color:var(--gold);font-size:12px;text-transform:uppercase}
       </div>
     </div>
 
+    <!-- PATRIMÓNIO -->
+    <div id="section-patrimonio" class="section">
+      <div class="grid-4">
+        <div class="card" style="text-align:center; padding:15px; border-left:4px solid var(--green); margin-bottom:0;">
+          <h4 style="color:var(--muted); font-size:11px; text-transform:uppercase;">Bens Ativos</h4>
+          <p style="font-size:20px; font-weight:800; color:var(--green)" id="patAtivos">0</p>
+        </div>
+        <div class="card" style="text-align:center; padding:15px; border-left:4px solid var(--gold); margin-bottom:0;">
+          <h4 style="color:var(--muted); font-size:11px; text-transform:uppercase;">Valor Total</h4>
+          <p style="font-size:20px; font-weight:800; color:var(--gold)" id="patValorTotal">0 Kz</p>
+        </div>
+        <div class="card" style="text-align:center; padding:15px; border-left:4px solid var(--blue); margin-bottom:0;">
+          <h4 style="color:var(--muted); font-size:11px; text-transform:uppercase;">Emprestados</h4>
+          <p style="font-size:20px; font-weight:800; color:var(--blue)" id="patEmprestados">0</p>
+        </div>
+        <div class="card" style="text-align:center; padding:15px; border-left:4px solid var(--cyan); margin-bottom:0;">
+          <h4 style="color:var(--muted); font-size:11px; text-transform:uppercase;">Pedidos Pendentes</h4>
+          <p style="font-size:20px; font-weight:800; color:var(--cyan)" id="patPendentes">0</p>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3 id="formPatTitulo">➕ Adicionar Novo Bem</h3>
+        <div class="grid-2">
+          <div class="field"><label>Nome do Bem *</label><input id="patNome" placeholder="Ex: Mesa de Som Yamaha"></div>
+          <div class="field">
+            <label>Categoria *</label>
+            <select id="patCategoria">
+              <option value="Equipamento">Equipamento</option>
+              <option value="Mobiliário">Mobiliário</option>
+              <option value="Veículos">Veículos</option>
+              <option value="Imóveis">Imóveis</option>
+            </select>
+          </div>
+          <div class="field"><label>Localização Atual *</label><input id="patLocal" placeholder="Ex: Templo Principal"></div>
+          <div class="field"><label>Valor Estimado (Kz) *</label><input type="number" id="patValor" placeholder="Ex: 250000"></div>
+          <div class="field"><label>Nº de Série / Matrícula</label><input id="patSerie"></div>
+          <div class="field"><label>Data de Aquisição</label><input type="date" id="patData"></div>
+          <div class="field">
+            <label>Estado de Conservação</label>
+            <select id="patEstado">
+              <option value="Novo">Novo</option>
+              <option value="Bom" selected>Bom</option>
+              <option value="Danificado">Danificado</option>
+            </select>
+          </div>
+          <div class="field"><label>Responsável Direto</label><input id="patResp" placeholder="Ex: Diácono Carlos"></div>
+          <div class="field" style="grid-column:1/-1">
+            <button class="btn btn-primary" onclick="salvarBemPatrimonio()" style="width:100%" id="btnSalvarPat">💾 Guardar Bem</button>
+            <button class="btn btn-outline" onclick="cancelarEdicaoPat()" style="width:100%;margin-top:8px;display:none" id="btnCancelarPat">Cancelar Edição</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:15px;">
+          <h3 style="margin:0;">🏛️ Inventário de Bens</h3>
+          <div style="display:flex; gap:8px; flex-wrap:wrap;">
+            <button class="btn btn-outline" onclick="imprimirRelatorioPat('inventario')">🖨️ Inventário</button>
+            <button class="btn btn-outline" onclick="imprimirRelatorioPat('emprestados')">🖨️ Emprestados</button>
+            <button class="btn btn-outline" onclick="imprimirRelatorioPat('abates')">🖨️ Abates</button>
+          </div>
+        </div>
+        <div id="listaPatrimonioAdmin" class="empty">A carregar...</div>
+      </div>
+    </div>
+
   </main>
 </div>
 
@@ -568,6 +641,22 @@ th{color:var(--gold);font-size:12px;text-transform:uppercase}
     <div style="display:flex;gap:10px;justify-content:flex-end">
       <button class="btn btn-outline" onclick="document.getElementById('modalSectores').style.display='none'">Cancelar</button>
       <button class="btn btn-primary" onclick="salvarSectoresMembro()">Guardar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL PEDIDO PATRIMÓNIO AO PASTOR -->
+<div id="modalPedidoPat" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:1000;place-items:center;padding:20px">
+  <div class="card" style="max-width:480px;width:100%;border-color:var(--gold)">
+    <h3 id="modalPedidoPatTitulo">📋 Solicitar Aprovação ao Pastor</h3>
+    <p id="modalPedidoPatBem" style="color:var(--gold);margin-bottom:15px;font-weight:bold;"></p>
+    <div class="field" id="campoNovaLoc" style="display:none;"><label>Nova Localização *</label><input id="pedNovaLoc" placeholder="Ex: Sala dos Jovens"></div>
+    <div class="field" id="campoMembroEmp" style="display:none;"><label>Membro (Apenas com Dízimo Validado este mês) *</label><select id="pedMembroId"></select></div>
+    <div class="field" id="campoDataDev" style="display:none;"><label>Data Prevista de Devolução *</label><input type="date" id="pedDataDev"></div>
+    <div class="field"><label>Motivo / Observação *</label><textarea id="pedMotivo" style="min-height:70px;" placeholder="Explique o motivo ao Pastor..."></textarea></div>
+    <div style="display:flex;gap:10px;justify-content:flex-end">
+      <button class="btn btn-outline" onclick="document.getElementById('modalPedidoPat').style.display='none'">Cancelar</button>
+      <button class="btn btn-primary" onclick="enviarPedidoPatPastor()">📤 Enviar Pedido</button>
     </div>
   </div>
 </div>
@@ -658,7 +747,7 @@ function section(name, btn) {
   document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
   document.getElementById('section-' + name).classList.add('active');
   btn.classList.add('active');
-  const titles = {sobre:['Sobre','Editar informação'],pastor:['Pastor','Gerir pastores'],departamentos:['Grupo/Departamento','Gerir grupos/departamentos e sectores'],membros:['Membros','Gerir todos os membros'],eventos:['Eventos','Agenda'],avisos:['Avisos','Comunicados'],galeria:['Galeria','Álbuns e Fotos'],ofertas:['Ofertas','Ver e validar'],contas:['Contas Bancárias','Gerir IBANs e Multicaixas'],relatorios:['Relatórios','Visão Global da Igreja'],chat:['Chat','Moderação de Mensagens'],midia:['Mídia','Gerir Vídeos, Áudios e Live'],tema:['Tema','Personalizar aparência']};
+  const titles = {sobre:['Sobre','Editar informação'],pastor:['Pastor','Gerir pastores'],departamentos:['Grupo/Departamento','Gerir grupos/departamentos e sectores'],membros:['Membros','Gerir todos os membros'],eventos:['Eventos','Agenda'],avisos:['Avisos','Comunicados'],galeria:['Galeria','Álbuns e Fotos'],ofertas:['Ofertas','Ver e validar'],contas:['Contas Bancárias','Gerir IBANs e Multicaixas'],relatorios:['Relatórios','Visão Global da Igreja'],chat:['Chat','Moderação de Mensagens'],midia:['Mídia','Gerir Vídeos, Áudios e Live'],tema:['Tema','Personalizar aparência'],patrimonio:['Património','Gerir bens e pedidos de aprovação']};
   document.getElementById('pageTitle').textContent = titles[name][0];
   document.getElementById('pageSub').textContent = titles[name][1];
 
@@ -673,10 +762,11 @@ function section(name, btn) {
   if (name === 'relatorios') document.getElementById('areaRelatorio').style.display = 'none';
   if (name === 'tema') { carregarTema(); carregarPreviewHero(); }
   if (name === 'chat') { 
-  document.getElementById('listaMensagensModeracao').innerHTML = '<div class="empty">Nenhuma mensagem carregada.</div>';
-  carregarDepartamentos(); // Carrega os departamentos para o dropdown do chat
-}
+    document.getElementById('listaMensagensModeracao').innerHTML = '<div class="empty">Nenhuma mensagem carregada.</div>';
+    carregarDepartamentos();
+  }
   if (name === 'midia') { carregarMidiaAdmin(); carregarEstadoLive(); }
+  if (name === 'patrimonio') { cancelarEdicaoPat(); carregarPatrimonioAdmin(); }
 }
 
 function logout() {
@@ -1553,6 +1643,7 @@ async function carregarMembros() {
     <option value="Pastor" ${m.cargo === 'Pastor' ? 'selected' : ''}>Pastor</option>
     <option value="Secretário" ${m.cargo === 'Secretário' ? 'selected' : ''}>Secretário</option>
     <option value="Financeiro" ${m.cargo === 'Financeiro' ? 'selected' : ''}>Financeiro</option>
+    <option value="Gestor de Património" ${m.cargo === 'Gestor de Património' ? 'selected' : ''}>Gestor de Património</option>
     <option value="Líder de Departamento" ${m.cargo === 'Líder de Departamento' ? 'selected' : ''}>Líder de Departamento</option>
     <option value="Líder de Sector" ${m.cargo === 'Líder de Sector' ? 'selected' : ''}>Líder de Sector</option>
     <option value="Madre" ${m.cargo === 'Madre' ? 'selected' : ''}>Madre</option>
@@ -1572,6 +1663,7 @@ async function carregarMembros() {
                 <button class="btn btn-outline" style="padding:5px 10px;font-size:12px" onclick="abrirModalSectores(${m.id}, '${m.nome.replace(/'/g,"\\'")}', [${(m.sectores||[]).map(s=>s.id)}])">Sectores</button>
                 <button class="btn btn-primary" style="padding:5px 10px;font-size:12px; background:#3b82f6" onclick="criarPerfilPublico('${m.nome.replace(/'/g,"\\'")}', '${m.email}')">🌐 Criar Perfil</button>
                 <button class="btn btn-primary" style="padding:5px 10px;font-size:12px; background:#facc15; color:#020617;" onclick="promoverMembro(${m.id}, '${m.nome.replace(/'/g,"\\'")}')">⬆️ Promover</button>
+                <button class="btn btn-outline" style="padding:5px 10px;font-size:12px;" onclick="darAcessoPatrimonio(${m.id}, '${m.nome.replace(/'/g,"\\'")}')">🏛️ Acesso Pat.</button>
                 <button class="btn btn-primary" style="padding:5px 10px;font-size:12px" onclick="redefinirSenha(${m.id})">🔑</button>
                 <button class="btn btn-danger" style="padding:5px 10px;font-size:12px" onclick="eliminarMembro(${m.id})">🗑️</button>
               </td>
@@ -2209,6 +2301,201 @@ async function mudarDepartamentoMembro(membroId, departamentoId) {
     toast(e.message, 'error');
   }
 }
+
+// --- PATRIMÓNIO ---
+let patEditandoId = null;
+let pedidoAtual = { patrimonioId: null, tipo: null };
+let listaBensCache = [];
+
+async function darAcessoPatrimonio(id, nome) {
+  if (!confirm('Dar acesso de Gestor de Património a ' + nome + '?')) return;
+  try {
+    const r = await fetch(API + '/membros/' + id + '/promover', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ cargo: 'Gestor de Património', role: 'patrimonio' })
+    });
+    if (!r.ok) throw new Error('Erro ao atribuir acesso');
+    toast(nome + ' agora pode aceder ao Painel do Património!', 'success');
+    carregarMembros();
+  } catch (e) { toast(e.message, 'error'); }
+}
+
+async function carregarPatrimonioAdmin() {
+  try {
+    const [resBens, resPed] = await Promise.all([
+      fetch(API + '/patrimonio/igreja/' + igrejaAtual.id),
+      fetch(API + '/patrimonio/igreja/' + igrejaAtual.id + '/pedidos?status=PENDENTE')
+    ]);
+    const bens = await resBens.json();
+    const pedidos = await resPed.json();
+    listaBensCache = bens;
+
+    const ativos = bens.filter(b => b.status === 'ATIVO');
+    const emprestados = bens.filter(b => b.status === 'EMPRESTADO');
+    const valorTotal = bens.filter(b => b.status !== 'ABATIDO').reduce((acc, b) => acc + (b.valor || 0), 0);
+
+    document.getElementById('patAtivos').textContent = ativos.length;
+    document.getElementById('patValorTotal').textContent = valorTotal.toLocaleString('pt-AO') + ' Kz';
+    document.getElementById('patEmprestados').textContent = emprestados.length;
+    document.getElementById('patPendentes').textContent = pedidos.length;
+
+    const div = document.getElementById('listaPatrimonioAdmin');
+    if (!bens.length) { div.innerHTML = 'Nenhum bem registado.'; return; }
+
+    let rows = '';
+    bens.forEach(b => {
+      let badge = b.status === 'ATIVO' ? 'Ativo' : (b.status === 'EMPRESTADO' ? 'Emprestado (' + (b.emprestadoPara ? b.emprestadoPara.nome : '') + ')' : 'Abatido');
+      let acoes = '';
+      if (b.status !== 'ABATIDO') {
+        acoes += '<button class="btn btn-outline" style="padding:4px 8px;font-size:11px" onclick="editarBemPat(' + b.id + ')">Editar</button> ';
+        acoes += '<button class="btn btn-outline" style="padding:4px 8px;font-size:11px" onclick="abrirModalPedidoPat(' + b.id + ', \'MOVIMENTACAO\')">Mover</button> ';
+        if (b.status === 'ATIVO') {
+          acoes += '<button class="btn btn-primary" style="padding:4px 8px;font-size:11px" onclick="abrirModalPedidoPat(' + b.id + ', \'EMPRESTIMO\')">Emprestar</button> ';
+        } else if (b.status === 'EMPRESTADO') {
+          acoes += '<button class="btn btn-success" style="padding:4px 8px;font-size:11px" onclick="devolverBemPat(' + b.id + ')">Devolver</button> ';
+        }
+        acoes += '<button class="btn btn-danger" style="padding:4px 8px;font-size:11px" onclick="abrirModalPedidoPat(' + b.id + ', \'ABATE\')">Abater</button>';
+      }
+      rows += '<tr><td><strong>' + b.nome + '</strong></td><td>' + b.categoria + '</td><td>' + b.localizacao + '</td><td>' + (b.valor || 0).toLocaleString('pt-AO') + ' Kz</td><td>' + badge + '</td><td>' + acoes + '</td></tr>';
+    });
+    div.innerHTML = '<table><thead><tr><th>Bem</th><th>Categoria</th><th>Local</th><th>Valor</th><th>Estado</th><th>Ações</th></tr></thead><tbody>' + rows + '</tbody></table>';
+  } catch (e) { toast('Erro ao carregar património', 'error'); }
+}
+
+async function salvarBemPatrimonio() {
+  const nome = document.getElementById('patNome').value.trim();
+  const localizacao = document.getElementById('patLocal').value.trim();
+  const valor = document.getElementById('patValor').value;
+  if (!nome || !localizacao || !valor) return toast('Preencha nome, localização e valor', 'error');
+
+  const payload = {
+    nome,
+    categoria: document.getElementById('patCategoria').value,
+    localizacao,
+    valor: Number(valor),
+    numeroSerie: document.getElementById('patSerie').value.trim(),
+    dataAquisicao: document.getElementById('patData').value || null,
+    estado: document.getElementById('patEstado').value,
+    responsavel: document.getElementById('patResp').value.trim()
+  };
+
+  try {
+    const url = patEditandoId ? API + '/patrimonio/' + patEditandoId : API + '/patrimonio/igreja/' + igrejaAtual.id;
+    const r = await fetch(url, {
+      method: patEditandoId ? 'PUT' : 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    if (!r.ok) throw new Error('Erro ao guardar bem');
+    toast(patEditandoId ? 'Bem atualizado!' : 'Bem adicionado!', 'success');
+    cancelarEdicaoPat();
+    carregarPatrimonioAdmin();
+  } catch (e) { toast(e.message, 'error'); }
+}
+
+function editarBemPat(id) {
+  const b = listaBensCache.find(x => x.id === id);
+  if (!b) return;
+  patEditandoId = id;
+  document.getElementById('patNome').value = b.nome;
+  document.getElementById('patCategoria').value = b.categoria;
+  document.getElementById('patLocal').value = b.localizacao;
+  document.getElementById('patValor').value = b.valor;
+  document.getElementById('patSerie').value = b.numeroSerie || '';
+  document.getElementById('patData').value = b.dataAquisicao ? b.dataAquisicao.split('T')[0] : '';
+  document.getElementById('patEstado').value = b.estado || 'Bom';
+  document.getElementById('patResp').value = b.responsavel || '';
+  document.getElementById('formPatTitulo').textContent = 'Editar Bem';
+  document.getElementById('btnSalvarPat').textContent = 'Atualizar Bem';
+  document.getElementById('btnCancelarPat').style.display = 'block';
+}
+
+function cancelarEdicaoPat() {
+  patEditandoId = null;
+  document.getElementById('formPatTitulo').textContent = 'Adicionar Novo Bem';
+  document.getElementById('btnSalvarPat').textContent = 'Guardar Bem';
+  document.getElementById('btnCancelarPat').style.display = 'none';
+  ['patNome','patLocal','patValor','patSerie','patData','patResp'].forEach(id => document.getElementById(id).value = '');
+}
+
+async function abrirModalPedidoPat(patrimonioId, tipo) {
+  const bem = listaBensCache.find(b => b.id === patrimonioId);
+  pedidoAtual = { patrimonioId, tipo };
+  document.getElementById('modalPedidoPatBem').textContent = 'Bem: ' + bem.nome + ' (' + bem.localizacao + ')';
+  document.getElementById('pedMotivo').value = '';
+  document.getElementById('campoNovaLoc').style.display = tipo === 'MOVIMENTACAO' ? 'block' : 'none';
+  document.getElementById('campoMembroEmp').style.display = tipo === 'EMPRESTIMO' ? 'block' : 'none';
+  document.getElementById('campoDataDev').style.display = tipo === 'EMPRESTIMO' ? 'block' : 'none';
+
+  const titulos = { MOVIMENTACAO: 'Pedir Movimentação ao Pastor', EMPRESTIMO: 'Pedir Empréstimo ao Pastor', ABATE: 'Pedir Abate ao Pastor' };
+  document.getElementById('modalPedidoPatTitulo').textContent = titulos[tipo];
+
+  if (tipo === 'EMPRESTIMO') {
+    const sel = document.getElementById('pedMembroId');
+    sel.innerHTML = '<option value="">A verificar dizimistas...</option>';
+    const r = await fetch(API + '/patrimonio/igreja/' + igrejaAtual.id + '/aptos-emprestimo');
+    const aptos = await r.json();
+    sel.innerHTML = aptos.length
+      ? aptos.map(m => '<option value="' + m.id + '">' + m.nome + '</option>').join('')
+      : '<option value="">Nenhum membro com dízimo validado este mês</option>';
+  }
+  document.getElementById('modalPedidoPat').style.display = 'grid';
+}
+
+async function enviarPedidoPatPastor() {
+  const motivo = document.getElementById('pedMotivo').value.trim();
+  if (!motivo) return toast('Escreva o motivo para o Pastor', 'error');
+
+  const payload = {
+    patrimonioId: pedidoAtual.patrimonioId,
+    tipo: pedidoAtual.tipo,
+    solicitadoPor: 'Subadmin',
+    novaLocalizacao: document.getElementById('pedNovaLoc').value.trim(),
+    membroId: document.getElementById('pedMembroId').value || null,
+    dataDevolucaoPrev: document.getElementById('pedDataDev').value || null,
+    motivo
+  };
+
+  if (pedidoAtual.tipo === 'MOVIMENTACAO' && !payload.novaLocalizacao) return toast('Indique a nova localização', 'error');
+  if (pedidoAtual.tipo === 'EMPRESTIMO' && (!payload.membroId || !payload.dataDevolucaoPrev)) return toast('Selecione o membro e a data de devolução', 'error');
+
+  try {
+    const r = await fetch(API + '/patrimonio/igreja/' + igrejaAtual.id + '/pedidos', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    if (!r.ok) throw new Error('Erro ao enviar pedido');
+    toast('Pedido enviado para aprovação do Pastor!', 'success');
+    document.getElementById('modalPedidoPat').style.display = 'none';
+    carregarPatrimonioAdmin();
+  } catch (e) { toast(e.message, 'error'); }
+}
+
+async function devolverBemPat(id) {
+  if (!confirm('Confirmar que este bem foi devolvido à igreja?')) return;
+  try {
+    await fetch(API + '/patrimonio/' + id + '/devolver', { method: 'PUT' });
+    toast('Devolução registada!', 'success');
+    carregarPatrimonioAdmin();
+  } catch (e) { toast('Erro ao devolver', 'error'); }
+}
+
+function imprimirRelatorioPat(tipo) {
+  let dados = listaBensCache;
+  let titulo = 'Inventário Completo de Património';
+  if (tipo === 'emprestados') { dados = listaBensCache.filter(b => b.status === 'EMPRESTADO'); titulo = 'Relatório de Bens Emprestados'; }
+  if (tipo === 'abates') { dados = listaBensCache.filter(b => b.status === 'ABATIDO'); titulo = 'Histórico de Abates'; }
+
+  const win = window.open('', '_blank');
+  let linhas = dados.map(b => '<tr><td>' + b.nome + '</td><td>' + b.categoria + '</td><td>' + b.localizacao + '</td><td>' + (b.valor || 0).toLocaleString('pt-AO') + ' Kz</td><td>' + b.status + '</td></tr>').join('');
+  win.document.write('<html><head><title>' + titulo + '</title><style>body{font-family:sans-serif;padding:30px}table{width:100%;border-collapse:collapse;margin-top:20px}th,td{border:1px solid #ccc;padding:8px;text-align:left}th{background:#020617;color:#fff}</style></head><body><h2>' + igrejaAtual.nome + ' - ' + titulo + '</h2><table><thead><tr><th>Bem</th><th>Categoria</th><th>Local</th><th>Valor</th><th>Estado</th></tr></thead><tbody>' + linhas + '</tbody></table></body></html>');
+  win.document.close();
+  win.print();
+}
+
+
 initLogin();
 </script>
 </body>

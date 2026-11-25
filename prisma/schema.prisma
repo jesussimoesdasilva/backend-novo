@@ -30,6 +30,9 @@ model Igreja {
   adminTelefone   String?
   adminBi         String?
   isCatolica Boolean @default(false)
+  patrimonios     Patrimonio[]
+  pedidosPatrimonio PedidoPatrimonio[]
+
 
   // NOVOS CAMPOS DA LIVE
   liveAtiva       Boolean  @default(false)
@@ -82,6 +85,9 @@ model Membro {
   status          String   @default("PENDENTE")
   role            String   @default("member")
   ultimaAtividade DateTime?
+  bensEmprestados    Patrimonio[]       @relation("BemEmprestadoMembro")
+  pedidosPatrimonio  PedidoPatrimonio[] @relation("PedidosDoMembro")
+
   
   departamentoId  Int?
   departamento    Departamento? @relation("MembrosDoDepartamento", fields: [departamentoId], references: [id])
@@ -368,4 +374,66 @@ model AdminMaster {
   telefone  String?
   bi        String?
   criadoEm  DateTime @default(now())
+}
+
+// ==========================================
+// MÓDULO DE PATRIMÓNIO (BENS E APROVAÇÕES)
+// ==========================================
+model Patrimonio {
+  id              Int      @id @default(autoincrement())
+  igrejaId        Int
+  igreja          Igreja   @relation(fields: [igrejaId], references: [id], onDelete: Cascade)
+  
+  nome            String
+  categoria       String   // Mobiliário, Equipamento, Veículos, Imóveis
+  localizacao     String
+  valor           Float
+  numeroSerie     String?
+  dataAquisicao   DateTime?
+  estado          String   @default("Bom") // Novo, Bom, Danificado
+  responsavel     String?
+  fotoUrl         String?
+  
+  status          String   @default("ATIVO") // ATIVO, EMPRESTADO, ABATIDO
+  motivoAbate     String?
+  dataAbate       DateTime?
+  aprovadoPor     String?  // Nome do Pastor que aprovou o abate
+  
+  // Dados de Empréstimo Atual
+  emprestadoParaId Int?
+  emprestadoPara   Membro?  @relation("BemEmprestadoMembro", fields: [emprestadoParaId], references: [id], onDelete: SetNull)
+  dataEmprestimo   DateTime?
+  dataDevolucaoPrev DateTime?
+  
+  pedidos         PedidoPatrimonio[]
+  criadoEm        DateTime @default(now())
+  atualizadoEm    DateTime @updatedAt
+
+  @@index([igrejaId])
+}
+
+model PedidoPatrimonio {
+  id                Int      @id @default(autoincrement())
+  igrejaId          Int
+  igreja            Igreja   @relation(fields: [igrejaId], references: [id], onDelete: Cascade)
+  
+  patrimonioId      Int
+  patrimonio        Patrimonio @relation(fields: [patrimonioId], references: [id], onDelete: Cascade)
+  
+  tipo              String   // MOVIMENTACAO, EMPRESTIMO, ABATE
+  solicitadoPor     String   // Nome do Subadmin ou Gestor que pediu
+  
+  // Campos específicos dependendo do tipo de pedido
+  novaLocalizacao   String?  // Usado na MOVIMENTACAO
+  membroId          Int?     // Usado no EMPRESTIMO
+  membro            Membro?  @relation("PedidosDoMembro", fields: [membroId], references: [id], onDelete: SetNull)
+  dataDevolucaoPrev DateTime? // Usado no EMPRESTIMO
+  motivo            String?  // Usado no ABATE ou observação de empréstimo
+  
+  status            String   @default("PENDENTE") // PENDENTE, APROVADO, NEGADO
+  respondidoPor     String?  // Nome do Pastor
+  criadoEm          DateTime @default(now())
+  respondidoEm      DateTime?
+
+  @@index([igrejaId])
 }

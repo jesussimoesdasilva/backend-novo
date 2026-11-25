@@ -1,0 +1,724 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Painel do Património</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+    body { background: #020617; color: #f8fafc; min-height: 100vh; }
+    
+    /* LOGIN */
+    .login-wrap { display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 20px; }
+    .login-box { background: #0f172a; border: 1px solid rgba(212, 160, 23, 0.3); padding: 40px 30px; border-radius: 16px; width: 100%; max-width: 400px; text-align: center; box-shadow: 0 20px 40px rgba(0,0,0,0.6); }
+    .login-box h2 { color: #facc15; margin-bottom: 6px; font-size: 24px; }
+    .login-box p { color: #94a3b8; font-size: 14px; margin-bottom: 24px; }
+    .form-group { margin-bottom: 16px; text-align: left; }
+    .form-group label { display: block; font-size: 13px; color: #cbd5e1; margin-bottom: 6px; font-weight: 600; }
+    .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid #334155; background: #1e293b; color: #fff; font-size: 14px; outline: none; }
+    .form-group input:focus, .form-group select:focus { border-color: #facc15; }
+    
+    .btn { padding: 12px 18px; border-radius: 10px; border: none; font-weight: 700; cursor: pointer; font-size: 14px; transition: 0.2s; display: inline-flex; align-items: center; justify-content: center; gap: 6px; }
+    .btn-primary { background: #d4a017; color: #020617; }
+    .btn-primary:hover { background: #facc15; }
+    .btn-success { background: #059669; color: #fff; }
+    .btn-info { background: #2563eb; color: #fff; }
+    .btn-danger { background: #dc2626; color: #fff; }
+    .btn-secondary { background: #334155; color: #fff; }
+    .btn-sm { padding: 6px 10px; font-size: 12px; border-radius: 8px; }
+
+    /* LAYOUT PRINCIPAL */
+    .app-wrap { display: none; min-height: 100vh; }
+    .topbar { background: #071b36; border-bottom: 1px solid rgba(212, 160, 23, 0.25); padding: 16px 24px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; }
+    .brand { display: flex; align-items: center; gap: 12px; }
+    .brand-icon { font-size: 28px; }
+    .brand h1 { font-size: 18px; color: #facc15; }
+    .brand span { font-size: 12px; color: #94a3b8; display: block; }
+    
+    .container { max-width: 1200px; margin: 0 auto; padding: 24px; }
+    
+    /* CARDS RESUMO */
+    .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-bottom: 24px; }
+    .stat-card { background: #0f172a; border: 1px solid #1e293b; padding: 20px; border-radius: 14px; }
+    .stat-card small { color: #94a3b8; font-size: 13px; display: block; margin-bottom: 6px; }
+    .stat-card strong { font-size: 26px; color: #facc15; }
+
+    /* BARRA DE AÇÕES */
+    .toolbar { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 20px; background: #0f172a; padding: 16px; border-radius: 14px; border: 1px solid #1e293b; }
+    .filters { display: flex; gap: 10px; flex-wrap: wrap; }
+    .filters select, .filters input { padding: 10px 12px; border-radius: 8px; border: 1px solid #334155; background: #1e293b; color: #fff; font-size: 13px; }
+
+    /* TABELA */
+    .card { background: #0f172a; border: 1px solid #1e293b; border-radius: 14px; padding: 20px; overflow-x: auto; margin-bottom: 24px; }
+    table { width: 100%; border-collapse: collapse; font-size: 14px; }
+    th { text-align: left; padding: 12px; background: #1e293b; color: #facc15; font-size: 12px; text-transform: uppercase; }
+    td { padding: 12px; border-bottom: 1px solid #1e293b; vertical-align: middle; }
+    .badge { padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; display: inline-block; }
+    .badge-ativo { background: rgba(16, 185, 129, 0.2); color: #34d399; }
+    .badge-emprestado { background: rgba(59, 130, 246, 0.2); color: #60a5fa; }
+    .badge-abatido { background: rgba(239, 68, 68, 0.2); color: #f87171; }
+    .badge-pendente { background: rgba(250, 204, 21, 0.2); color: #facc15; }
+
+    /* MODAIS */
+    .modal-bg { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.75); z-index: 1000; align-items: center; justify-content: center; padding: 16px; }
+    .modal-box { background: #0f172a; border: 1px solid rgba(212, 160, 23, 0.4); border-radius: 16px; width: 100%; max-width: 500px; max-height: 90vh; overflow-y: auto; padding: 24px; }
+    .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; border-bottom: 1px solid #1e293b; padding-bottom: 12px; }
+    .modal-header h3 { color: #facc15; font-size: 18px; }
+    .close-btn { background: none; border: none; color: #94a3b8; font-size: 22px; cursor: pointer; }
+
+    /* ÁREA DE RELATÓRIO IMPRIMÍVEL */
+    .report-paper { background: #ffffff; color: #0f172a; padding: 30px; border-radius: 12px; margin-top: 20px; }
+    .report-paper th { background: #020617; color: #fff; }
+    .report-paper td { border-bottom: 1px solid #cbd5e1; color: #0f172a; }
+
+    @media print {
+      body * { visibility: hidden; }
+      #areaRelatorio, #areaRelatorio * { visibility: visible; }
+      #areaRelatorio { position: absolute; left: 0; top: 0; width: 100%; }
+      .no-print { display: none !important; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- TELA DE LOGIN -->
+  <div id="loginSection" class="login-wrap">
+    <div class="login-box">
+      <div style="font-size: 40px; margin-bottom: 10px;">🏛️</div>
+      <h2 id="loginIgrejaNome">A carregar...</h2>
+      <p>Painel de Gestão de Património</p>
+      <div class="form-group">
+        <label>Email de Acesso</label>
+        <input type="email" id="loginEmail" placeholder="seuemail@exemplo.com" />
+      </div>
+      <div class="form-group">
+        <label>Senha</label>
+        <input type="password" id="loginSenha" placeholder="••••••••" />
+      </div>
+      <button class="btn btn-primary" style="width: 100%; margin-top: 8px;" onclick="fazerLogin()">🔐 Entrar no Património</button>
+      <p id="loginErro" style="color: #f87171; font-size: 13px; margin-top: 12px; display: none;"></p>
+    </div>
+  </div>
+
+  <!-- PAINEL PRINCIPAL -->
+  <div id="appSection" class="app-wrap">
+    <header class="topbar no-print">
+      <div class="brand">
+        <span class="brand-icon">🏛️</span>
+        <div>
+          <h1 id="topIgrejaNome">Igreja</h1>
+          <span id="topGestorNome">Gestor de Património</span>
+        </div>
+      </div>
+      <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+        <button class="btn btn-primary" onclick="abrirModalBem()">➕ Adicionar Bem</button>
+        <button class="btn btn-secondary" onclick="alternarVista('inventario')">📋 Inventário</button>
+        <button class="btn btn-secondary" onclick="alternarVista('pedidos')">⏳ Pedidos ao Pastor (<span id="badgePedidos">0</span>)</button>
+        <button class="btn btn-info" onclick="alternarVista('relatorios')">📊 Relatórios</button>
+        <button class="btn btn-danger" onclick="sair()">🚪 Sair</button>
+      </div>
+    </header>
+
+    <div class="container">
+      <!-- RESUMO -->
+      <div class="stats-grid no-print">
+        <div class="stat-card">
+          <small>🟢 Bens Ativos</small>
+          <strong id="statAtivos">0</strong>
+        </div>
+        <div class="stat-card">
+          <small>💰 Valor Total do Património</small>
+          <strong id="statValor">0 Kz</strong>
+        </div>
+        <div class="stat-card">
+          <small>🤝 Bens Emprestados</small>
+          <strong id="statEmprestados">0</strong>
+        </div>
+        <div class="stat-card">
+          <small>🟡 Pedidos Pendentes (Pastor)</small>
+          <strong id="statPendentes">0</strong>
+        </div>
+      </div>
+
+      <!-- VISTA 1: INVENTÁRIO -->
+      <div id="vistaInventario">
+        <div class="toolbar no-print">
+          <div class="filters">
+            <input type="text" id="filtroBusca" placeholder="🔍 Pesquisar bem..." oninput="renderizarTabela()" />
+            <select id="filtroCategoria" onchange="renderizarTabela()">
+              <option value="">Todas as Categorias</option>
+              <option value="Mobiliário">Mobiliário</option>
+              <option value="Equipamento">Equipamento</option>
+              <option value="Veículos">Veículos</option>
+              <option value="Imóveis">Imóveis</option>
+            </select>
+            <select id="filtroStatus" onchange="renderizarTabela()">
+              <option value="ATIVOS_E_EMP">Ativos e Emprestados</option>
+              <option value="ATIVO">Só Ativos</option>
+              <option value="EMPRESTADO">Só Emprestados</option>
+              <option value="ABATIDO">Abatidos (Histórico)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="card">
+          <table>
+            <thead>
+              <tr>
+                <th>Bem / Nº Série</th>
+                <th>Categoria</th>
+                <th>Estado</th>
+                <th>Localização / Posse</th>
+                <th>Valor</th>
+                <th>Status</th>
+                <th class="no-print">Ações</th>
+              </tr>
+            </thead>
+            <tbody id="tabelaBens">
+              <tr><td colspan="7" style="text-align:center; color:#94a3b8;">A carregar bens...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- VISTA 2: PEDIDOS ENVIADOS AO PASTOR -->
+      <div id="vistaPedidos" style="display: none;">
+        <div class="card">
+          <h3 style="color: #facc15; margin-bottom: 16px;">⏳ Histórico de Pedidos de Aprovação ao Pastor</h3>
+          <table>
+            <thead>
+              <tr>
+                <th>Data</th>
+                <th>Tipo</th>
+                <th>Bem</th>
+                <th>Detalhes</th>
+                <th>Solicitado Por</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="tabelaPedidos"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- VISTA 3: RELATÓRIOS -->
+      <div id="vistaRelatorios" style="display: none;">
+        <div class="card no-print">
+          <h3 style="color: #facc15; margin-bottom: 14px;">📊 Gerar Relatórios Oficiais de Património</h3>
+          <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+            <button class="btn btn-primary" onclick="gerarRelatorio('inventario')">📋 Inventário Completo</button>
+            <button class="btn btn-success" onclick="gerarRelatorio('valor')">💰 Valor por Categoria</button>
+            <button class="btn btn-info" onclick="gerarRelatorio('emprestados')">🤝 Bens Emprestados</button>
+            <button class="btn btn-danger" onclick="gerarRelatorio('abates')">🗑️ Histórico de Abates</button>
+          </div>
+        </div>
+        <div id="areaRelatorio" style="display: none;"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: ADICIONAR / EDITAR BEM -->
+  <div id="modalBem" class="modal-bg">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3 id="modalBemTitulo">➕ Adicionar Novo Bem</h3>
+        <button class="close-btn" onclick="fecharModais()">✕</button>
+      </div>
+      <input type="hidden" id="bemId" />
+      <div class="form-group">
+        <label>Nome do Item *</label>
+        <input type="text" id="bemNome" placeholder="Ex: Violão Yamaha / Cadeira" />
+      </div>
+      <div class="form-group">
+        <label>Categoria *</label>
+        <select id="bemCategoria">
+          <option value="Mobiliário">Mobiliário</option>
+          <option value="Equipamento">Equipamento</option>
+          <option value="Veículos">Veículos</option>
+          <option value="Imóveis">Imóveis</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Localização Atual *</label>
+        <input type="text" id="bemLocalizacao" placeholder="Ex: Templo Principal, Sala do Louvor" />
+      </div>
+      <div class="form-group">
+        <label>Valor Estimado (Kz) *</label>
+        <input type="number" id="bemValor" placeholder="Ex: 50000" />
+      </div>
+      <div class="form-group">
+        <label>Estado de Conservação *</label>
+        <select id="bemEstado">
+          <option value="Novo">Novo</option>
+          <option value="Bom" selected>Bom</option>
+          <option value="Danificado">Danificado</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Nº de Série (Opcional)</label>
+        <input type="text" id="bemSerie" placeholder="Ex: SN-98765" />
+      </div>
+      <div class="form-group">
+        <label>Data de Aquisição (Opcional)</label>
+        <input type="date" id="bemData" />
+      </div>
+      <div class="form-group">
+        <label>Responsável pelo Setor/Bem (Opcional)</label>
+        <input type="text" id="bemResponsavel" placeholder="Nome do responsável" />
+      </div>
+      <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 16px;">
+        <button class="btn btn-secondary" onclick="fecharModais()">Cancelar</button>
+        <button class="btn btn-primary" onclick="salvarBem()">💾 Guardar Bem</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: AÇÕES (MOVER / EMPRESTAR / ABATER) -->
+  <div id="modalAcao" class="modal-bg">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3 id="modalAcaoTitulo">📦 Ação sobre o Bem</h3>
+        <button class="close-btn" onclick="fecharModais()">✕</button>
+      </div>
+      <input type="hidden" id="acaoBemId" />
+      <p style="font-size: 13px; color: #94a3b8; margin-bottom: 16px;">
+        Todas as movimentações, empréstimos e abates exigem aprovação do Pastor.
+      </p>
+      <div class="form-group">
+        <label>Escolha a Ação *</label>
+        <select id="acaoTipo" onchange="atualizarCamposAcao()">
+          <option value="MOVIMENTACAO">📍 Mover de Local</option>
+          <option value="EMPRESTIMO">🤝 Emprestar a Membro (Dízimos em dia)</option>
+          <option value="ABATE">🗑️ Abater (Vendido / Perdido / Inutilizado)</option>
+        </select>
+      </div>
+
+      <!-- Campo Movimentação -->
+      <div id="campoMover" class="form-group">
+        <label>Nova Localização *</label>
+        <input type="text" id="acaoNovaLocalizacao" placeholder="Ex: Anexo Jovens, Gabinete Pastoral" />
+      </div>
+
+      <!-- Campos Empréstimo -->
+      <div id="campoEmprestar" style="display: none;">
+        <div class="form-group">
+          <label>Membro (Apenas com dízimos pagos este mês) *</label>
+          <select id="acaoMembroId">
+            <option value="">A carregar membros aptos...</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Data Prevista de Devolução *</label>
+          <input type="date" id="acaoDataDevolucao" />
+        </div>
+      </div>
+
+      <!-- Campo Motivo / Observação -->
+      <div class="form-group">
+        <label id="labelMotivo">Observações (Opcional)</label>
+        <input type="text" id="acaoMotivo" placeholder="Descreva o motivo..." />
+      </div>
+
+      <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 16px;">
+        <button class="btn btn-secondary" onclick="fecharModais()">Cancelar</button>
+        <button class="btn btn-primary" onclick="enviarPedidoPastor()">📨 Pedir Aprovação ao Pastor</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const API = '/api';
+    let igrejaAtual = null;
+    let utilizadorAtual = null;
+    let listaBens = [];
+    let listaPedidos = [];
+
+    // Obter slug da URL (/igreja/:slug/patrimonio)
+    const partesUrl = window.location.pathname.split('/');
+    const slug = partesUrl[2];
+
+    async function init() {
+      try {
+        const res = await fetch(`${API}/igrejas/slug/${slug}`);
+        igrejaAtual = await res.json();
+        document.getElementById('loginIgrejaNome').textContent = igrejaAtual.nome || 'Igreja';
+        document.getElementById('topIgrejaNome').textContent = igrejaAtual.nome || 'Igreja';
+
+        const salvo = localStorage.getItem('patrimonio_user_' + slug);
+        if (salvo) {
+          utilizadorAtual = JSON.parse(salvo);
+          entrarNoPainel();
+        }
+      } catch (e) {
+        document.getElementById('loginIgrejaNome').textContent = 'Erro ao carregar igreja';
+      }
+    }
+
+    async function fazerLogin() {
+      const email = document.getElementById('loginEmail').value.trim();
+      const password = document.getElementById('loginSenha').value.trim();
+      const erroEl = document.getElementById('loginErro');
+      erroEl.style.display = 'none';
+
+      if (!email || !password) {
+        erroEl.textContent = 'Preencha email e senha.';
+        erroEl.style.display = 'block';
+        return;
+      }
+
+      try {
+        // 1. Tenta login como Membro promovido a Gestor de Património
+        const resMembro = await fetch(`${API}/membros/login`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password, igrejaId: igrejaAtual.id })
+        });
+
+        if (resMembro.ok) {
+          const dados = await resMembro.json();
+          const membro = dados.membro || dados;
+          if (membro.role === 'patrimonio' || membro.cargo === 'Gestor de Património') {
+            utilizadorAtual = { nome: membro.nome, email: membro.email, tipo: 'Gestor' };
+            localStorage.setItem('patrimonio_user_' + slug, JSON.stringify(utilizadorAtual));
+            entrarNoPainel();
+            return;
+          }
+        }
+
+        // 2. Verifica se é o Subadmin da Igreja
+        if (igrejaAtual.subadminEmail === email && igrejaAtual.subadminSenha === password) {
+          utilizadorAtual = { nome: 'Subadmin (' + igrejaAtual.nome + ')', email, tipo: 'Subadmin' };
+          localStorage.setItem('patrimonio_user_' + slug, JSON.stringify(utilizadorAtual));
+          entrarNoPainel();
+          return;
+        }
+
+        erroEl.textContent = 'Acesso negado. Apenas Subadmin ou Membro promovido a Gestor de Património.';
+        erroEl.style.display = 'block';
+      } catch (e) {
+        erroEl.textContent = 'Erro de ligação ao servidor.';
+        erroEl.style.display = 'block';
+      }
+    }
+
+    function entrarNoPainel() {
+      document.getElementById('loginSection').style.display = 'none';
+      document.getElementById('appSection').style.display = 'block';
+      document.getElementById('topGestorNome').textContent = `${utilizadorAtual.tipo}: ${utilizadorAtual.nome}`;
+      carregarDados();
+    }
+
+    function sair() {
+      localStorage.removeItem('patrimonio_user_' + slug);
+      location.reload();
+    }
+
+    async function carregarDados() {
+      const [resBens, resPedidos] = await Promise.all([
+        fetch(`${API}/patrimonio/igreja/${igrejaAtual.id}`),
+        fetch(`${API}/patrimonio/igreja/${igrejaAtual.id}/pedidos`)
+      ]);
+      listaBens = await resBens.json();
+      listaPedidos = await resPedidos.json();
+
+      atualizarResumo();
+      renderizarTabela();
+      renderizarPedidos();
+    }
+
+    function atualizarResumo() {
+      const ativos = listaBens.filter(b => b.status === 'ATIVO' || b.status === 'EMPRESTADO');
+      const emprestados = listaBens.filter(b => b.status === 'EMPRESTADO');
+      const valorTotal = ativos.reduce((acc, b) => acc + (b.valor || 0), 0);
+      const pendentes = listaPedidos.filter(p => p.status === 'PENDENTE');
+
+      document.getElementById('statAtivos').textContent = ativos.length;
+      document.getElementById('statValor').textContent = valorTotal.toLocaleString('pt-AO') + ' Kz';
+      document.getElementById('statEmprestados').textContent = emprestados.length;
+      document.getElementById('statPendentes').textContent = pendentes.length;
+      document.getElementById('badgePedidos').textContent = pendentes.length;
+    }
+
+    function renderizarTabela() {
+      const busca = document.getElementById('filtroBusca').value.toLowerCase();
+      const cat = document.getElementById('filtroCategoria').value;
+      const st = document.getElementById('filtroStatus').value;
+
+      const filtrados = listaBens.filter(b => {
+        const matchNome = b.nome.toLowerCase().includes(busca) || (b.numeroSerie || '').toLowerCase().includes(busca);
+        const matchCat = !cat || b.categoria === cat;
+        let matchStatus = true;
+        if (st === 'ATIVOS_E_EMP') matchStatus = b.status === 'ATIVO' || b.status === 'EMPRESTADO';
+        else if (st) matchStatus = b.status === st;
+        return matchNome && matchCat && matchStatus;
+      });
+
+      const tbody = document.getElementById('tabelaBens');
+      if (filtrados.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; color:#94a3b8;">Nenhum bem encontrado.</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = filtrados.map(b => {
+        let badge = '<span class="badge badge-ativo">Ativo</span>';
+        let localTexto = b.localizacao;
+
+        if (b.status === 'EMPRESTADO') {
+          badge = '<span class="badge badge-emprestado">Emprestado</span>';
+          localTexto = `🤝 Com: <strong>${b.emprestadoPara ? b.emprestadoPara.nome : 'Membro'}</strong>`;
+        } else if (b.status === 'ABATIDO') {
+          badge = '<span class="badge badge-abatido">Abatido</span>';
+          localTexto = `Motivo: ${b.motivoAbate || '-'}`;
+        }
+
+        const botoes = b.status === 'ABATIDO' ? '-' : `
+          <button class="btn btn-secondary btn-sm" onclick="editarBem(${b.id})" title="Editar">✏️</button>
+          <button class="btn btn-primary btn-sm" onclick="abrirModalAcao(${b.id})" title="Mover / Emprestar / Abater">📦</button>
+          ${b.status === 'EMPRESTADO' ? `<button class="btn btn-success btn-sm" onclick="registarDevolucao(${b.id})">↩️ Devolver</button>` : ''}
+        `;
+
+        return `
+          <tr>
+            <td><strong>${b.nome}</strong><br><small style="color:#94a3b8;">${b.numeroSerie || 'S/N'}</small></td>
+            <td>${b.categoria}</td>
+            <td>${b.estado}</td>
+            <td>${localTexto}</td>
+            <td><strong>${(b.valor || 0).toLocaleString('pt-AO')} Kz</strong></td>
+            <td>${badge}</td>
+            <td class="no-print" style="display:flex; gap:6px; flex-wrap:wrap;">${botoes}</td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function renderizarPedidos() {
+      const tbody = document.getElementById('tabelaPedidos');
+      if (listaPedidos.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; color:#94a3b8;">Nenhum pedido registado.</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = listaPedidos.map(p => {
+        let detalhe = '';
+        if (p.tipo === 'MOVIMENTACAO') detalhe = `Para: <strong>${p.novaLocalizacao}</strong>`;
+        if (p.tipo === 'EMPRESTIMO') detalhe = `Membro: <strong>${p.membro ? p.membro.nome : '-'}</strong>`;
+        if (p.tipo === 'ABATE') detalhe = `Motivo: ${p.motivo || '-'}`;
+
+        let badge = '<span class="badge badge-pendente">Pendente</span>';
+        if (p.status === 'APROVADO') badge = '<span class="badge badge-ativo">Aprovado</span>';
+        if (p.status === 'NEGADO') badge = '<span class="badge badge-abatido">Negado</span>';
+
+        return `
+          <tr>
+            <td>${new Date(p.criadoEm).toLocaleDateString('pt-PT')}</td>
+            <td><strong>${p.tipo}</strong></td>
+            <td>${p.patrimonio ? p.patrimonio.nome : '-'}</td>
+            <td>${detalhe}</td>
+            <td>${p.solicitadoPor}</td>
+            <td>${badge}</td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function alternarVista(vista) {
+      document.getElementById('vistaInventario').style.display = vista === 'inventario' ? 'block' : 'none';
+      document.getElementById('vistaPedidos').style.display = vista === 'pedidos' ? 'block' : 'none';
+      document.getElementById('vistaRelatorios').style.display = vista === 'relatorios' ? 'block' : 'none';
+    }
+
+    function abrirModalBem() {
+      document.getElementById('modalBemTitulo').textContent = '➕ Adicionar Novo Bem';
+      document.getElementById('bemId').value = '';
+      document.getElementById('bemNome').value = '';
+      document.getElementById('bemLocalizacao').value = '';
+      document.getElementById('bemValor').value = '';
+      document.getElementById('bemSerie').value = '';
+      document.getElementById('bemData').value = '';
+      document.getElementById('bemResponsavel').value = '';
+      document.getElementById('modalBem').style.display = 'flex';
+    }
+
+    function editarBem(id) {
+      const bem = listaBens.find(b => b.id === id);
+      if (!bem) return;
+      document.getElementById('modalBemTitulo').textContent = '✏️ Editar Bem';
+      document.getElementById('bemId').value = bem.id;
+      document.getElementById('bemNome').value = bem.nome;
+      document.getElementById('bemCategoria').value = bem.categoria;
+      document.getElementById('bemLocalizacao').value = bem.localizacao;
+      document.getElementById('bemValor').value = bem.valor;
+      document.getElementById('bemEstado').value = bem.estado;
+      document.getElementById('bemSerie').value = bem.numeroSerie || '';
+      document.getElementById('bemData').value = bem.dataAquisicao ? bem.dataAquisicao.split('T')[0] : '';
+      document.getElementById('bemResponsavel').value = bem.responsavel || '';
+      document.getElementById('modalBem').style.display = 'flex';
+    }
+
+    async function salvarBem() {
+      const id = document.getElementById('bemId').value;
+      const body = {
+        nome: document.getElementById('bemNome').value.trim(),
+        categoria: document.getElementById('bemCategoria').value,
+        localizacao: document.getElementById('bemLocalizacao').value.trim(),
+        valor: document.getElementById('bemValor').value,
+        estado: document.getElementById('bemEstado').value,
+        numeroSerie: document.getElementById('bemSerie').value.trim(),
+        dataAquisicao: document.getElementById('bemData').value,
+        responsavel: document.getElementById('bemResponsavel').value.trim()
+      };
+
+      if (!body.nome || !body.localizacao || !body.valor) {
+        alert('Preencha Nome, Localização e Valor.');
+        return;
+      }
+
+      const url = id ? `${API}/patrimonio/${id}` : `${API}/patrimonio/igreja/${igrejaAtual.id}`;
+      const method = id ? 'PUT' : 'POST';
+
+      await fetch(url, {
+        method,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+      });
+
+      fecharModais();
+      carregarDados();
+    }
+
+    async function abrirModalAcao(id) {
+      const bem = listaBens.find(b => b.id === id);
+      if (!bem) return;
+      document.getElementById('acaoBemId').value = bem.id;
+      document.getElementById('modalAcaoTitulo').textContent = `📦 Ação: ${bem.nome}`;
+      document.getElementById('acaoTipo').value = 'MOVIMENTACAO';
+      document.getElementById('acaoNovaLocalizacao').value = '';
+      document.getElementById('acaoMotivo').value = '';
+      atualizarCamposAcao();
+      document.getElementById('modalAcao').style.display = 'flex';
+
+      // Carrega membros aptos (com dízimo pago no mês)
+      const res = await fetch(`${API}/patrimonio/igreja/${igrejaAtual.id}/aptos-emprestimo`);
+      const aptos = await res.json();
+      const select = document.getElementById('acaoMembroId');
+      if (aptos.length === 0) {
+        select.innerHTML = '<option value="">Nenhum membro com dízimo validado este mês</option>';
+      } else {
+        select.innerHTML = '<option value="">Selecione o membro...</option>' +
+          aptos.map(m => `<option value="${m.id}">${m.nome} (${m.telefone || 'S/ Tel'})</option>`).join('');
+      }
+    }
+
+    function atualizarCamposAcao() {
+      const tipo = document.getElementById('acaoTipo').value;
+      document.getElementById('campoMover').style.display = tipo === 'MOVIMENTACAO' ? 'block' : 'none';
+      document.getElementById('campoEmprestar').style.display = tipo === 'EMPRESTIMO' ? 'block' : 'none';
+      document.getElementById('labelMotivo').textContent = tipo === 'ABATE' ? 'Motivo do Abate (Vendido/Perdido) *' : 'Observações (Opcional)';
+    }
+
+    async function enviarPedidoPastor() {
+      const tipo = document.getElementById('acaoTipo').value;
+      const body = {
+        patrimonioId: document.getElementById('acaoBemId').value,
+        tipo,
+        solicitadoPor: utilizadorAtual.nome,
+        novaLocalizacao: document.getElementById('acaoNovaLocalizacao').value.trim(),
+        membroId: document.getElementById('acaoMembroId').value,
+        dataDevolucaoPrev: document.getElementById('acaoDataDevolucao').value,
+        motivo: document.getElementById('acaoMotivo').value.trim()
+      };
+
+      if (tipo === 'MOVIMENTACAO' && !body.novaLocalizacao) return alert('Indique a nova localização.');
+      if (tipo === 'EMPRESTIMO' && (!body.membroId || !body.dataDevolucaoPrev)) return alert('Selecione o membro apto e a data de devolução.');
+      if (tipo === 'ABATE' && !body.motivo) return alert('Indique o motivo do abate.');
+
+      await fetch(`${API}/patrimonio/igreja/${igrejaAtual.id}/pedidos`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+      });
+
+      alert('Pedido enviado para aprovação do Pastor!');
+      fecharModais();
+      carregarDados();
+    }
+
+    async function registarDevolucao(id) {
+      if (!confirm('Confirmar que o bem foi devolvido à igreja?')) return;
+      await fetch(`${API}/patrimonio/${id}/devolver`, { method: 'PUT' });
+      carregarDados();
+    }
+
+    function gerarRelatorio(tipo) {
+      const area = document.getElementById('areaRelatorio');
+      area.style.display = 'block';
+      const dataHoje = new Date().toLocaleDateString('pt-PT');
+      let html = '';
+
+      if (tipo === 'inventario') {
+        const ativos = listaBens.filter(b => b.status !== 'ABATIDO');
+        const total = ativos.reduce((acc, b) => acc + (b.valor || 0), 0);
+        html = `
+          <div class="report-paper">
+            <h2>Inventário Completo de Património — ${igrejaAtual.nome}</h2>
+            <p style="margin-bottom:16px;">Emitido em: ${dataHoje} | Total de Bens: <strong>${ativos.length}</strong> | Valor Total: <strong>${total.toLocaleString('pt-AO')} Kz</strong></p>
+            <table>
+              <thead><tr><th>Bem</th><th>Categoria</th><th>Estado</th><th>Localização</th><th>Valor</th></tr></thead>
+              <tbody>${ativos.map(b => `<tr><td>${b.nome}</td><td>${b.categoria}</td><td>${b.estado}</td><td>${b.localizacao}</td><td>${(b.valor||0).toLocaleString('pt-AO')} Kz</td></tr>`).join('')}</tbody>
+            </table>
+            <button class="btn btn-primary no-print" style="margin-top:20px;" onclick="window.print()">🖨️ Imprimir / PDF</button>
+          </div>`;
+      } else if (tipo === 'valor') {
+        const cats = ['Mobiliário', 'Equipamento', 'Veículos', 'Imóveis'];
+        const ativos = listaBens.filter(b => b.status !== 'ABATIDO');
+        html = `
+          <div class="report-paper">
+            <h2>Valor do Património por Categoria — ${igrejaAtual.nome}</h2>
+            <p style="margin-bottom:16px;">Emitido em: ${dataHoje}</p>
+            <table>
+              <thead><tr><th>Categoria</th><th>Quantidade</th><th>Valor Total</th></tr></thead>
+              <tbody>${cats.map(c => {
+                const itens = ativos.filter(b => b.categoria === c);
+                const soma = itens.reduce((acc, b) => acc + (b.valor || 0), 0);
+                return `<tr><td><strong>${c}</strong></td><td>${itens.length}</td><td>${soma.toLocaleString('pt-AO')} Kz</td></tr>`;
+              }).join('')}</tbody>
+            </table>
+            <button class="btn btn-primary no-print" style="margin-top:20px;" onclick="window.print()">🖨️ Imprimir / PDF</button>
+          </div>`;
+      } else if (tipo === 'emprestados') {
+        const emp = listaBens.filter(b => b.status === 'EMPRESTADO');
+        html = `
+          <div class="report-paper">
+            <h2>Relatório de Bens Emprestados — ${igrejaAtual.nome}</h2>
+            <p style="margin-bottom:16px;">Emitido em: ${dataHoje} | Total Emprestados: <strong>${emp.length}</strong></p>
+            <table>
+              <thead><tr><th>Bem</th><th>Membro</th><th>Data Empréstimo</th><th>Devolução Prevista</th></tr></thead>
+              <tbody>${emp.map(b => `<tr><td>${b.nome}</td><td>${b.emprestadoPara ? b.emprestadoPara.nome : '-'}</td><td>${b.dataEmprestimo ? new Date(b.dataEmprestimo).toLocaleDateString('pt-PT') : '-'}</td><td>${b.dataDevolucaoPrev ? new Date(b.dataDevolucaoPrev).toLocaleDateString('pt-PT') : '-'}</td></tr>`).join('')}</tbody>
+            </table>
+            <button class="btn btn-primary no-print" style="margin-top:20px;" onclick="window.print()">🖨️ Imprimir / PDF</button>
+          </div>`;
+      } else if (tipo === 'abates') {
+        const ab = listaBens.filter(b => b.status === 'ABATIDO');
+        html = `
+          <div class="report-paper">
+            <h2>Histórico de Bens Abatidos — ${igrejaAtual.nome}</h2>
+            <p style="margin-bottom:16px;">Emitido em: ${dataHoje} | Total Abatidos: <strong>${ab.length}</strong></p>
+            <table>
+              <thead><tr><th>Bem</th><th>Motivo</th><th>Data Abate</th><th>Aprovado Por</th></tr></thead>
+              <tbody>${ab.map(b => `<tr><td>${b.nome}</td><td>${b.motivoAbate || '-'}</td><td>${b.dataAbate ? new Date(b.dataAbate).toLocaleDateString('pt-PT') : '-'}</td><td>${b.aprovadoPor || '-'}</td></tr>`).join('')}</tbody>
+            </table>
+            <button class="btn btn-primary no-print" style="margin-top:20px;" onclick="window.print()">🖨️ Imprimir / PDF</button>
+          </div>`;
+      }
+      area.innerHTML = html;
+    }
+
+    function fecharModais() {
+      document.getElementById('modalBem').style.display = 'none';
+      document.getElementById('modalAcao').style.display = 'none';
+    }
+
+    init();
+  </script>
+</body>
+</html>

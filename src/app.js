@@ -26,6 +26,7 @@ app.use('/api/oracao', require('./routes/oracao.routes'));
 app.use('/api/midia', require('./routes/midia.routes'));
 app.use('/api/documentos', require('./routes/documento.routes'));
 app.use('/api/presencas', require('./routes/presenca.routes'));
+app.use('/api/patrimonio', require('./routes/patrimonio.routes'));
 
 app.get('/igreja/:slug', (req, res) => {
   res.sendFile(path.join(__dirname, '..', 'public', 'site-igreja.html'));
@@ -41,6 +42,10 @@ app.get('/igreja/:slug/pastor', (req, res) => {
 
 app.get('/igreja/:slug/secretario', (req, res) => {
   res.sendFile(path.join(__dirname, '..', 'public', 'painel-secretario.html'));
+});
+
+app.get('/igreja/:slug/patrimonio', (req, res) => { // <-- AQUI
+  res.sendFile(path.join(__dirname, '..', 'public', 'painel-patrimonio.html'));
 });
 
 module.exports = app;
