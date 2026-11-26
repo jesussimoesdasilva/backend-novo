@@ -71,6 +71,10 @@ async function updateIgreja(id, data) {
     ativo: data.ativo,
   };
 
+  if (data.isCatolica !== undefined) {
+    updateData.isCatolica = data.isCatolica === true || data.isCatolica === 'true';
+  }
+
   if (data.subadminEmail) updateData.subadminEmail = data.subadminEmail;
 
   if (data.subadminSenha) {
@@ -122,6 +126,7 @@ async function updateIgreja(id, data) {
     data: updateData,
   });
 }
+
 
 async function deleteIgreja(id) {
   return await prisma.igreja.delete({ where: { id: Number(id) } });
