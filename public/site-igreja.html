@@ -1033,6 +1033,41 @@ footer strong{color:#f2d27c}
   </div>
 </div>
 
+<!-- MODAL PREMIUM DE INDISPONIBILIDADE / TROCA NA ESCALA -->
+<div class="modal-overlay" id="modalIndisponivelEscala">
+  <div class="modal modal-premium" style="max-width:440px;">
+    <div class="modal-header">
+      <div>
+        <h2 style="color:var(--gold);font-size:20px;">🔄 Justificar Indisponibilidade</h2>
+        <p style="color:#bfdbfe;font-size:12px;">O Secretário será notificado imediatamente para ajustar a escala</p>
+      </div>
+      <button class="close-btn" onclick="fecharModal('modalIndisponivelEscala')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="input-group" style="margin-bottom:14px;">
+        <label style="color:#cbd5e1;">Motivo Rápido</label>
+        <select id="selectMotivoEscala" onchange="verificarMotivoEscalaOutro()" style="background:#020617;color:#f1f5f9;border-color:#334155;">
+          <option value="Viagem">✈️ Viagem</option>
+          <option value="Trabalho / Compromisso Profissional">💼 Trabalho / Compromisso Profissional</option>
+          <option value="Motivo de Saúde">🏥 Motivo de Saúde</option>
+          <option value="Compromisso Familiar">👨‍👩‍👧‍👦 Compromisso Familiar</option>
+          <option value="Outro">✏️ Outro motivo (escrever)</option>
+        </select>
+      </div>
+
+      <div class="input-group" id="campoMotivoEscalaTexto" style="margin-bottom:16px;">
+        <label style="color:#cbd5e1;">Detalhes / Observação (Opcional)</label>
+        <input type="text" id="inputMotivoEscala" placeholder="Ex: Estarei fora da província neste domingo" style="background:#020617;color:#f1f5f9;border-color:#334155;">
+      </div>
+
+      <div style="display:flex;gap:10px;justify-content:flex-end;">
+        <button type="button" class="btn outline" onclick="fecharModal('modalIndisponivelEscala')" style="padding:10px 16px;">Cancelar</button>
+        <button type="button" class="btn gold" id="btnEnviarJustificativaEscala" onclick="enviarJustificativaEscala()" style="padding:10px 18px;">📩 Enviar Justificativa</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- BOTÃO VOLTAR AO TOPO -->
 <button id="btnTopo" onclick="window.scrollTo({top: 0, behavior: 'smooth'})" style="
   display: none;
@@ -2820,13 +2855,41 @@ async function carregarMinhasEscalas() {
   }
 }
 
-async function responderMinhaEscala(escalaId, status) {
-  let motivo = '';
+let escalaJustificandoId = null;
+
+function responderMinhaEscala(escalaId, status) {
   if (status === 'INDISPONIVEL') {
-    motivo = prompt('Escreve o motivo da indisponibilidade ou pedido de troca (ex: Viagem, Trabalho, Saúde):');
-    if (motivo === null) return;
-    if (!motivo.trim()) return alert('Por favor, escreve o motivo para o Secretário saber.');
+    escalaJustificandoId = escalaId;
+    document.getElementById('selectMotivoEscala').value = 'Viagem';
+    document.getElementById('inputMotivoEscala').value = '';
+    document.getElementById('modalIndisponivelEscala').style.display = 'flex';
+    return;
   }
+  gravarRespostaEscala(escalaId, 'CONFIRMADO', '');
+}
+
+function verificarMotivoEscalaOutro() {
+  const sel = document.getElementById('selectMotivoEscala').value;
+  if (sel === 'Outro') {
+    document.getElementById('inputMotivoEscala').focus();
+  }
+}
+
+function enviarJustificativaEscala() {
+  const sel = document.getElementById('selectMotivoEscala').value;
+  const det = document.getElementById('inputMotivoEscala').value.trim();
+  const motivoFinal = sel === 'Outro' ? det : (det ? `${sel} — ${det}` : sel);
+
+  if (!motivoFinal) {
+    document.getElementById('inputMotivoEscala').focus();
+    return;
+  }
+
+  fecharModal('modalIndisponivelEscala');
+  gravarRespostaEscala(escalaJustificandoId, 'INDISPONIVEL', motivoFinal);
+}
+
+async function gravarRespostaEscala(escalaId, status, motivo) {
   try {
     const r = await fetch(`/api/presencas/escala/${escalaId}/responder`, {
       method: 'PUT',
@@ -2835,14 +2898,13 @@ async function responderMinhaEscala(escalaId, status) {
         membroId: membroLogado.id,
         nomeMembro: membroLogado.nome,
         status,
-        motivo: motivo.trim()
+        motivo
       })
     });
     if (!r.ok) throw new Error('Erro ao registar resposta');
-    alert(status === 'CONFIRMADO' ? '✅ Presença confirmada na escala!' : '⚠️ Pedido de troca enviado ao Secretário!');
-    carregarMinhasEscalas();
+    await carregarMinhasEscalas();
   } catch (e) {
-    alert('❌ ' + e.message);
+    console.error(e);
   }
 }
 
