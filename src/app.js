@@ -9,10 +9,6 @@ app.use(express.json());
 
 app.use(express.static(path.join(__dirname, '..', 'public')));
 
-// MIDDLEWARE DE ASSINATURA
-const verificarAssinatura = require('./middlewares/verificarAssinatura');
-app.use('/api', verificarAssinatura);
-
 // ROTAS
 app.use('/api/igrejas', require('./routes/igreja.routes'));
 app.use('/api/membros', require('./routes/membro.routes'));
