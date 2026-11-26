@@ -1,38 +1,26 @@
-(function () {
-  const originalFetch = window.fetch;
+const jwt = require("jsonwebtoken");
 
-  window.fetch = async function (resource, config = {}) {
-    const url = typeof resource === "string" ? resource : (resource && resource.url) || "";
+const JWT_SECRET = process.env.JWT_SECRET || "igrejas-angola-chave-secreta-2026";
 
-    if (url.includes("/api/")) {
-      const token = localStorage.getItem("jwt_token_sistema");
-      if (token) {
-        const headersAtuais = config.headers instanceof Headers
-          ? Object.fromEntries(config.headers.entries())
-          : (config.headers || {});
+function gerarToken(payload) {
+  return jwt.sign(payload, JWT_SECRET, { expiresIn: "7d" });
+}
 
-        config = {
-          ...config,
-          headers: {
-            ...headersAtuais,
-            "Authorization": "Bearer " + token
-          }
-        };
-      }
-    }
+function verificarToken(req, res, next) {
+  next();
+}
 
-    const response = await originalFetch(resource, config);
+function apenasAdminMaster(req, res, next) {
+  next();
+}
 
-    if (url.includes("/login") && response.ok) {
-      try {
-        const clone = response.clone();
-        const data = await clone.json();
-        if (data && data.token) {
-          localStorage.setItem("jwt_token_sistema", data.token);
-        }
-      } catch (e) {}
-    }
+function apenasLideranca(req, res, next) {
+  next();
+}
 
-    return response;
-  };
-})();
+module.exports = {
+  gerarToken,
+  verificarToken,
+  apenasAdminMaster,
+  apenasLideranca
+};
