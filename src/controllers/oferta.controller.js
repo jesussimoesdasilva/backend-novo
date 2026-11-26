@@ -2,6 +2,7 @@ const prisma = require("../config/prisma");
 const service = require("../services/oferta.service");
 const PDFDocument = require('pdfkit');
 const https = require('https');
+const { registarAuditoria } = require("../middlewares/auditoria");
 
 async function list(req, res, next) {
   try { res.json(await service.listOfertas(req.params.igrejaId)); } catch (err) { next(err); }
@@ -41,15 +42,45 @@ async function consultar(req, res, next) {
 }
 
 async function preValidar(req, res, next) {
-  try { res.json(await service.preValidarOferta(req.params.id)); } catch (err) { next(err); }
+  try {
+    const oferta = await service.preValidarOferta(req.params.id);
+    await registarAuditoria({
+      igrejaId: oferta.igrejaId,
+      modulo: "TESOURARIA",
+      acao: "Dízimo Pré-Validado",
+      detalhes: `${oferta.codigo} (${oferta.nomeDoador || 'Membro'}) — ${Number(oferta.valor || 0).toLocaleString('pt-AO')} Kz`,
+      responsavel: "Subadmin / Tesouraria"
+    });
+    res.json(oferta);
+  } catch (err) { next(err); }
 }
 
 async function validar(req, res, next) {
-  try { res.json(await service.validarOferta(req.params.id)); } catch (err) { next(err); }
+  try {
+    const oferta = await service.validarOferta(req.params.id);
+    await registarAuditoria({
+      igrejaId: oferta.igrejaId,
+      modulo: "TESOURARIA",
+      acao: "Entrada Financeira Validada",
+      detalhes: `${oferta.finalidade} (${oferta.codigo}) — ${Number(oferta.valor || 0).toLocaleString('pt-AO')} Kz`,
+      responsavel: "Pastor / Padre"
+    });
+    res.json(oferta);
+  } catch (err) { next(err); }
 }
 
 async function negar(req, res, next) {
-  try { res.json(await service.negarOferta(req.params.id)); } catch (err) { next(err); }
+  try {
+    const oferta = await service.negarOferta(req.params.id);
+    await registarAuditoria({
+      igrejaId: oferta.igrejaId,
+      modulo: "TESOURARIA",
+      acao: "Registo Financeiro Negado",
+      detalhes: `${oferta.finalidade} (${oferta.codigo}) — ${Number(oferta.valor || 0).toLocaleString('pt-AO')} Kz`,
+      responsavel: "Liderança / Tesouraria"
+    });
+    res.json(oferta);
+  } catch (err) { next(err); }
 }
 
 async function estatisticas(req, res, next) {
@@ -366,7 +397,17 @@ async function relatorioFidelidade(req, res, next) {
 
 async function remove(req, res) {
   try {
+    const item = await prisma.oferta.findUnique({ where: { id: Number(req.params.id) } });
     await prisma.oferta.delete({ where: { id: Number(req.params.id) } });
+    if (item) {
+      await registarAuditoria({
+        igrejaId: item.igrejaId,
+        modulo: "TESOURARIA",
+        acao: "Registo Negado Limpo",
+        detalhes: `${item.codigo} (${item.finalidade}) — ${Number(item.valor || 0).toLocaleString('pt-AO')} Kz`,
+        responsavel: "Subadmin / Tesouraria"
+      });
+    }
     res.json({ ok: true });
   } catch (err) {
     res.status(500).json({ message: err.message });
