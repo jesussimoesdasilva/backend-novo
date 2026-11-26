@@ -9,6 +9,10 @@ app.use(express.json());
 
 app.use(express.static(path.join(__dirname, '..', 'public')));
 
+// MIDDLEWARE DE ASSINATURA
+const verificarAssinatura = require('./middlewares/verificarAssinatura');
+app.use('/api', verificarAssinatura);
+
 // ROTAS
 app.use('/api/igrejas', require('./routes/igreja.routes'));
 app.use('/api/membros', require('./routes/membro.routes'));
@@ -21,7 +25,7 @@ app.use('/api/avisos', require('./routes/aviso.routes'));
 app.use('/api/ofertas', require('./routes/oferta.routes'));
 app.use('/api/contas', require('./routes/conta.routes'));
 app.use('/api/galeria', require('./routes/galeria.routes'));
-app.use('/api/chat', require('./routes/chat.routes')); // <-- CHAT AQUI
+app.use('/api/chat', require('./routes/chat.routes'));
 app.use('/api/oracao', require('./routes/oracao.routes'));
 app.use('/api/midia', require('./routes/midia.routes'));
 app.use('/api/documentos', require('./routes/documento.routes'));
@@ -44,8 +48,12 @@ app.get('/igreja/:slug/secretario', (req, res) => {
   res.sendFile(path.join(__dirname, '..', 'public', 'painel-secretario.html'));
 });
 
-app.get('/igreja/:slug/patrimonio', (req, res) => { // <-- AQUI
+app.get('/igreja/:slug/patrimonio', (req, res) => {
   res.sendFile(path.join(__dirname, '..', 'public', 'painel-patrimonio.html'));
+});
+
+app.get('/verificar-membro/:id', (req, res) => {
+  res.sendFile(path.join(__dirname, '..', 'public', 'verificar-membro.html'));
 });
 
 module.exports = app;

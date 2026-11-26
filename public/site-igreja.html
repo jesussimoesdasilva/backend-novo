@@ -600,6 +600,35 @@ footer strong{color:#f2d27c}
   <h3>⛪ Onde Sirvo</h3>
   <p><b>Departamento:</b> <span id="infoDepto"></span></p>
   <div id="infoSectores" style="margin-bottom: 20px;"></div>
+<!-- CARTÃO DE MEMBRO DIGITAL COM QR CODE -->
+<div style="margin-top:25px; background:linear-gradient(135deg,#020617,#1e293b); border:2px solid #facc15; border-radius:18px; padding:22px; color:#f1f5f9; max-width:440px; box-shadow:0 15px 35px rgba(0,0,0,0.4);" id="cartaoMembroDigital">
+  <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #334155; padding-bottom:12px; margin-bottom:15px;">
+    <div>
+      <span style="font-size:10px; text-transform:uppercase; letter-spacing:1.5px; color:#facc15; font-weight:800;">Cartão Oficial de Membro</span>
+      <h4 id="cartaoIgrejaNome" style="margin:2px 0 0; font-size:15px; color:#fff;">Igreja</h4>
+    </div>
+    <span id="cartaoNumero" style="background:rgba(250,204,21,0.15); color:#facc15; padding:4px 10px; border-radius:8px; font-family:monospace; font-weight:800; font-size:12px;">#00000</span>
+  </div>
+
+  <div style="display:flex; gap:15px; align-items:center;">
+    <img id="cartaoFoto" src="" alt="Foto" style="width:72px; height:72px; border-radius:12px; object-fit:cover; border:2px solid #facc15; background:#0f172a; display:none;">
+    <div id="cartaoSemFoto" style="width:72px; height:72px; border-radius:12px; border:2px solid #facc15; background:#0f172a; display:grid; place-items:center; font-size:28px;">👤</div>
+    <div style="flex:1; min-width:0;">
+      <p id="cartaoNome" style="font-weight:800; font-size:16px; color:#fff; margin-bottom:3px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">-</p>
+      <p id="cartaoCargo" style="color:#facc15; font-size:12px; font-weight:700; margin-bottom:3px;">Membro</p>
+      <p id="cartaoDepto" style="color:#94a3b8; font-size:11px;">Departamento: -</p>
+    </div>
+    <div style="background:#fff; padding:6px; border-radius:10px; flex-shrink:0;">
+      <img id="cartaoQrCode" src="" alt="QR Code" style="width:72px; height:72px; display:block;">
+    </div>
+  </div>
+
+  <div style="margin-top:15px; padding-top:12px; border-top:1px solid #334155; display:flex; justify-content:space-between; align-items:center;">
+    <span style="font-size:11px; color:#10b981; font-weight:700;">● Credencial Ativa</span>
+    <button type="button" onclick="imprimirCartaoMembro()" style="background:#facc15; color:#020617; border:none; padding:7px 14px; border-radius:8px; font-weight:800; font-size:12px; cursor:pointer;">🖨️ Imprimir Cartão</button>
+  </div>
+</div>
+
 
   <!-- NOVO: GRELHA DE DÍZIMOS -->
   <div style="border-top: 1px solid #e2e8f0; padding-top: 20px;">
@@ -2662,9 +2691,37 @@ if (membroLogado.cargo) {
   document.getElementById('dBi').value = membroLogado.bi || 'Não registado';
   document.getElementById('dTelefone').value = membroLogado.telefone || 'Não registado';
 
+  // Preencher Cartão Digital com QR Code
+  const urlValidacao = window.location.origin + '/verificar-membro/' + membroLogado.id;
+  document.getElementById('cartaoIgrejaNome').textContent = (membroLogado.igreja && membroLogado.igreja.nome) ? membroLogado.igreja.nome : document.title;
+  document.getElementById('cartaoNumero').textContent = '#' + String(membroLogado.id).padStart(5, '0');
+  document.getElementById('cartaoNome').textContent = membroLogado.nome;
+  document.getElementById('cartaoCargo').textContent = membroLogado.cargo || 'Membro';
+  document.getElementById('cartaoDepto').textContent = 'Depto: ' + nomeDepto;
+    const hostQr = 'api.qrserver' + '.com';
+  const qrApi = 'https://' + hostQr + '/v1/create-qr-code/?size=150x150&data=';
+  document.getElementById('cartaoQrCode').src = qrApi + encodeURIComponent(urlValidacao);
+
+  if (membroLogado.foto && membroLogado.foto !== 'null') {
+    document.getElementById('cartaoFoto').src = membroLogado.foto;
+    document.getElementById('cartaoFoto').style.display = 'block';
+    document.getElementById('cartaoSemFoto').style.display = 'none';
+  } else {
+    document.getElementById('cartaoFoto').style.display = 'none';
+    document.getElementById('cartaoSemFoto').style.display = 'grid';
+  }
+
   scrollToId('areaMembro');
   carregarGrelhaDizimos();
   iniciarHeartbeat();   // <-- A ÚNICA COISA QUE MUDOU
+}
+
+function imprimirCartaoMembro() {
+  const cartaoHtml = document.getElementById('cartaoMembroDigital').outerHTML;
+  const win = window.open('', '_blank');
+  win.document.write('<html><head><title>Cartão de Membro</title><style>body{font-family:sans-serif;display:grid;place-items:center;min-height:100vh;margin:0;background:#fff}button{display:none!important}</style></head><body>' + cartaoHtml + '</body></html>');
+  win.document.close();
+  setTimeout(() => win.print(), 500);
 }
 
 function sairMembro() {
