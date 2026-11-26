@@ -629,8 +629,11 @@ footer strong{color:#f2d27c}
   <h3>⛪ Onde Sirvo</h3>
   <p><b>Departamento:</b> <span id="infoDepto"></span></p>
   <div id="infoSectores" style="margin-bottom: 20px;"></div>
-
-
+  <!-- MINHAS ESCALAS DE SERVIÇO -->
+  <div style="border-top: 1px solid #e2e8f0; padding-top: 15px; margin-bottom: 20px;">
+    <h4 style="margin: 0 0 10px; font-size: 16px; color: #071b36;">📅 Minhas Escalas de Serviço</h4>
+    <div id="listaMinhasEscalas"><p style="color:#64748b;font-size:13px;">A verificar escalas...</p></div>
+  </div>
 
   <!-- NOVO: GRELHA DE DÍZIMOS -->
   <div style="border-top: 1px solid #e2e8f0; padding-top: 20px;">
@@ -2704,8 +2707,10 @@ if (membroLogado.cargo) {
 
   scrollToId('areaMembro');
   carregarGrelhaDizimos();
+  carregarMinhasEscalas();
   iniciarHeartbeat();   // <-- A ÚNICA COISA QUE MUDOU
 }
+
 
 function imprimirCartaoMembro() {
   const cartaoHtml = document.getElementById('cartaoMembroDigital').outerHTML;
@@ -2765,6 +2770,33 @@ async function pedirCodigo() {
     alerta.className = "alert error"; alerta.textContent = "❌ " + err.message;
   } finally {
     btn.innerHTML = "📩 Gerar Código"; btn.disabled = false;
+  }
+}
+
+async function carregarMinhasEscalas() {
+  const div = document.getElementById('listaMinhasEscalas');
+  if (!div || !membroLogado) return;
+  try {
+    const r = await fetch('/api/presencas/escala/membro/' + membroLogado.id);
+    const lista = await r.json();
+    if (!Array.isArray(lista) || !lista.length) {
+      div.innerHTML = '<p style="color:#64748b;font-size:13px;">Ainda não estás escalado para nenhum culto.</p>';
+      return;
+    }
+    div.innerHTML = lista.map(e => {
+      const dataFmt = new Date(e.data).toLocaleString('pt-PT', { dateStyle: 'short', timeStyle: 'short' });
+      const colegas = (e.membros || []).map(m => m.nome).join(', ');
+      return `
+        <div style="background:#f8fafc;border:1px solid #e2e8f0;border-left:4px solid #d4a017;border-radius:10px;padding:12px;margin-bottom:8px;">
+          <strong style="color:#071b36;font-size:14px;display:block;">${e.titulo}</strong>
+          <span style="color:#b45309;font-size:12px;font-weight:700;">🕒 ${dataFmt}</span>
+          ${e.descricao ? `<p style="color:#475569;font-size:12px;margin:4px 0 0;">📝 ${e.descricao}</p>` : ''}
+          <p style="color:#64748b;font-size:11px;margin:4px 0 0;">👥 Equipa: ${colegas}</p>
+        </div>
+      `;
+    }).join('');
+  } catch (e) {
+    div.innerHTML = '<p style="color:#64748b;font-size:13px;">Não foi possível carregar escalas.</p>';
   }
 }
 
