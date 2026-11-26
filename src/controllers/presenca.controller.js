@@ -30,4 +30,16 @@ async function apagarEscala(req, res) {
   catch (err) { res.status(500).json({ message: err.message }); }
 }
 
-module.exports = { registarPresenca, listarPresencas, criarEscala, listarEscalas, listarEscalasMembro, apagarEscala };
+async function editarEscala(req, res) {
+  try { res.json(await service.editarEscala(req.params.id, req.body)); } 
+  catch (err) { res.status(500).json({ message: err.message }); }
+}
+
+async function responderEscalaMembro(req, res) {
+  try {
+    const { membroId, nomeMembro, status, motivo } = req.body;
+    res.json(await service.responderEscalaMembro(req.params.id, membroId, nomeMembro, status, motivo));
+  } catch (err) { res.status(500).json({ message: err.message }); }
+}
+
+module.exports = { registarPresenca, listarPresencas, criarEscala, listarEscalas, listarEscalasMembro, apagarEscala, editarEscala, responderEscalaMembro };

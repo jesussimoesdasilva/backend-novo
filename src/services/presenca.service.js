@@ -53,4 +53,50 @@ async function apagarEscala(id) {
   return await prisma.escala.delete({ where: { id: Number(id) } });
 }
 
-module.exports = { registarPresenca, listarPresencas, criarEscala, listarEscalas, listarEscalasMembro, apagarEscala };
+async function editarEscala(id, data) {
+  const escalaAtual = await prisma.escala.findUnique({ where: { id: Number(id) } });
+  const descAtual = escalaAtual?.descricao || "";
+  const blocoRespostas = descAtual.includes("||RESPOSTAS:") ? "||RESPOSTAS:" + descAtual.split("||RESPOSTAS:")[1] : "";
+
+  return await prisma.escala.update({
+    where: { id: Number(id) },
+    data: {
+      titulo: data.titulo,
+      descricao: (data.descricao || "") + blocoRespostas,
+      data: new Date(data.data),
+      membros: {
+        set: data.membrosIds.map(mId => ({ id: Number(mId) }))
+      }
+    },
+    include: { membros: true }
+  });
+}
+
+async function responderEscalaMembro(escalaId, membroId, nomeMembro, status, motivo) {
+  const escala = await prisma.escala.findUnique({ where: { id: Number(escalaId) } });
+  if (!escala) throw new Error("Escala não encontrada");
+
+  const partes = (escala.descricao || "").split("||RESPOSTAS:");
+  const textoLimpo = partes[0];
+  let respostas = {};
+  if (partes[1]) {
+    try { respostas = JSON.parse(partes[1]); } catch (e) {}
+  }
+
+  respostas[membroId] = {
+    nome: nomeMembro,
+    status, // "CONFIRMADO" ou "INDISPONIVEL"
+    motivo: motivo || "",
+    em: new Date().toISOString()
+  };
+
+  return await prisma.escala.update({
+    where: { id: Number(escalaId) },
+    data: {
+      descricao: textoLimpo + "||RESPOSTAS:" + JSON.stringify(respostas)
+    },
+    include: { membros: true }
+  });
+}
+
+module.exports = { registarPresenca, listarPresencas, criarEscala, listarEscalas, listarEscalasMembro, apagarEscala, editarEscala, responderEscalaMembro };
