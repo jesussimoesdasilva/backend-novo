@@ -43,6 +43,14 @@ async function login(req, res) {
     const valid = await bcrypt.compare(senha, membro.password);
     if (!valid) return res.status(401).json({ message: "Senha incorreta" });
 
+    const numeroIgreja = await prisma.membro.count({
+      where: {
+        igrejaId: membro.igrejaId,
+        id: { lte: membro.id }
+      }
+    });
+    membro.numeroIgreja = numeroIgreja;
+
     res.json({ membro });
   } catch (err) { 
     res.status(500).json({ message: err.message }); 
@@ -605,13 +613,18 @@ async function getPublico(req, res) {
     const m = await prisma.membro.findUnique({
       where: { id: Number(req.params.id) },
       select: {
-        id: true, nome: true, foto: true, cargo: true, status: true, criadoEm: true,
+        id: true, igrejaId: true, nome: true, foto: true, cargo: true, status: true, criadoEm: true,
         igreja: { select: { nome: true, logoUrl: true } },
         departamento: { select: { nome: true } }
       }
     });
     if (!m) return res.status(404).json({ message: "Não encontrado" });
-    res.json(m);
+
+    const numeroIgreja = await prisma.membro.count({
+      where: { igrejaId: m.igrejaId, id: { lte: m.id } }
+    });
+
+    res.json({ ...m, numeroIgreja });
   } catch (err) { res.status(500).json({ message: err.message }); }
 }
 

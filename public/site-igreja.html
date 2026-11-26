@@ -2694,7 +2694,8 @@ if (membroLogado.cargo) {
   // Preencher Cartão Digital com QR Code
   const urlValidacao = window.location.origin + '/verificar-membro/' + membroLogado.id;
   document.getElementById('cartaoIgrejaNome').textContent = (membroLogado.igreja && membroLogado.igreja.nome) ? membroLogado.igreja.nome : document.title;
-  document.getElementById('cartaoNumero').textContent = '#' + String(membroLogado.id).padStart(5, '0');
+  const numMembro = membroLogado.numeroIgreja || membroLogado.id;
+  document.getElementById('cartaoNumero').textContent = '#' + String(numMembro).padStart(5, '0');
   document.getElementById('cartaoNome').textContent = membroLogado.nome;
   document.getElementById('cartaoCargo').textContent = membroLogado.cargo || 'Membro';
   document.getElementById('cartaoDepto').textContent = 'Depto: ' + nomeDepto;

@@ -38,7 +38,7 @@ async function validar() {
       <h2>${m.nome}</h2>
       <div class="igreja">${m.igreja?.nome || 'Igreja Oficial'}</div>
       <div class="info">
-        <p><strong>Nº de Registo:</strong> #${String(m.id).padStart(5, '0')}</p>
+                <p><strong>Nº de Registo:</strong> #${String(m.numeroIgreja || m.id).padStart(5, '0')}</p>
         <p><strong>Cargo:</strong> ${m.cargo || 'Membro'}</p>
         <p><strong>Departamento:</strong> ${m.departamento?.nome || 'Geral'}</p>
         <p style="margin:0"><strong>Membro desde:</strong> ${new Date(m.criadoEm).toLocaleDateString('pt-PT')}</p>
