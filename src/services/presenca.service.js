@@ -56,7 +56,7 @@ async function apagarEscala(id) {
 async function editarEscala(id, data) {
   const escalaAtual = await prisma.escala.findUnique({ where: { id: Number(id) } });
   const descAtual = escalaAtual?.descricao || "";
-  const blocoRespostas = descAtual.includes("||RESPOSTAS:") ? "||RESPOSTAS:" + descAtual.split("||RESPOSTAS:")[1] : "";
+  const blocoRespostas = descAtual.includes("||RESPOSTAS:") ? "||RESPOSTAS:" + descAtual.split("||RESPOSTAS:").pop() : "";
 
   return await prisma.escala.update({
     where: { id: Number(id) },
@@ -77,15 +77,15 @@ async function responderEscalaMembro(escalaId, membroId, nomeMembro, status, mot
   if (!escala) throw new Error("Escala não encontrada");
 
   const partes = (escala.descricao || "").split("||RESPOSTAS:");
-  const textoLimpo = partes[0];
+  const textoLimpo = partes.shift() || "";
   let respostas = {};
-  if (partes[1]) {
-    try { respostas = JSON.parse(partes[1]); } catch (e) {}
+  if (partes.length > 0) {
+    try { respostas = JSON.parse(partes.join("||RESPOSTAS:")); } catch (e) {}
   }
 
   respostas[membroId] = {
     nome: nomeMembro,
-    status, // "CONFIRMADO" ou "INDISPONIVEL"
+    status,
     motivo: motivo || "",
     em: new Date().toISOString()
   };
