@@ -12,7 +12,8 @@ function verificarToken(req, res, next) {
     return res.status(401).json({ error: true, message: "Acesso não autorizado. Faça login novamente." });
   }
 
-  const token = authHeader.split(" ");
+  const token = authHeader.replace("Bearer ", "").trim();
+
   try {
     const decoded = jwt.verify(token, JWT_SECRET);
     req.utilizador = decoded;
