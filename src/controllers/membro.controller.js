@@ -600,9 +600,24 @@ async function atualizarAtividade(req, res, next) {
   } catch (err) { next(err); }
 }
 
+async function getPublico(req, res) {
+  try {
+    const m = await prisma.membro.findUnique({
+      where: { id: Number(req.params.id) },
+      select: {
+        id: true, nome: true, foto: true, cargo: true, status: true, criadoEm: true,
+        igreja: { select: { nome: true, logoUrl: true } },
+        departamento: { select: { nome: true } }
+      }
+    });
+    if (!m) return res.status(404).json({ message: "Não encontrado" });
+    res.json(m);
+  } catch (err) { res.status(500).json({ message: err.message }); }
+}
+
 module.exports = {
   publicRegister, login, verificarTelefone, verCodigo, redefinirSenhaComCodigo,
   list, create, aprovar, promover, setSectores, resetPassword, remove,
   updatePerfil, updateFoto, gerarFichaMembroPDF, gerarPDFMembrosSecretario, gerarPDFBatismosSecretario,
- gerarPDFPresencasSecretario, editarMembroSecretario, editarDepartamentoMembro, atualizarAtividade
+ gerarPDFPresencasSecretario, editarMembroSecretario, editarDepartamentoMembro, atualizarAtividade, getPublico
 };

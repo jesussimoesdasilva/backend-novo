@@ -32,5 +32,6 @@ router.delete("/:id", c.remove);
 router.put("/:id/perfil", c.updatePerfil);
 router.post("/:id/atividade", c.atualizarAtividade);
 router.post("/:id/foto", c.updateFoto);
+router.get("/publico/:id", c.getPublico);
 
 module.exports = router;
