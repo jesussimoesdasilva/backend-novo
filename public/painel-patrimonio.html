@@ -484,7 +484,7 @@
         const botoes = b.status === 'ABATIDO' ? '-' : `
           <button class="btn btn-secondary btn-sm" onclick="editarBem(${b.id})" title="Editar">✏️</button>
           <button class="btn btn-primary btn-sm" onclick="abrirModalAcao(${b.id})" title="Mover / Emprestar / Abater">📦</button>
-          ${b.status === 'EMPRESTADO' ? `<button class="btn btn-success btn-sm" onclick="registarDevolucao(${b.id})">↩️ Devolver</button>` : ''}
+                   ${b.status === 'EMPRESTADO' ? `<button class="btn btn-info btn-sm" onclick="imprimirTermoEmprestimo(${b.id})" title="Termo de Responsabilidade">📄 Termo</button><button class="btn btn-success btn-sm" onclick="registarDevolucao(${b.id})">↩️ Devolver</button>` : ''}
         `;
 
         return `
@@ -659,77 +659,131 @@
       carregarDados();
     }
 
-    function gerarRelatorio(tipo) {
-      const area = document.getElementById('areaRelatorio');
-      area.style.display = 'block';
-      const dataHoje = new Date().toLocaleDateString('pt-PT');
-      let html = '';
+async function imprimirTermoEmprestimo(id) {
+  const b = listaBens.find(x => x.id === id);
+  if (!b) return;
 
-      if (tipo === 'inventario') {
-        const ativos = listaBens.filter(b => b.status !== 'ABATIDO');
-        const total = ativos.reduce((acc, b) => acc + (b.valor || 0), 0);
-        html = `
-          <div class="report-paper">
-            <h2>Inventário Completo de Património — ${igrejaAtual.nome}</h2>
-            <p style="margin-bottom:16px;">Emitido em: ${dataHoje} | Total de Bens: <strong>${ativos.length}</strong> | Valor Total: <strong>${total.toLocaleString('pt-AO')} Kz</strong></p>
-            <table>
-              <thead><tr><th>Bem</th><th>Categoria</th><th>Estado</th><th>Localização</th><th>Valor</th></tr></thead>
-              <tbody>${ativos.map(b => `<tr><td>${b.nome}</td><td>${b.categoria}</td><td>${b.estado}</td><td>${b.localizacao}</td><td>${(b.valor||0).toLocaleString('pt-AO')} Kz</td></tr>`).join('')}</tbody>
-            </table>
-            <button class="btn btn-primary no-print" style="margin-top:20px;" onclick="window.print()">🖨️ Imprimir / PDF</button>
-          </div>`;
-      } else if (tipo === 'valor') {
-        const cats = ['Mobiliário', 'Equipamento', 'Veículos', 'Imóveis'];
-        const ativos = listaBens.filter(b => b.status !== 'ABATIDO');
-        html = `
-          <div class="report-paper">
-            <h2>Valor do Património por Categoria — ${igrejaAtual.nome}</h2>
-            <p style="margin-bottom:16px;">Emitido em: ${dataHoje}</p>
-            <table>
-              <thead><tr><th>Categoria</th><th>Quantidade</th><th>Valor Total</th></tr></thead>
-              <tbody>${cats.map(c => {
-                const itens = ativos.filter(b => b.categoria === c);
-                const soma = itens.reduce((acc, b) => acc + (b.valor || 0), 0);
-                return `<tr><td><strong>${c}</strong></td><td>${itens.length}</td><td>${soma.toLocaleString('pt-AO')} Kz</td></tr>`;
-              }).join('')}</tbody>
-            </table>
-            <button class="btn btn-primary no-print" style="margin-top:20px;" onclick="window.print()">🖨️ Imprimir / PDF</button>
-          </div>`;
-      } else if (tipo === 'emprestados') {
-        const emp = listaBens.filter(b => b.status === 'EMPRESTADO');
-        html = `
-          <div class="report-paper">
-            <h2>Relatório de Bens Emprestados — ${igrejaAtual.nome}</h2>
-            <p style="margin-bottom:16px;">Emitido em: ${dataHoje} | Total Emprestados: <strong>${emp.length}</strong></p>
-            <table>
-              <thead><tr><th>Bem</th><th>Membro</th><th>Data Empréstimo</th><th>Devolução Prevista</th></tr></thead>
-              <tbody>${emp.map(b => `<tr><td>${b.nome}</td><td>${b.emprestadoPara ? b.emprestadoPara.nome : '-'}</td><td>${b.dataEmprestimo ? new Date(b.dataEmprestimo).toLocaleDateString('pt-PT') : '-'}</td><td>${b.dataDevolucaoPrev ? new Date(b.dataDevolucaoPrev).toLocaleDateString('pt-PT') : '-'}</td></tr>`).join('')}</tbody>
-            </table>
-            <button class="btn btn-primary no-print" style="margin-top:20px;" onclick="window.print()">🖨️ Imprimir / PDF</button>
-          </div>`;
-      } else if (tipo === 'abates') {
-        const ab = listaBens.filter(b => b.status === 'ABATIDO');
-        html = `
-          <div class="report-paper">
-            <h2>Histórico de Bens Abatidos — ${igrejaAtual.nome}</h2>
-            <p style="margin-bottom:16px;">Emitido em: ${dataHoje} | Total Abatidos: <strong>${ab.length}</strong></p>
-            <table>
-              <thead><tr><th>Bem</th><th>Motivo</th><th>Data Abate</th><th>Aprovado Por</th></tr></thead>
-              <tbody>${ab.map(b => `<tr><td>${b.nome}</td><td>${b.motivoAbate || '-'}</td><td>${b.dataAbate ? new Date(b.dataAbate).toLocaleDateString('pt-PT') : '-'}</td><td>${b.aprovadoPor || '-'}</td></tr>`).join('')}</tbody>
-            </table>
-            <button class="btn btn-primary no-print" style="margin-top:20px;" onclick="window.print()">🖨️ Imprimir / PDF</button>
-          </div>`;
-      }
-      area.innerHTML = html;
+  let liderNome = 'Direção / Liderança Eclesiástica';
+  let liderCargo = 'Pastor / Padre — Autorização';
+  try {
+    const rP = await fetch(API + '/pastores/igreja/' + igrejaAtual.id);
+    const pastores = await rP.json();
+    if (Array.isArray(pastores) && pastores.length > 0) {
+      const p = pastores.shift();
+      liderNome = p.nome;
+      liderCargo = (p.cargo || 'Pastor / Padre') + ' — Autorização';
     }
+  } catch (e) {}
 
-    function fecharModais() {
-      document.getElementById('modalBem').style.display = 'none';
-      document.getElementById('modalAcao').style.display = 'none';
+  const membroNome = b.emprestadoPara ? b.emprestadoPara.nome : 'Membro Responsável';
+  const membroTel = b.emprestadoPara && b.emprestadoPara.telefone ? b.emprestadoPara.telefone : '-';
+  const dataEmp = b.dataEmprestimo ? new Date(b.dataEmprestimo).toLocaleDateString('pt-PT') : new Date().toLocaleDateString('pt-PT');
+  const dataDev = b.dataDevolucaoPrev ? new Date(b.dataDevolucaoPrev).toLocaleDateString('pt-PT') : 'A combinar';
+
+  const win = window.open('', '_blank');
+  const d = win.document;
+  d.open();
+  d.write('<!DOCTYPE html><html lang="pt-AO"><head><meta charset="UTF-8"><title>Termo de Empréstimo</title>');
+  d.write('<style>@page{size:A4;margin:18mm}body{font-family:Arial,sans-serif;color:#1e293b;line-height:1.6}.header{display:flex;justify-content:space-between;align-items:center;border-bottom:3px solid #071b36;padding-bottom:14px;margin-bottom:22px}.titulo{text-align:center;background:#f8fafc;border-left:5px solid #d4a017;padding:14px;margin-bottom:22px}.titulo h1{font-size:18px;color:#071b36;text-transform:uppercase;margin:0}.box{border:1px solid #cbd5e1;border-radius:10px;padding:16px;margin-bottom:18px}.box h3{font-size:13px;text-transform:uppercase;color:#071b36;border-bottom:1px solid #e2e8f0;padding-bottom:6px;margin:0 0 10px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;font-size:14px}.clausula{font-size:13px;background:#fffbeb;border:1px solid #fde68a;padding:14px;border-radius:8px;margin-bottom:30px}.assinaturas{display:grid;grid-template-columns:1fr 1fr 1fr;gap:24px;margin-top:45px;text-align:center;font-size:12px}.linha{border-top:1px solid #334155;padding-top:6px;font-weight:700;color:#071b36}</style></head><body>');
+  d.write('<div class="header"><div><strong style="font-size:18px;color:#071b36;">' + igrejaAtual.nome + '</strong><br><small>Departamento de Património</small></div><div style="text-align:right;font-size:12px;"><strong>TERMO Nº ' + String(b.id).padStart(4, '0') + '</strong><br>Data: ' + dataEmp + '</div></div>');
+  d.write('<div class="titulo"><h1>Termo de Empréstimo e Responsabilidade</h1></div>');
+  d.write('<div class="box"><h3>1. Identificação do Bem</h3><div class="grid"><div><strong>Item:</strong> ' + b.nome + '</div><div><strong>Série:</strong> ' + (b.numeroSerie || 'S/N') + '</div><div><strong>Categoria:</strong> ' + b.categoria + '</div><div><strong>Estado:</strong> ' + b.estado + '</div><div><strong>Valor:</strong> ' + (b.valor || 0).toLocaleString('pt-AO') + ' Kz</div><div><strong>Origem:</strong> ' + b.localizacao + '</div></div></div>');
+  d.write('<div class="box"><h3>2. Responsável pelo Empréstimo</h3><div class="grid"><div><strong>Membro:</strong> ' + membroNome + '</div><div><strong>Telefone:</strong> ' + membroTel + '</div><div><strong>Retirada:</strong> ' + dataEmp + '</div><div><strong>Devolução Prevista:</strong> ' + dataDev + '</div></div></div>');
+  d.write('<div class="clausula"><strong>Compromisso:</strong> Declaro ter recebido o bem acima descrito em perfeitas condições de uso, comprometendo-me a devolvê-lo na data prevista nas mesmas condições em que o recebi.</div>');
+  d.write('<div class="assinaturas"><div><div class="linha">' + membroNome + '</div><span>Membro Receptor</span></div><div><div class="linha">' + utilizadorAtual.nome + '</div><span>Gestor de Património</span></div><div><div class="linha">' + liderNome + '</div><span>' + liderCargo + '</span></div></div>');
+  d.write('</body></html>');
+  d.close();
+  setTimeout(() => win.print(), 400);
+}
+async function gerarRelatorio(tipo) {
+  const area = document.getElementById('areaRelatorio');
+  area.style.display = 'block';
+  const dataHoje = new Date().toLocaleString('pt-PT', { dateStyle: 'long', timeStyle: 'short' });
+
+  let liderNome = 'Direção / Liderança Eclesiástica';
+  let liderCargo = 'Pastor / Padre — Visto e Aprovação';
+  try {
+    const rP = await fetch(API + '/pastores/igreja/' + igrejaAtual.id);
+    const pastores = await rP.json();
+    if (Array.isArray(pastores) && pastores.length > 0) {
+      const p = pastores.shift();
+      liderNome = p.nome;
+      liderCargo = (p.cargo || 'Pastor / Padre') + ' — Visto e Aprovação';
     }
+  } catch (e) {}
 
-    init();
-  </script>
+  let tituloDoc = '';
+  let subtituloDoc = '';
+  let linhas = '';
+  let cabecalho = '';
+
+  if (tipo === 'inventario') {
+    const ativos = listaBens.filter(b => b.status !== 'ABATIDO');
+    const total = ativos.reduce((acc, b) => acc + (b.valor || 0), 0);
+    tituloDoc = 'Inventário Geral de Património';
+    subtituloDoc = 'Total de Bens Ativos: ' + ativos.length + ' • Valor Global: ' + total.toLocaleString('pt-AO') + ' Kz';
+    cabecalho = '<tr><th>Bem / Série</th><th>Categoria</th><th>Estado</th><th>Localização</th><th>Valor (Kz)</th></tr>';
+    linhas = ativos.map(b => '<tr><td><strong>' + b.nome + '</strong><br><small>' + (b.numeroSerie || 'S/N') + '</small></td><td>' + b.categoria + '</td><td>' + b.estado + '</td><td>' + b.localizacao + '</td><td><strong>' + (b.valor || 0).toLocaleString('pt-AO') + ' Kz</strong></td></tr>').join('');
+  } else if (tipo === 'valor') {
+    const cats = ['Mobiliário', 'Equipamento', 'Veículos', 'Imóveis'];
+    const ativos = listaBens.filter(b => b.status !== 'ABATIDO');
+    const total = ativos.reduce((acc, b) => acc + (b.valor || 0), 0);
+    tituloDoc = 'Relatório Financeiro por Categoria';
+    subtituloDoc = 'Avaliação Patrimonial Consolidada: ' + total.toLocaleString('pt-AO') + ' Kz';
+    cabecalho = '<tr><th>Categoria</th><th>Quantidade</th><th>Valor Acumulado (Kz)</th></tr>';
+    linhas = cats.map(c => {
+      const itens = ativos.filter(b => b.categoria === c);
+      const soma = itens.reduce((acc, b) => acc + (b.valor || 0), 0);
+      return '<tr><td><strong>' + c + '</strong></td><td>' + itens.length + '</td><td><strong>' + soma.toLocaleString('pt-AO') + ' Kz</strong></td></tr>';
+    }).join('');
+  } else if (tipo === 'emprestados') {
+    const emp = listaBens.filter(b => b.status === 'EMPRESTADO');
+    tituloDoc = 'Relatório de Bens Emprestados';
+    subtituloDoc = 'Total Sob Empréstimo: ' + emp.length;
+    cabecalho = '<tr><th>Bem</th><th>Membro Responsável</th><th>Data Retirada</th><th>Devolução Prevista</th></tr>';
+    linhas = emp.length ? emp.map(b => '<tr><td><strong>' + b.nome + '</strong></td><td>' + (b.emprestadoPara ? b.emprestadoPara.nome : '-') + '</td><td>' + (b.dataEmprestimo ? new Date(b.dataEmprestimo).toLocaleDateString('pt-PT') : '-') + '</td><td>' + (b.dataDevolucaoPrev ? new Date(b.dataDevolucaoPrev).toLocaleDateString('pt-PT') : '-') + '</td></tr>').join('') : '<tr><td colspan="4" style="text-align:center;">Nenhum bem emprestado.</td></tr>';
+  } else if (tipo === 'abates') {
+    const ab = listaBens.filter(b => b.status === 'ABATIDO');
+    tituloDoc = 'Histórico Oficial de Abates Patrimoniais';
+    subtituloDoc = 'Total Abatidos: ' + ab.length;
+    cabecalho = '<tr><th>Bem</th><th>Motivo</th><th>Data Abate</th><th>Autorizado Por</th></tr>';
+    linhas = ab.length ? ab.map(b => '<tr><td><strong>' + b.nome + '</strong></td><td>' + (b.motivoAbate || '-') + '</td><td>' + (b.dataAbate ? new Date(b.dataAbate).toLocaleDateString('pt-PT') : '-') + '</td><td>' + (b.aprovadoPor || '-') + '</td></tr>').join('') : '<tr><td colspan="4" style="text-align:center;">Nenhum bem abatido.</td></tr>';
+  }
+
+  area.innerHTML = [
+    '<div class="report-paper" id="folhaRelatorioPat">',
+    '<div style="display:flex;justify-content:space-between;align-items:center;border-bottom:3px solid #071b36;padding-bottom:14px;margin-bottom:18px;">',
+    '<div><h2 style="margin:0;color:#071b36;font-size:20px;text-transform:uppercase;">' + igrejaAtual.nome + '</h2><small style="color:#64748b;">' + (igrejaAtual.endereco || 'Departamento de Património') + '</small></div>',
+    '<div style="text-align:right;"><span style="background:#071b36;color:#facc15;padding:4px 10px;border-radius:6px;font-size:11px;font-weight:800;">DOCUMENTO OFICIAL</span><p style="font-size:11px;color:#64748b;margin-top:5px;">' + dataHoje + '</p></div>',
+    '</div>',
+    '<div style="background:#f8fafc;border-left:5px solid #d4a017;padding:12px 16px;margin-bottom:18px;">',
+    '<h3 style="margin:0;color:#071b36;font-size:17px;text-transform:uppercase;">' + tituloDoc + '</h3>',
+    '<p style="margin:3px 0 0;color:#475569;font-size:13px;">' + subtituloDoc + '</p>',
+    '</div>',
+    '<table><thead>' + cabecalho + '</thead><tbody>' + linhas + '</tbody></table>',
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:40px;margin-top:45px;text-align:center;font-size:12px;">',
+    '<div><div style="border-top:1px solid #334155;padding-top:6px;font-weight:700;color:#071b36;">' + utilizadorAtual.nome + '</div><span style="color:#64748b;">Gestor(a) de Património</span></div>',
+    '<div><div style="border-top:1px solid #334155;padding-top:6px;font-weight:700;color:#071b36;">' + liderNome + '</div><span style="color:#64748b;">' + liderCargo + '</span></div>',
+    '</div>',
+    '</div>'
+  ].join('');
+
+  const btnPrint = document.createElement('button');
+  btnPrint.className = 'btn btn-primary no-print';
+  btnPrint.style.marginTop = '20px';
+  btnPrint.style.width = '100%';
+  btnPrint.textContent = '🖨️ Imprimir / Guardar PDF Oficial';
+  btnPrint.onclick = () => window.print();
+  document.getElementById('folhaRelatorioPat').appendChild(btnPrint);
+}
+
+function fecharModais() {
+  document.getElementById('modalBem').style.display = 'none';
+  document.getElementById('modalAcao').style.display = 'none';
+}
+
+init();
+</script>
 <script src="/bloqueio-assinatura.js"></script>
 </body>
 </html>
