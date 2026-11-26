@@ -694,12 +694,15 @@ async function carregarDizimos() {
     }
     
     div.innerHTML = pendentes.map(o => `
-      <div class="depto-item" style="display:flex;justify-content:space-between;align-items:center">
+      <div class="depto-item" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">
         <div>
           <strong style="color:var(--gold)">${o.membro ? o.membro.nome : (o.nomeDoador || 'Anónimo')}</strong>
           <p style="color:var(--muted);font-size:12px">Dízimo: ${o.valor.toLocaleString('pt-AO')} Kz</p>
         </div>
-        <button class="btn btn-success" onclick="validarDizimo(${o.id})">✅ Validar</button>
+        <div style="display:flex;gap:8px;">
+          <button class="btn btn-success" onclick="validarDizimo(${o.id})">✅ Validar</button>
+          <button class="btn btn-danger" style="padding:11px 16px;font-size:14px;" onclick="negarDizimo(${o.id})">❌ Negar</button>
+        </div>
       </div>
     `).join('');
   } catch (e) { div.innerHTML = '<div class="empty" style="color:red">Erro ao carregar.</div>'; }
@@ -713,6 +716,16 @@ async function validarDizimo(id) {
     carregarDizimos();
     carregarEstatisticas();
   } catch (e) { toast('Erro ao validar', 'error'); }
+}
+
+async function negarDizimo(id) {
+  if (!confirm('Tem a certeza que deseja NEGAR este dízimo?')) return;
+  try {
+    await fetch(API + '/ofertas/' + id + '/negar', { method: 'PUT' });
+    toast('Dízimo negado!', 'error');
+    carregarDizimos();
+    carregarEstatisticas();
+  } catch (e) { toast('Erro ao negar', 'error'); }
 }
 
 async function adicionarDespesa() {
