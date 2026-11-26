@@ -1046,6 +1046,8 @@ async function carregarOfertas() {
           acoes = `<button class="btn btn-success" style="padding:4px 8px;font-size:11px" onclick="validarOferta(${o.id})">Validar</button>`;
         }
         acoes += ` <button class="btn btn-danger" style="padding:4px 8px;font-size:11px" onclick="negarOferta(${o.id})">Negar</button>`;
+      } else if (o.status === 'NEGADO') {
+        acoes = `<button class="btn btn-danger" style="padding:4px 8px;font-size:11px" onclick="apagarOferta(${o.id})">🗑️ Limpar</button>`;
       }
 
       // AQUI ESTÁ A CORREÇÃO DO FRONTEND
@@ -1094,6 +1096,19 @@ async function negarOferta(id) {
   await fetch(API + '/ofertas/' + id + '/negar', { method: 'PUT' });
   toast('Oferta negada', 'success'); carregarOfertas(); carregarEstatisticas();
 }
+
+async function apagarOferta(id) {
+  if (!confirm('Apagar permanentemente este registo negado?')) return;
+  try {
+    const r = await fetch(API + '/ofertas/' + id, { method: 'DELETE' });
+    if (!r.ok) throw new Error('Erro ao apagar');
+    toast('Registo negado removido!', 'success');
+    carregarOfertas();
+  } catch (e) {
+    toast(e.message, 'error');
+  }
+}
+
 
 // --- RELATÓRIOS ---
 async function gerarRelatorioMembros() {
