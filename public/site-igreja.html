@@ -2822,9 +2822,9 @@ async function carregarMinhasEscalas() {
       const dataFmt = new Date(e.data).toLocaleString('pt-PT', { dateStyle: 'short', timeStyle: 'short' });
       const colegas = (e.membros || []).map(m => m.nome).join(', ');
       const partes = (e.descricao || '').split('||RESPOSTAS:');
-      const obsLimpa = partes[0];
+      const obsLimpa = partes.shift() || '';
       let respostas = {};
-      if (partes[1]) { try { respostas = JSON.parse(partes[1]); } catch (err) {} }
+      if (partes.length > 0) { try { respostas = JSON.parse(partes.join('||RESPOSTAS:')); } catch (err) {} }
       const minhaResp = respostas[membroLogado.id];
 
       let estadoHtml = '';
