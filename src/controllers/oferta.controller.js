@@ -364,8 +364,17 @@ async function relatorioFidelidade(req, res, next) {
   } catch (err) { next(err); }
 }
 
+async function remove(req, res) {
+  try {
+    await prisma.oferta.delete({ where: { id: Number(req.params.id) } });
+    res.json({ ok: true });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+}
+
 module.exports = { 
   list, create, consultar, preValidar, validar, negar, estatisticas, 
   relatorioDizimistas, meusDizimos, gerarComprovativoPDF, zerarFinancas, 
-  gerarPDFMembros, gerarPDFDepartamentos, gerarPDFSectores, relatorioFidelidade  
+  gerarPDFMembros, gerarPDFDepartamentos, gerarPDFSectores, relatorioFidelidade, remove  
 };

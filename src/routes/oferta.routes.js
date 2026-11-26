@@ -19,5 +19,7 @@ router.delete("/igreja/:igrejaId/zerar", c.zerarFinancas);
 router.put("/:id/pre-validar", c.preValidar);
 router.put("/:id/validar", c.validar);
 router.put("/:id/negar", c.negar);
+router.delete("/:id", c.remove);
+
 
 module.exports = router;
