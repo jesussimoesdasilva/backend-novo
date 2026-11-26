@@ -97,7 +97,15 @@ async function login(req, res, next) {
     const igreja = await igrejaService.loginSubadmin(email, senha);
     res.json({
       ok: true,
-      igreja: { id: igreja.id, nome: igreja.nome, slug: igreja.slug, icone: igreja.icone, descricao: igreja.descricao }
+      igreja: { 
+        id: igreja.id, 
+        nome: igreja.nome, 
+        slug: igreja.slug, 
+        icone: igreja.icone, 
+        descricao: igreja.descricao,
+        ativo: igreja.ativo,
+        dataExpiracao: igreja.dataExpiracao
+      }
     });
   } catch (err) { res.status(401).json({ error: true, message: err.message }); }
 }
