@@ -39,4 +39,18 @@ async function listarEscalas(igrejaId) {
   });
 }
 
-module.exports = { registarPresenca, listarPresencas, criarEscala, listarEscalas };
+async function listarEscalasMembro(membroId) {
+  return await prisma.escala.findMany({
+    where: {
+      membros: { some: { id: Number(membroId) } }
+    },
+    include: { membros: { select: { id: true, nome: true } } },
+    orderBy: { data: 'asc' }
+  });
+}
+
+async function apagarEscala(id) {
+  return await prisma.escala.delete({ where: { id: Number(id) } });
+}
+
+module.exports = { registarPresenca, listarPresencas, criarEscala, listarEscalas, listarEscalasMembro, apagarEscala };
