@@ -3,6 +3,7 @@ const bcrypt = require("bcryptjs");
 const PDFDocument = require('pdfkit');
 const membroService = require("../services/membro.service");
 const https = require('https');
+const { gerarToken } = require("../middlewares/authJwt");
 
 // ===== FUNÇÕES ORIGINAIS =====
 async function publicRegister(req, res) {
@@ -51,7 +52,14 @@ async function login(req, res) {
     });
     membro.numeroIgreja = numeroIgreja;
 
-    res.json({ membro });
+const token = gerarToken({
+  id: membro.id,
+  igrejaId: membro.igrejaId,
+  role: membro.role || "member"
+});
+
+    res.json({ token, membro });
+
   } catch (err) { 
     res.status(500).json({ message: err.message }); 
   }

@@ -1,5 +1,6 @@
 const igrejaService = require("../services/igreja.service");
 const prisma = require("../config/prisma"); // <-- ADICIONA AQUI
+const { gerarToken } = require("../middlewares/authJwt");
 
 async function listIgrejas(req, res, next) {
   try { res.json(await igrejaService.getAllIgrejas()); } catch (err) { next(err); }
@@ -95,8 +96,10 @@ async function login(req, res, next) {
     const { email, senha } = req.body;
     if (!email || !senha) return res.status(400).json({ error: true, message: "Email e senha obrigatórios" });
     const igreja = await igrejaService.loginSubadmin(email, senha);
+    const token = gerarToken({ id: igreja.id, igrejaId: igreja.id, role: "subadmin" });
     res.json({
       ok: true,
+      token,
       igreja: { 
         id: igreja.id, 
         nome: igreja.nome, 
