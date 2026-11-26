@@ -343,9 +343,16 @@ async function carregarIgrejas() {
         <tbody>
           ${igrejas.map(ig => {
             // Lógica para verificar se a assinatura está ativa
-            const expiracao = ig.dataExpiracao ? new Date(ig.dataExpiracao) : null;
+                        const expiracao = ig.dataExpiracao ? new Date(ig.dataExpiracao) : null;
             const ativa = expiracao && expiracao > new Date();
             const dataFormatada = expiracao ? expiracao.toLocaleDateString('pt-PT') : 'Sem data';
+            
+            let badgeAssinatura = `<span class="badge badge-gold">🟡 Livre (Sem data)</span>`;
+            if (expiracao) {
+              badgeAssinatura = ativa
+                ? `<span class="badge badge-green">🟢 Ativa até ${dataFormatada}</span>`
+                : `<span class="badge badge-red">🔴 Expirada (${dataFormatada})</span>`;
+            }
             
             return `
             <tr>
@@ -353,14 +360,7 @@ async function carregarIgrejas() {
               <td style="font-family:monospace; color:var(--gold)">/${ig.slug}</td>
               <td>${ig._count?.membros || 0}</td>
               <td>${ig._count?.departamentos || 0}</td>
-              
-              <!-- NOVA COLUNA DE ASSINATURA -->
-              <td>
-                ${ativa 
-                  ? `<span class="badge badge-green">🟢 Ativa até ${dataFormatada}</span>`
-                  : `<span class="badge badge-red">🔴 Expirada</span>`
-                }
-              </td>
+              <td>${badgeAssinatura}</td>
 
               <td>
                 <a href="/igreja/${ig.slug}" target="_blank" class="btn btn-primary" style="padding:6px 12px; font-size:12px; text-decoration:none; width:auto; margin:0;">🌐 Abrir</a>
