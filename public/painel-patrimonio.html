@@ -161,6 +161,8 @@
           </div>
         </div>
 
+        <div id="alertasDevolucaoPatrimonio" class="no-print" style="margin-bottom: 18px;"></div>
+
         <div class="card">
           <table>
             <thead>
@@ -434,6 +436,8 @@
       atualizarResumo();
       renderizarTabela();
       renderizarPedidos();
+      atualizarAlertasDevolucao();
+
     }
 
     function atualizarResumo() {
@@ -780,6 +784,49 @@ async function gerarRelatorio(tipo) {
 function fecharModais() {
   document.getElementById('modalBem').style.display = 'none';
   document.getElementById('modalAcao').style.display = 'none';
+}
+function atualizarAlertasDevolucao() {
+  const box = document.getElementById('alertasDevolucaoPatrimonio');
+  if (!box || !Array.isArray(listaBens)) return;
+  const hoje = new Date();
+  hoje.setHours(0, 0, 0, 0);
+
+  const emp = listaBens.filter(b => b.status === 'EMPRESTADO' && b.dataDevolucaoPrev);
+  const alertas = emp.map(b => {
+    const dev = new Date(b.dataDevolucaoPrev);
+    dev.setHours(0, 0, 0, 0);
+    const diffDias = Math.round((dev - hoje) / (1000 * 60 * 60 * 24));
+    return { bem: b, diffDias };
+  }).filter(x => x.diffDias <= 3);
+
+  if (!alertas.length) {
+    box.innerHTML = '';
+    return;
+  }
+
+  const waBase = 'https://' + 'wa.me/';
+  box.innerHTML = alertas.map(a => {
+    const b = a.bem;
+    const atrasado = a.diffDias < 0;
+    const corBorda = atrasado ? '#ef4444' : '#f59e0b';
+    const etiqueta = atrasado
+      ? '🚨 ATRASADO HÁ ' + Math.abs(a.diffDias) + ' DIA(S)'
+      : (a.diffDias === 0 ? '⚠️ VENCE HOJE' : '⏳ VENCE EM ' + a.diffDias + ' DIA(S)');
+
+    const membroNome = b.emprestadoPara ? b.emprestadoPara.nome : 'Irmão(ã)';
+    const telLimpo = (b.emprestadoPara && b.emprestadoPara.telefone ? b.emprestadoPara.telefone : '').replace(/\D/g, '');
+    const msg = encodeURIComponent('Olá ' + membroNome + ', paz! Lembramos da devolução do património "' + b.nome + '" da igreja ' + igrejaAtual.nome + ', prevista para ' + new Date(b.dataDevolucaoPrev).toLocaleDateString('pt-PT') + '. 🙏');
+    const linkZap = telLimpo ? waBase + (telLimpo.startsWith('244') ? telLimpo : '244' + telLimpo) + '?text=' + msg : waBase + '?text=' + msg;
+
+    return '<div style="background:#0f172a;border:1px solid ' + corBorda + ';border-left:5px solid ' + corBorda + ';border-radius:12px;padding:12px 16px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">' +
+      '<div>' +
+        '<span style="color:' + corBorda + ';font-size:11px;font-weight:900;">' + etiqueta + '</span>' +
+        '<strong style="color:#fff;display:block;font-size:15px;">' + b.nome + ' — Com: ' + membroNome + '</strong>' +
+        '<small style="color:#94a3b8;">Devolução prevista: ' + new Date(b.dataDevolucaoPrev).toLocaleDateString('pt-PT') + '</small>' +
+      '</div>' +
+      '<a href="' + linkZap + '" target="_blank" class="btn btn-success btn-sm" style="text-decoration:none;">📲 Cobrar Devolução no WhatsApp</a>' +
+    '</div>';
+  }).join('');
 }
 
 init();
