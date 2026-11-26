@@ -2,17 +2,16 @@ const express = require("express");
 const router = express.Router();
 const c = require("../controllers/pastor.controller");
 const prisma = require("../config/prisma");
-const { verificarToken, apenasLideranca } = require("../middlewares/authJwt");
 
 router.post("/login", c.login);
 router.get("/igreja/:igrejaId", c.list);
 router.get("/:id", c.get);
-router.post("/igreja/:igrejaId", verificarToken, apenasLideranca, c.create);
-router.put("/:id", verificarToken, apenasLideranca, c.update);
-router.delete("/:id", verificarToken, apenasLideranca, c.remove);
+router.post("/igreja/:igrejaId", c.create);
+router.put("/:id", c.update);
+router.delete("/:id", c.remove);
 
 // Rota para atualizar foto do pastor (recebe o link do Cloudinary)
-router.put("/:id/foto", verificarToken, apenasLideranca, async (req, res) => {
+router.put("/:id/foto", async (req, res) => {
   try {
     const { fotoUrl } = req.body;
     if (!fotoUrl) return res.status(400).json({ message: "Nenhuma foto enviada" });
