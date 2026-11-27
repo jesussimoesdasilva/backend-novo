@@ -9,6 +9,10 @@ app.use(express.json());
 
 app.use(express.static(path.join(__dirname, '..', 'public')));
 
+const { verificarBloqueioLogin, protegerCadastroRobo } = require('./middlewares/seguranca');
+app.use(verificarBloqueioLogin);
+app.use(protegerCadastroRobo);
+
 // ROTAS
 app.use('/api/igrejas', require('./routes/igreja.routes'));
 app.use('/api/membros', require('./routes/membro.routes'));

@@ -4,6 +4,7 @@ const PDFDocument = require('pdfkit');
 const membroService = require("../services/membro.service");
 const https = require('https');
 const { gerarToken } = require("../middlewares/authJwt");
+const { desbloquearConta } = require("../middlewares/seguranca");
 
 // ===== FUNÇÕES ORIGINAIS =====
 async function publicRegister(req, res) {
@@ -111,6 +112,7 @@ async function redefinirSenhaComCodigo(req, res) {
 
     const hash = await bcrypt.hash(novaSenha, 10);
     await prisma.membro.update({ where: { email }, data: { password: hash } });
+    desbloquearConta(email);
     codigosRecuperacao.delete(email);
 
     res.json({ ok: true, message: "Senha redefinida com sucesso!" });
@@ -161,7 +163,12 @@ async function setSectores(req, res) {
 }
 
 async function resetPassword(req, res) {
-  try { const hash = await bcrypt.hash("123456", 10); await prisma.membro.update({ where: { id: Number(req.params.id) }, data: { password: hash } }); res.json({ ok: true }); } catch (err) { res.status(500).json({ message: err.message }); }
+  try {
+    const hash = await bcrypt.hash("123456", 10);
+    const m = await prisma.membro.update({ where: { id: Number(req.params.id) }, data: { password: hash } });
+    if (m && m.email) desbloquearConta(m.email);
+    res.json({ ok: true });
+  } catch (err) { res.status(500).json({ message: err.message }); }
 }
 
 async function remove(req, res) {

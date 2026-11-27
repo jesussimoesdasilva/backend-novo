@@ -736,6 +736,8 @@ footer strong{color:#f2d27c}
             </label>
           </div>
           <div class="input-group full"><label>Nome Completo *</label><input type="text" id="rNome" required></div>
+          <input type="text" id="_website_isca" name="_website_isca" autocomplete="off" tabindex="-1" style="display:none !important;">
+          <input type="hidden" id="_tempo_abertura" value="">
           <div class="input-group"><label>Email *</label><input type="email" id="rEmail" required></div>
           <div class="input-group"><label>Palavra-passe *</label><input type="password" id="rSenha" required minlength="6"></div>
           <div class="input-group"><label>Telefone *</label><input type="tel" id="rTelefone" required></div>
@@ -2580,7 +2582,11 @@ function abrirDetalheEvento(id, title, data, local, desc, imagem) {
   document.getElementById('modalEventoDetalhe').style.display = 'flex';
 }
 
-function abrirModalRegisto() { document.getElementById('modalRegisto').style.display = 'flex'; }
+function abrirModalRegisto() {
+  document.getElementById('_tempo_abertura').value = Date.now();
+  document.getElementById('modalRegisto').style.display = 'flex';
+}
+
 function abrirModalLogin() { document.getElementById('modalLogin').style.display = 'flex'; }
 function abrirModalRecuperar() {
   fecharModal('modalLogin');
@@ -2631,6 +2637,8 @@ async function submeterRegisto(e) {
       bi: document.getElementById('rBi').value,
       endereco: document.getElementById('rEndereco').value,
       dataNascimento: document.getElementById('rNascimento').value,
+      _website_isca: document.getElementById('_website_isca')?.value || '',
+      _tempo_abertura: document.getElementById('_tempo_abertura')?.value || Date.now(),
       foto: fotoUrl
     };
 
