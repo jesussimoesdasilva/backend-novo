@@ -20,6 +20,7 @@ model Igreja {
   heroSmall       String?  @default("ASSEMBLEIA DE DEUS PENTECOSTAL")
   heroTitulo      String?  @default("Onde a fé encontra")
   heroDestaque    String?  @default("o coração")
+  slogan          String?
   logoUrl         String?  
   imagensHero     String?  
   corFundo        String?  @default("#f1f5f9") 
