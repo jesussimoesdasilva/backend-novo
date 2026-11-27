@@ -56,6 +56,7 @@ async function updateIgreja(id, data) {
     nome: data.nome,
     slug: data.slug,
     descricao: data.descricao,
+    slogan: data.slogan,
     icone: data.icone,
     endereco: data.endereco,
     telefone: data.telefone,
