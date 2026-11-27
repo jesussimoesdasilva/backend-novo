@@ -5,6 +5,11 @@ const upload = require("../middlewares/upload");
 
 router.get("/", c.listIgrejas);
 router.post("/login", c.login);
+router.post("/admin/login", c.loginAdminMaster);
+router.put("/admin/config", c.salvarConfigAdminMaster);
+router.post("/admin/recuperar", c.solicitarCodigoAdmin);
+router.post("/admin/redefinir", c.redefinirSenhaAdmin);
+
 router.get("/:id", c.getIgreja);
 router.post("/", c.addIgreja);
 router.put("/:id", c.editIgreja);
@@ -14,11 +19,7 @@ router.delete("/:id", c.removeIgreja);
 router.post("/:id/logo", upload.single("logo"), c.uploadLogo);
 router.post("/:id/imagens-hero", upload.array("imagens", 5), c.uploadImagensHero);
 router.put("/:id/cor-fundo", c.salvarCorFundo);
-router.put("/:id/cor-barra-topo", c.salvarCorBarraTopo); // NOVO
+router.put("/:id/cor-barra-topo", c.salvarCorBarraTopo);
 router.put("/:id/renovar", c.renovarAssinatura);
 
-router.post("/admin/login", c.loginAdminMaster);
-router.put("/admin/config", c.salvarConfigAdminMaster);
-router.post("/admin/recuperar", c.solicitarCodigoAdmin);
-router.post("/admin/redefinir", c.redefinirSenhaAdmin);
 module.exports = router;
