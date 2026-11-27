@@ -105,26 +105,44 @@ tr:hover td{background:rgba(255,255,255,0.02)}
 
 <!-- ECRÃ DE RECUPERAÇÃO DE SENHA -->
 <div id="modalRecuperarAdmin" style="position:fixed; inset:0; background:rgba(0,0,0,0.85); display:none; align-items:center; justify-content:center; z-index:10000;">
-  <div style="background:var(--navy2); padding:40px; border-radius:16px; border:1px solid var(--gold); width:100%; max-width:420px; text-align:center;">
-    <h2 style="color:var(--gold); margin-bottom:15px;">Recuperar Senha</h2>
-    <p style="color:var(--muted); margin-bottom:20px; font-size:13px;">Insira os dados registados nas Configurações.</p>
+  <div style="background:var(--navy2); padding:35px; border-radius:16px; border:1px solid var(--gold); width:100%; max-width:420px; text-align:center;">
+    <h2 style="color:var(--gold); margin-bottom:10px;">🔑 Redefinir Senha Master</h2>
     <div id="recuperarAdminError" style="color:var(--red); margin-bottom:15px; display:none; font-size:13px;"></div>
-    <div class="field" style="text-align:left;">
-      <label>Email</label>
-      <input type="email" id="recEmailAdmin" placeholder="admin@master.com">
+    <div id="recuperarAdminOk" style="color:var(--green); margin-bottom:15px; display:none; font-size:13px; font-weight:bold;"></div>
+
+    <div id="passo1RecAdmin">
+      <p style="color:var(--muted); margin-bottom:16px; font-size:13px;">Confirme os dados guardados nas Configurações.</p>
+      <div class="field" style="text-align:left; margin-bottom:12px;">
+        <label>Email</label>
+        <input type="email" id="recEmailAdmin" placeholder="admin@master.com">
+      </div>
+      <div class="field" style="text-align:left; margin-bottom:12px;">
+        <label>Telefone</label>
+        <input type="text" id="recTelefoneAdmin" placeholder="Ex: 923000000">
+      </div>
+      <div class="field" style="text-align:left; margin-bottom:16px;">
+        <label>B.I.</label>
+        <input type="text" id="recBiAdmin" placeholder="Ex: 000000000LA000">
+      </div>
+      <button type="button" class="btn btn-primary" onclick="recuperarSenhaAdmin()" style="width:100%;">📩 Gerar Código</button>
     </div>
-    <div class="field" style="text-align:left;">
-      <label>Telefone</label>
-      <input type="text" id="recTelefoneAdmin" placeholder="Ex: 923...">
+
+    <div id="passo2RecAdmin" style="display:none;">
+      <div class="field" style="text-align:left; margin-bottom:12px;">
+        <label>Código de Verificação (6 dígitos)</label>
+        <input type="text" id="recCodigoAdmin" maxlength="6" placeholder="000000">
+      </div>
+      <div class="field" style="text-align:left; margin-bottom:16px;">
+        <label>Nova Palavra-passe (mín. 6 caracteres)</label>
+        <input type="password" id="recNovaSenhaAdmin" minlength="6" placeholder="Nova senha">
+      </div>
+      <button type="button" class="btn btn-primary" onclick="confirmarRedefinicaoAdmin()" style="width:100%;">✅ Confirmar Nova Senha</button>
     </div>
-    <div class="field" style="text-align:left;">
-      <label>B.I.</label>
-      <input type="text" id="recBiAdmin" placeholder="Ex: 004...">
-    </div>
-    <button class="btn btn-primary" onclick="recuperarSenhaAdmin()" style="width:100%; margin-top:10px;">📩 Enviar Código</button>
-    <button class="btn btn-outline" onclick="fecharModalAdmin()" style="width:100%; margin-top:10px;">Cancelar</button>
+
+    <button type="button" class="btn btn-outline" onclick="fecharModalAdmin()" style="width:100%; margin-top:10px; margin-left:0;">Cancelar</button>
   </div>
 </div>
+
 
 <!-- O RESTO DO PAINEL -->
 <aside class="sidebar" id="sidebarAdmin" style="display:none;">
@@ -231,22 +249,35 @@ function toast(msg, type='success') {
   setTimeout(() => el.remove(), 4000);
 }
 
-// --- LOGIN ---
-function fazerLoginAdmin(e) {
+// --- LOGIN REAL ---
+async function fazerLoginAdmin(e) {
   e.preventDefault();
-  const email = document.getElementById('adminEmail').value;
+  const email = document.getElementById('adminEmail').value.trim();
   const senha = document.getElementById('adminSenha').value;
   const erro = document.getElementById('loginAdminError');
+  erro.style.display = 'none';
 
-  // SIMULAÇÃO (Depois ligar ao backend)
-  if (email === 'admin@master.com' && senha === '123456') {
+  try {
+    const r = await fetch(API + '/igrejas/admin/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, senha })
+    });
+    const d = await r.json();
+    if (!r.ok) throw new Error(d.message || 'Email ou senha incorretos.');
+
+    document.getElementById('cfgNome').value = d.admin.nome || 'Admin Master';
+    document.getElementById('cfgEmail').value = d.admin.email || email;
+    document.getElementById('cfgTelefone').value = d.admin.telefone || '';
+    document.getElementById('cfgBi').value = d.admin.bi || '';
+
     document.getElementById('loginAdminScreen').style.display = 'none';
     document.getElementById('sidebarAdmin').style.display = 'flex';
     document.getElementById('mainAdmin').style.display = 'block';
     carregarStatsTopo();
     carregarIgrejas();
-  } else {
-    erro.textContent = '❌ Email ou senha incorretos.';
+  } catch (err) {
+    erro.textContent = '❌ ' + err.message;
     erro.style.display = 'block';
   }
 }
@@ -258,47 +289,78 @@ function sairAdmin() {
 }
 
 function abrirModalRecuperarAdmin() {
+  document.getElementById('passo1RecAdmin').style.display = 'block';
+  document.getElementById('passo2RecAdmin').style.display = 'none';
+  document.getElementById('recuperarAdminError').style.display = 'none';
+  document.getElementById('recuperarAdminOk').style.display = 'none';
   document.getElementById('modalRecuperarAdmin').style.display = 'flex';
 }
 function fecharModalAdmin() {
   document.getElementById('modalRecuperarAdmin').style.display = 'none';
 }
 async function recuperarSenhaAdmin() {
-  const email = document.getElementById('recEmailAdmin').value;
-  const tel = document.getElementById('recTelefoneAdmin').value;
-  const bi = document.getElementById('recBiAdmin').value;
+  const email = document.getElementById('recEmailAdmin').value.trim();
+  const tel = document.getElementById('recTelefoneAdmin').value.trim();
+  const bi = document.getElementById('recBiAdmin').value.trim();
   const erro = document.getElementById('recuperarAdminError');
-  const btn = event.target;
+  const okEl = document.getElementById('recuperarAdminOk');
 
   if (!email || !tel || !bi) {
     erro.textContent = '❌ Preencha todos os campos.';
     erro.style.display = 'block';
     return;
   }
-
-  btn.innerHTML = '⏳ A enviar...';
-  btn.disabled = true;
   erro.style.display = 'none';
 
   try {
-    const r = await fetch('/api/igrejas/admin/recuperar', {
+    const r = await fetch(API + '/igrejas/admin/recuperar', {
       method: 'POST',
-      headers: {'Content-Type':'application/json'},
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email, telefone: tel, bi })
     });
     const d = await r.json();
     if (!r.ok) throw new Error(d.message);
 
-    alert(`✅ Código gerado (Simulação): ${d.codigo}\n\nO código deveria ser enviado por SMS.`);
-    fecharModalAdmin();
+    okEl.textContent = '✅ Código gerado: ' + d.codigo;
+    okEl.style.display = 'block';
+    document.getElementById('passo1RecAdmin').style.display = 'none';
+    document.getElementById('passo2RecAdmin').style.display = 'block';
   } catch (e) {
     erro.textContent = '❌ ' + e.message;
     erro.style.display = 'block';
-  } finally {
-    btn.innerHTML = '📩 Enviar Código';
-    btn.disabled = false;
   }
 }
+
+async function confirmarRedefinicaoAdmin() {
+  const email = document.getElementById('recEmailAdmin').value.trim();
+  const codigo = document.getElementById('recCodigoAdmin').value.trim();
+  const novaSenha = document.getElementById('recNovaSenhaAdmin').value;
+  const erro = document.getElementById('recuperarAdminError');
+  const okEl = document.getElementById('recuperarAdminOk');
+
+  try {
+    const r = await fetch(API + '/igrejas/admin/redefinir', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, codigo, novaSenha })
+    });
+    const d = await r.json();
+    if (!r.ok) throw new Error(d.message);
+
+    erro.style.display = 'none';
+    okEl.textContent = '✅ ' + d.message;
+    okEl.style.display = 'block';
+    setTimeout(() => {
+      fecharModalAdmin();
+      document.getElementById('adminEmail').value = email;
+      document.getElementById('adminSenha').value = '';
+    }, 1800);
+  } catch (e) {
+    erro.textContent = '❌ ' + e.message;
+    erro.style.display = 'block';
+  }
+}
+
 // --- RESTO DO PAINEL ---
 function mudarAba(aba, btn) {
   document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
@@ -494,6 +556,7 @@ async function salvarSubadmin(e) {
     btn.innerHTML = txtOriginal; btn.disabled = false;
   }
 }
+
 async function carregarMembrosGlobal() {
   const div = document.getElementById('listaMembrosGlobal');
   div.innerHTML = '<div class="loader">A compilar lista de membros...</div>';
@@ -525,6 +588,7 @@ async function carregarMembrosGlobal() {
     `;
   } catch (e) { div.innerHTML = '<p style="color:var(--red)">Erro ao compilar os membros.</p>'; }
 }
+
 async function carregarFinanceiroGlobal() {
   const div = document.getElementById('tabelaFinanceiroGlobal');
   div.innerHTML = '<div class="loader">A calcular finanças globais...</div>';
@@ -562,15 +626,34 @@ async function carregarFinanceiroGlobal() {
     `;
   } catch (e) { div.innerHTML = '<p style="color:var(--red)">Erro ao calcular o financeiro.</p>'; }
 }
-function salvarConfiguracoes() {
+
+async function salvarConfiguracoes() {
   const alerta = document.getElementById('msgAlertaConfig');
-  const nome = document.getElementById('cfgNome').value;
-  alerta.style.display = 'block';
-  alerta.style.background = 'rgba(16,185,129,0.15)';
-  alerta.style.color = 'var(--green)';
-  alerta.style.border = '1px solid rgba(16,185,129,0.3)';
-  alerta.innerHTML = `✅ Perfil do Administrador <strong>${nome}</strong> atualizado com sucesso (Simulado)!`;
-  setTimeout(() => alerta.style.display = 'none', 4000);
+  const nome = document.getElementById('cfgNome').value.trim();
+  const email = document.getElementById('cfgEmail').value.trim();
+  const telefone = document.getElementById('cfgTelefone').value.trim();
+  const bi = document.getElementById('cfgBi').value.trim();
+  const novaSenha = document.getElementById('cfgSenha').value;
+
+  try {
+    const r = await fetch(API + '/igrejas/admin/config', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ nome, email, telefone, bi, novaSenha })
+    });
+    const d = await r.json();
+    if (!r.ok) throw new Error(d.message || 'Erro ao guardar configurações');
+
+    document.getElementById('cfgSenha').value = '';
+    alerta.style.display = 'block';
+    alerta.style.background = 'rgba(16,185,129,0.15)';
+    alerta.style.color = 'var(--green)';
+    alerta.style.border = '1px solid rgba(16,185,129,0.3)';
+    alerta.innerHTML = '✅ Configurações e credenciais do Admin Master guardadas com sucesso!';
+    setTimeout(() => alerta.style.display = 'none', 4000);
+  } catch (e) {
+    toast(e.message, 'error');
+  }
 }
 
 async function zerarFinancasAdmin(igrejaId, nomeIgreja) {
