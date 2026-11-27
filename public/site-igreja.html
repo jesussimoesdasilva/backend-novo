@@ -837,28 +837,58 @@ footer strong{color:#f2d27c}
   </div>
 </div>
 
-<!-- MODAL DA BÍBLIA -->
+<!-- MODAL DA BÍBLIA PREMIUM -->
 <div class="modal-overlay" id="modalBiblia">
-  <div class="modal" style="max-width:800px; background:#fff;">
-    <div class="modal-header">
-      <div><h2 id="bibliaTitulo">📖 Bíblia Sagrada</h2><p id="bibliaRef">Selecione um livro e capítulo</p></div>
-      <button class="close-btn" onclick="fecharModal('modalBiblia')">✕</button>
+  <div class="modal" style="max-width:860px; background:#0f172a; color:#f1f5f9; border:2px solid #d4a017;">
+    <div class="modal-header" style="background:linear-gradient(135deg,#020617,#1e3a8a); border-bottom:1px solid #d4a017; padding:18px 24px;">
+      <div>
+        <h2 id="bibliaTitulo" style="color:#facc15; font-size:22px;">📖 Bíblia Sagrada (Almeida)</h2>
+        <p id="bibliaRef" style="color:#bfdbfe; font-size:12px;">Leitura rápida, pesquisa e versículos favoritos</p>
+      </div>
+      <div style="display:flex; align-items:center; gap:8px;">
+        <button type="button" onclick="mudarFonteBiblia(-2)" title="Diminuir letra" style="background:rgba(255,255,255,0.1); color:#fff; border:1px solid #475569; border-radius:8px; padding:5px 10px; font-weight:800;">A-</button>
+        <button type="button" onclick="mudarFonteBiblia(2)" title="Aumentar letra" style="background:rgba(255,255,255,0.1); color:#fff; border:1px solid #475569; border-radius:8px; padding:5px 10px; font-weight:800;">A+</button>
+        <button type="button" id="btnModoBiblia" onclick="alternarModoBiblia()" title="Modo Claro / Escuro" style="background:rgba(250,204,21,0.15); color:#facc15; border:1px solid #d4a017; border-radius:8px; padding:5px 10px; font-weight:800;">🌙</button>
+        <button class="close-btn" onclick="fecharModal('modalBiblia')" style="margin-left:6px;">✕</button>
+      </div>
     </div>
-    <div class="modal-body">
-      <div class="biblia-controls">
-        <select id="bibliaLivro" onchange="carregarCapitulosBiblia()">
-          <option value="">A carregar livros...</option>
-        </select>
-        <select id="bibliaCapitulo" onchange="buscarVersiculosBiblia()">
-          <option value="">Capítulo...</option>
-        </select>
+
+    <div class="modal-body" style="padding:20px 24px;">
+      <!-- ABAS LEITURA / PESQUISA / FAVORITOS -->
+      <div style="display:flex; gap:8px; margin-bottom:16px; flex-wrap:wrap;">
+        <button type="button" id="tabBibliaLeitura" onclick="mudarAbaBiblia('leitura')" class="btn gold" style="padding:8px 16px; font-size:13px; border-radius:10px;">📖 Leitura</button>
+        <button type="button" id="tabBibliaFavoritos" onclick="mudarAbaBiblia('favoritos')" class="btn outline" style="padding:8px 16px; font-size:13px; border-radius:10px;">⭐ Favoritos (<span id="qtdFavBiblia">0</span>)</button>
+        <div style="flex:1; min-width:210px; position:relative;">
+          <input type="text" id="inputBuscaBiblia" placeholder="🔍 Ir rápido (ex: João 3:16, Salmos 23) ou filtrar..." onkeyup="if(event.key==='Enter') buscaRapidaBiblia(); else filtrarVersiculosNaTela(this.value);" style="width:100%; padding:9px 38px 9px 14px; border-radius:10px; border:1px solid #334155; background:#020617; color:#fff; font-size:13px;">
+          <button type="button" onclick="buscaRapidaBiblia()" style="position:absolute; right:6px; top:50%; transform:translateY(-50%); background:#d4a017; color:#020617; border:none; border-radius:6px; padding:4px 8px; font-size:11px; font-weight:900;">Ir</button>
+        </div>
       </div>
-      <div id="bibliaLeitura" class="biblia-leitura">
-        <p style="text-align:center; color:#64748b; font-style:italic;">Selecione o Livro e o Capítulo para começar a leitura.</p>
+
+      <!-- ÁREA DE LEITURA -->
+      <div id="painelBibliaLeitura">
+        <div class="biblia-controls" style="display:grid; grid-template-columns:1.4fr 1fr; gap:10px; margin-bottom:14px;">
+          <select id="bibliaLivro" onchange="carregarCapitulosBiblia(true)" style="background:#020617; color:#facc15; border:1px solid #334155; padding:11px; border-radius:10px; font-weight:700;">
+            <option value="">Selecione o Livro</option>
+          </select>
+          <select id="bibliaCapitulo" onchange="buscarVersiculosBiblia()" style="background:#020617; color:#fff; border:1px solid #334155; padding:11px; border-radius:10px; font-weight:700;">
+            <option value="">Capítulo...</option>
+          </select>
+        </div>
+
+        <div id="bibliaLeitura" class="biblia-leitura" style="background:#fdfbf7; color:#1e293b; border-radius:14px; padding:24px; max-height:52vh; overflow-y:auto; font-family:Georgia,serif; font-size:18px; line-height:1.85; border:1px solid #cbd5e1;">
+          <p style="text-align:center; color:#64748b; font-style:italic;">Selecione um livro ou digite uma referência como <strong>João 3:16</strong> acima.</p>
+        </div>
+
+        <div class="biblia-nav" style="display:flex; justify-content:space-between; align-items:center; margin-top:14px;">
+          <button type="button" class="btn outline" onclick="navegarBiblia(-1)" style="padding:9px 18px; font-size:13px;">⬅ Capítulo Anterior</button>
+          <span id="bibliaProgresso" style="font-size:12px; color:#94a3b8; font-weight:700;"></span>
+          <button type="button" class="btn gold" onclick="navegarBiblia(1)" style="padding:9px 18px; font-size:13px;">Próximo Capítulo ➡</button>
+        </div>
       </div>
-      <div class="biblia-nav">
-        <button class="btn btn-outline" onclick="navegarBiblia(-1)" style="color:#020617; border-color:#020617;">⬅ Anterior</button>
-        <button class="btn btn-outline" onclick="navegarBiblia(1)" style="color:#020617; border-color:#020617;">Próximo ➡</button>
+
+      <!-- ÁREA DE FAVORITOS -->
+      <div id="painelBibliaFavoritos" style="display:none;">
+        <div id="listaFavoritosBiblia" style="max-height:56vh; overflow-y:auto; display:flex; flex-direction:column; gap:10px;"></div>
       </div>
     </div>
   </div>
@@ -1385,92 +1415,322 @@ function gerarPDFComprovativo() {
   window.open(`/api/ofertas/comprovativo/${igrejaIdAtual}/${dadosComprovativo.codigo}`, '_blank');
 }
 
-// ===== BÍBLIA =====
+// ===== BÍBLIA PREMIUM =====
 const LIVROS_BIBLIA = [
-  "Génesis", "Êxodo", "Levítico", "Números", "Deuteronómio", "Josué", "Juízes", "Rute", "1 Samuel", "2 Samuel", "1 Reis", "2 Reis", "1 Crónicas", "2 Crónicas", "Esdras", "Neemias", "Ester", "Jó", "Salmos", "Provérbios", "Eclesiastes", "Cantares", "Isaías", "Jeremias", "Lamentações", "Ezequiel", "Daniel", "Oseias", "Joel", "Amós", "Obadias", "Jonas", "Miqueias", "Naum", "Habacuque", "Sofonias", "Ageu", "Zacarias", "Malaquias",
-  "Mateus", "Marcos", "Lucas", "João", "Atos", "Romanos", "1 Coríntios", "2 Coríntios", "Gálatas", "Efésios", "Filipenses", "Colossenses", "1 Tessalonicenses", "2 Tessalonicenses", "1 Timóteo", "2 Timóteo", "Tito", "Filemom", "Hebreus", "Tiago", "1 Pedro", "2 Pedro", "1 João", "2 João", "3 João", "Judas", "Apocalipse"
+  { pt: "Génesis", en: "Genesis", caps: 50, test: "AT" },
+  { pt: "Êxodo", en: "Exodus", caps: 40, test: "AT" },
+  { pt: "Levítico", en: "Leviticus", caps: 27, test: "AT" },
+  { pt: "Números", en: "Numbers", caps: 36, test: "AT" },
+  { pt: "Deuteronómio", en: "Deuteronomy", caps: 34, test: "AT" },
+  { pt: "Josué", en: "Joshua", caps: 24, test: "AT" },
+  { pt: "Juízes", en: "Judges", caps: 21, test: "AT" },
+  { pt: "Rute", en: "Ruth", caps: 4, test: "AT" },
+  { pt: "1 Samuel", en: "1 Samuel", caps: 31, test: "AT" },
+  { pt: "2 Samuel", en: "2 Samuel", caps: 24, test: "AT" },
+  { pt: "1 Reis", en: "1 Kings", caps: 22, test: "AT" },
+  { pt: "2 Reis", en: "2 Kings", caps: 25, test: "AT" },
+  { pt: "1 Crónicas", en: "1 Chronicles", caps: 29, test: "AT" },
+  { pt: "2 Crónicas", en: "2 Chronicles", caps: 36, test: "AT" },
+  { pt: "Esdras", en: "Ezra", caps: 10, test: "AT" },
+  { pt: "Neemias", en: "Nehemiah", caps: 13, test: "AT" },
+  { pt: "Ester", en: "Esther", caps: 10, test: "AT" },
+  { pt: "Jó", en: "Job", caps: 42, test: "AT" },
+  { pt: "Salmos", en: "Psalms", caps: 150, test: "AT" },
+  { pt: "Provérbios", en: "Proverbs", caps: 31, test: "AT" },
+  { pt: "Eclesiastes", en: "Ecclesiastes", caps: 12, test: "AT" },
+  { pt: "Cantares", en: "Song of Solomon", caps: 8, test: "AT" },
+  { pt: "Isaías", en: "Isaiah", caps: 66, test: "AT" },
+  { pt: "Jeremias", en: "Jeremiah", caps: 52, test: "AT" },
+  { pt: "Lamentações", en: "Lamentations", caps: 5, test: "AT" },
+  { pt: "Ezequiel", en: "Ezekiel", caps: 48, test: "AT" },
+  { pt: "Daniel", en: "Daniel", caps: 12, test: "AT" },
+  { pt: "Oseias", en: "Hosea", caps: 14, test: "AT" },
+  { pt: "Joel", en: "Joel", caps: 3, test: "AT" },
+  { pt: "Amós", en: "Amos", caps: 9, test: "AT" },
+  { pt: "Obadias", en: "Obadiah", caps: 1, test: "AT" },
+  { pt: "Jonas", en: "Jonah", caps: 4, test: "AT" },
+  { pt: "Miqueias", en: "Micah", caps: 7, test: "AT" },
+  { pt: "Naum", en: "Nahum", caps: 3, test: "AT" },
+  { pt: "Habacuque", en: "Habakkuk", caps: 3, test: "AT" },
+  { pt: "Sofonias", en: "Zephaniah", caps: 3, test: "AT" },
+  { pt: "Ageu", en: "Haggai", caps: 2, test: "AT" },
+  { pt: "Zacarias", en: "Zechariah", caps: 14, test: "AT" },
+  { pt: "Malaquias", en: "Malachi", caps: 4, test: "AT" },
+  { pt: "Mateus", en: "Matthew", caps: 28, test: "NT" },
+  { pt: "Marcos", en: "Mark", caps: 16, test: "NT" },
+  { pt: "Lucas", en: "Luke", caps: 24, test: "NT" },
+  { pt: "João", en: "John", caps: 21, test: "NT" },
+  { pt: "Atos", en: "Acts", caps: 28, test: "NT" },
+  { pt: "Romanos", en: "Romans", caps: 16, test: "NT" },
+  { pt: "1 Coríntios", en: "1 Corinthians", caps: 16, test: "NT" },
+  { pt: "2 Coríntios", en: "2 Corinthians", caps: 13, test: "NT" },
+  { pt: "Gálatas", en: "Galatians", caps: 6, test: "NT" },
+  { pt: "Efésios", en: "Ephesians", caps: 6, test: "NT" },
+  { pt: "Filipenses", en: "Philippians", caps: 4, test: "NT" },
+  { pt: "Colossenses", en: "Colossians", caps: 4, test: "NT" },
+  { pt: "1 Tessalonicenses", en: "1 Thessalonians", caps: 5, test: "NT" },
+  { pt: "2 Tessalonicenses", en: "2 Thessalonians", caps: 3, test: "NT" },
+  { pt: "1 Timóteo", en: "1 Timothy", caps: 6, test: "NT" },
+  { pt: "2 Timóteo", en: "2 Timothy", caps: 4, test: "NT" },
+  { pt: "Tito", en: "Titus", caps: 3, test: "NT" },
+  { pt: "Filemom", en: "Philemon", caps: 1, test: "NT" },
+  { pt: "Hebreus", en: "Hebrews", caps: 13, test: "NT" },
+  { pt: "Tiago", en: "James", caps: 5, test: "NT" },
+  { pt: "1 Pedro", en: "1 Peter", caps: 5, test: "NT" },
+  { pt: "2 Pedro", en: "2 Peter", caps: 3, test: "NT" },
+  { pt: "1 João", en: "1 John", caps: 5, test: "NT" },
+  { pt: "2 João", en: "2 John", caps: 1, test: "NT" },
+  { pt: "3 João", en: "3 John", caps: 1, test: "NT" },
+  { pt: "Judas", en: "Jude", caps: 1, test: "NT" },
+  { pt: "Apocalipse", en: "Revelation", caps: 22, test: "NT" }
 ];
+
+const cacheCapitulosBiblia = {};
+let versiculosAtuaisBiblia = [];
+let tamanhoFonteBiblia = 18;
+let modoNoturnoBiblia = false;
+let versiculoDestaqueAlvo = null;
+
+function normalizarTxtBiblia(s) {
+  return String(s || '').toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
+}
+
+function atualizarContadorFavBiblia() {
+  const el = document.getElementById('qtdFavBiblia');
+  if (el) el.textContent = favoritosBiblia.length;
+}
 
 function abrirBiblia() {
   const select = document.getElementById('bibliaLivro');
   if (select.options.length <= 1) {
-    select.innerHTML = '<option value="">Selecione o Livro</option>' + LIVROS_BIBLIA.map(l => `<option value="${l}">${l}</option>`).join('');
+    const at = LIVROS_BIBLIA.filter(l => l.test === "AT").map(l => '<option value="' + l.pt + '">' + l.pt + '</option>').join('');
+    const nt = LIVROS_BIBLIA.filter(l => l.test === "NT").map(l => '<option value="' + l.pt + '">' + l.pt + '</option>').join('');
+    select.innerHTML = '<option value="">Selecione o Livro</option><optgroup label="Antigo Testamento">' + at + '</optgroup><optgroup label="Novo Testamento">' + nt + '</optgroup>';
   }
-  document.getElementById('bibliaLeitura').innerHTML = '<p style="text-align:center; color:#64748b; font-style:italic;">Selecione o Livro e o Capítulo para começar a leitura.</p>';
-  document.getElementById('bibliaCapitulo').innerHTML = '<option value="">Capítulo...</option>';
+  atualizarContadorFavBiblia();
+  mudarAbaBiblia('leitura');
   document.getElementById('modalBiblia').style.display = 'flex';
+  if (!select.value) {
+    select.value = "Salmos";
+    carregarCapitulosBiblia(false);
+    document.getElementById('bibliaCapitulo').value = "23";
+    buscarVersiculosBiblia();
+  }
 }
 
-function carregarCapitulosBiblia() {
-  const livro = document.getElementById('bibliaLivro').value;
-  const selectCap = document.getElementById('bibliaCapitulo');
-  if (!livro) return selectCap.innerHTML = '<option value="">Capítulo...</option>';
-  
-  let numCapitulos = 50;
-  if (livro === "Salmos") numCapitulos = 150;
-  if (livro === "Génesis") numCapitulos = 50;
-  if (livro === "Mateus") numCapitulos = 28;
-  if (livro === "João") numCapitulos = 21;
-  if (livro === "Apocalipse") numCapitulos = 22;
+function mudarAbaBiblia(aba) {
+  const pLeitura = document.getElementById('painelBibliaLeitura');
+  const pFav = document.getElementById('painelBibliaFavoritos');
+  const bLeitura = document.getElementById('tabBibliaLeitura');
+  const bFav = document.getElementById('tabBibliaFavoritos');
 
-  let options = '<option value="">Selecione o Capítulo</option>';
-  for (let i = 1; i <= numCapitulos; i++) {
-    options += `<option value="${i}">Capítulo ${i}</option>`;
+  if (aba === 'favoritos') {
+    pLeitura.style.display = 'none';
+    pFav.style.display = 'block';
+    bFav.className = 'btn gold';
+    bLeitura.className = 'btn outline';
+    renderizarFavoritosBiblia();
+  } else {
+    pLeitura.style.display = 'block';
+    pFav.style.display = 'none';
+    bLeitura.className = 'btn gold';
+    bFav.className = 'btn outline';
+  }
+}
+
+function mudarFonteBiblia(delta) {
+  tamanhoFonteBiblia = Math.max(14, Math.min(28, tamanhoFonteBiblia + delta));
+  document.getElementById('bibliaLeitura').style.fontSize = tamanhoFonteBiblia + 'px';
+}
+
+function alternarModoBiblia() {
+  modoNoturnoBiblia = !modoNoturnoBiblia;
+  const box = document.getElementById('bibliaLeitura');
+  const btn = document.getElementById('btnModoBiblia');
+  if (modoNoturnoBiblia) {
+    box.style.background = '#020617';
+    box.style.color = '#f1f5f9';
+    box.style.borderColor = '#334155';
+    btn.textContent = 'Dia';
+  } else {
+    box.style.background = '#fdfbf7';
+    box.style.color = '#1e293b';
+    box.style.borderColor = '#cbd5e1';
+    btn.textContent = 'Noite';
+  }
+}
+
+function carregarCapitulosBiblia(autoAbrirCap1 = false) {
+  const livroNome = document.getElementById('bibliaLivro').value;
+  const selectCap = document.getElementById('bibliaCapitulo');
+  const info = LIVROS_BIBLIA.find(l => l.pt === livroNome);
+  if (!info) { selectCap.innerHTML = '<option value="">Capítulo...</option>'; return; }
+
+  let options = '<option value="">Capítulo...</option>';
+  for (let i = 1; i <= info.caps; i++) {
+    options += '<option value="' + i + '">Capítulo ' + i + '</option>';
   }
   selectCap.innerHTML = options;
+  if (autoAbrirCap1) {
+    selectCap.value = "1";
+    buscarVersiculosBiblia();
+  }
 }
-
 async function buscarVersiculosBiblia() {
-  const livro = document.getElementById('bibliaLivro').value;
+  const livroNome = document.getElementById('bibliaLivro').value;
   const capitulo = document.getElementById('bibliaCapitulo').value;
   const divLeitura = document.getElementById('bibliaLeitura');
-  
-  if (!livro || !capitulo) return;
+  const info = LIVROS_BIBLIA.find(l => l.pt === livroNome);
 
-  divLeitura.innerHTML = '<p style="text-align:center;">A carregar a Palavra...</p>';
-  document.getElementById('bibliaRef').textContent = `${livro} ${capitulo}`;
+  if (!info || !capitulo) return;
+
+  document.getElementById('bibliaRef').textContent = livroNome + ' ' + capitulo;
+  document.getElementById('bibliaProgresso').textContent = 'Cap. ' + capitulo + ' de ' + info.caps;
+  const chaveCache = info.en + '_' + capitulo;
+
+  if (cacheCapitulosBiblia[chaveCache]) {
+    versiculosAtuaisBiblia = cacheCapitulosBiblia[chaveCache];
+    renderizarVersiculosBiblia(versiculosAtuaisBiblia, livroNome, capitulo);
+    return;
+  }
+
+  divLeitura.innerHTML = '<p style="text-align:center; padding:30px;">A abrir as Escrituras...</p>';
 
   try {
-    const livroFormatado = livro.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/ /g, "+");
-    const url = `https://bible-api.com/${livroFormatado}+${capitulo}?translation=almeida`;
-    const r = await fetch(url);
+    const queryEn = encodeURIComponent(info.en + ' ' + capitulo);
+    const urlBiblia = 'https:' + '//bible-api.com' + '/' + queryEn + '?translation=arc1911&single_chapter_book_matching=indifferent';
+    const r = await fetch(urlBiblia);
     const d = await r.json();
-    
-    if (d.error) throw new Error("Capítulo não encontrado na API.");
+    if (!d.verses || d.error) throw new Error("Capítulo não encontrado.");
 
-    divLeitura.innerHTML = d.verses.map(v => {
-      const isFav = favoritosBiblia.some(f => f.texto === v.text);
-      return `
-      <div class="versiculo-row">
-        <div class="versiculo-texto"><span class="versiculo-num">${v.verse}</span> ${v.text}</div>
-        <button class="fav-btn ${isFav ? 'active' : ''}" onclick="toggleFavoritoBiblia(event, '${livro}', '${capitulo}', '${v.verse}', \`${v.text.replace(/`/g, '\\`')}\`)">⭐</button>
-      </div>
-    `;
-    }).join('');
+    cacheCapitulosBiblia[chaveCache] = d.verses;
+    versiculosAtuaisBiblia = d.verses;
+    renderizarVersiculosBiblia(d.verses, livroNome, capitulo);
   } catch (e) {
-    divLeitura.innerHTML = `<p style="text-align:center; color:#dc2626;">Não foi possível carregar o texto. Verifique a ligação à internet.</p>`;
+    divLeitura.innerHTML = '<p style="text-align:center; color:#dc2626; padding:20px;">Não foi possível carregar o texto. Verifique a ligação à internet.</p>';
   }
+}
+
+function renderizarVersiculosBiblia(lista, livroNome, capitulo) {
+  const divLeitura = document.getElementById('bibliaLeitura');
+  if (!lista.length) {
+    divLeitura.innerHTML = '<p style="text-align:center; color:#64748b;">Nenhum versículo corresponde ao filtro.</p>';
+    return;
+  }
+
+  divLeitura.innerHTML = lista.map(v => {
+    const ref = livroNome + ' ' + capitulo + ':' + v.verse;
+    const isFav = favoritosBiblia.some(f => f.ref === ref);
+    const destaque = versiculoDestaqueAlvo && Number(versiculoDestaqueAlvo) === Number(v.verse)
+      ? 'background:rgba(250,204,21,0.28); border-radius:10px; padding:8px;' : '';
+    const txtLimpo = v.text.trim();
+    const txtJson = JSON.stringify(txtLimpo).replace(/'/g, "&#39;");
+    const waUrl = 'https://' + 'wa.me/?text=' + encodeURIComponent('"' + txtLimpo + '" (' + ref + ')');
+
+    return '<div id="vers_' + v.verse + '" class="versiculo-row" style="display:flex; justify-content:space-between; align-items:flex-start; gap:10px; margin-bottom:10px; border-bottom:1px dashed rgba(148,163,184,0.35); padding-bottom:8px; ' + destaque + '">' +
+      '<div class="versiculo-texto" style="flex:1;"><span class="versiculo-num" style="font-weight:900; color:#b45309; font-size:13px; margin-right:6px;">' + v.verse + '</span>' + txtLimpo + '</div>' +
+      '<div style="display:flex; gap:6px; flex-shrink:0; align-items:center;">' +
+        '<button type="button" class="fav-btn ' + (isFav ? 'active' : '') + '" title="Guardar nos Favoritos" onclick=\'toggleFavoritoBiblia(event, "' + livroNome + '", "' + capitulo + '", "' + v.verse + '", ' + txtJson + ')\' style="font-size:18px; background:none; border:none; color:' + (isFav ? '#eab308' : '#94a3b8') + ';">' + (isFav ? '★' : '☆') + '</button>' +
+        '<a href="' + waUrl + '" target="_blank" title="Partilhar no WhatsApp" style="text-decoration:none; font-size:11px; background:#059669; color:#fff; padding:3px 7px; border-radius:6px; font-weight:700;">Zap</a>' +
+      '</div>' +
+    '</div>';
+  }).join('');
+
+  if (versiculoDestaqueAlvo) {
+    const alvoEl = document.getElementById('vers_' + versiculoDestaqueAlvo);
+    if (alvoEl) alvoEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    versiculoDestaqueAlvo = null;
+  }
+}
+
+function buscaRapidaBiblia() {
+  const termo = document.getElementById('inputBuscaBiblia').value.trim();
+  if (!termo) return;
+
+  const match = termo.match(/^([1-3]?\s*[a-zA-ZÀ-ÿ\s]+?)\s+(\d+)(?:[:\s.,]+(\d+))?$/);
+  if (match) {
+ const livroDigitado = normalizarTxtBiblia(match[1]);
+ const cap = Number(match[2]);
+ const vers = match[3] ? Number(match[3]) : null;
+
+    const livroEnc = LIVROS_BIBLIA.find(l =>
+      normalizarTxtBiblia(l.pt) === livroDigitado || normalizarTxtBiblia(l.pt).startsWith(livroDigitado)
+    );
+
+    if (livroEnc && cap >= 1 && cap <= livroEnc.caps) {
+      mudarAbaBiblia('leitura');
+      document.getElementById('bibliaLivro').value = livroEnc.pt;
+      carregarCapitulosBiblia(false);
+      document.getElementById('bibliaCapitulo').value = String(cap);
+      versiculoDestaqueAlvo = vers;
+      document.getElementById('inputBuscaBiblia').value = '';
+      buscarVersiculosBiblia();
+      return;
+    }
+  }
+  filtrarVersiculosNaTela(termo);
+}
+
+function filtrarVersiculosNaTela(termo) {
+  const livroNome = document.getElementById('bibliaLivro').value;
+  const capitulo = document.getElementById('bibliaCapitulo').value;
+  if (!versiculosAtuaisBiblia.length) return;
+  const q = normalizarTxtBiblia(termo);
+  const filtrados = q ? versiculosAtuaisBiblia.filter(v => normalizarTxtBiblia(v.text).includes(q)) : versiculosAtuaisBiblia;
+  renderizarVersiculosBiblia(filtrados, livroNome, capitulo);
 }
 
 function toggleFavoritoBiblia(e, livro, capitulo, versiculo, texto) {
   e.stopPropagation();
-  const ref = `${livro} ${capitulo}:${versiculo}`;
-  const index = favoritosBiblia.findIndex(f => f.texto === texto);
-  
+  const ref = livro + ' ' + capitulo + ':' + versiculo;
+  const index = favoritosBiblia.findIndex(f => f.ref === ref);
+
   if (index > -1) {
     favoritosBiblia.splice(index, 1);
+    e.target.textContent = '☆';
+    e.target.style.color = '#94a3b8';
   } else {
-    favoritosBiblia.push({ ref, texto });
+    favoritosBiblia.unshift({ ref, texto, livro, capitulo, versiculo });
+    e.target.textContent = '★';
+    e.target.style.color = '#eab308';
   }
   localStorage.setItem('favoritos_biblia', JSON.stringify(favoritosBiblia));
-  e.target.classList.toggle('active');
+  atualizarContadorFavBiblia();
+}
+
+function renderizarFavoritosBiblia() {
+  const div = document.getElementById('listaFavoritosBiblia');
+  if (!favoritosBiblia.length) {
+    div.innerHTML = '<div style="text-align:center; padding:40px; color:#94a3b8;">Ainda não guardaste nenhum versículo.<br><small>Clica na estrela ao lado de qualquer versículo para guardar aqui.</small></div>';
+    return;
+  }
+  div.innerHTML = favoritosBiblia.map((f, idx) => {
+    const waUrl = 'https://' + 'wa.me/?text=' + encodeURIComponent('"' + f.texto + '" (' + f.ref + ')');
+    return '<div style="background:#1e293b; border:1px solid #334155; border-left:4px solid #facc15; border-radius:12px; padding:14px;">' +
+      '<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">' +
+        '<strong style="color:#facc15; font-size:14px;">★ ' + f.ref + '</strong>' +
+        '<div style="display:flex; gap:8px;">' +
+          '<a href="' + waUrl + '" target="_blank" style="background:#059669; color:#fff; text-decoration:none; padding:4px 10px; border-radius:6px; font-size:11px; font-weight:700;">WhatsApp</a>' +
+          '<button type="button" onclick="removerFavoritoBiblia(' + idx + ')" style="background:rgba(239,68,68,0.2); color:#fca5a5; border:1px solid rgba(239,68,68,0.4); border-radius:6px; padding:4px 8px; font-size:11px;">Remover</button>' +
+        '</div>' +
+      '</div>' +
+      '<p style="color:#f1f5f9; font-family:Georgia,serif; font-size:15px; line-height:1.6; margin:0;">"' + f.texto + '"</p>' +
+    '</div>';
+  }).join('');
+}
+
+function removerFavoritoBiblia(idx) {
+  favoritosBiblia.splice(idx, 1);
+  localStorage.setItem('favoritos_biblia', JSON.stringify(favoritosBiblia));
+  atualizarContadorFavBiblia();
+  renderizarFavoritosBiblia();
 }
 
 function navegarBiblia(dir) {
   const selectCap = document.getElementById('bibliaCapitulo');
   let atual = Number(selectCap.value);
   if (!atual) return;
-  
+
   const proximo = atual + dir;
   if (proximo >= 1 && proximo <= selectCap.options.length - 1) {
     selectCap.value = proximo;
