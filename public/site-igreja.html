@@ -1417,72 +1417,72 @@ function gerarPDFComprovativo() {
 
 // ===== BÍBLIA PREMIUM =====
 const LIVROS_BIBLIA = [
-  { pt: "Génesis", en: "Genesis", caps: 50, test: "AT" },
-  { pt: "Êxodo", en: "Exodus", caps: 40, test: "AT" },
-  { pt: "Levítico", en: "Leviticus", caps: 27, test: "AT" },
-  { pt: "Números", en: "Numbers", caps: 36, test: "AT" },
-  { pt: "Deuteronómio", en: "Deuteronomy", caps: 34, test: "AT" },
-  { pt: "Josué", en: "Joshua", caps: 24, test: "AT" },
-  { pt: "Juízes", en: "Judges", caps: 21, test: "AT" },
-  { pt: "Rute", en: "Ruth", caps: 4, test: "AT" },
-  { pt: "1 Samuel", en: "1 Samuel", caps: 31, test: "AT" },
-  { pt: "2 Samuel", en: "2 Samuel", caps: 24, test: "AT" },
-  { pt: "1 Reis", en: "1 Kings", caps: 22, test: "AT" },
-  { pt: "2 Reis", en: "2 Kings", caps: 25, test: "AT" },
-  { pt: "1 Crónicas", en: "1 Chronicles", caps: 29, test: "AT" },
-  { pt: "2 Crónicas", en: "2 Chronicles", caps: 36, test: "AT" },
-  { pt: "Esdras", en: "Ezra", caps: 10, test: "AT" },
-  { pt: "Neemias", en: "Nehemiah", caps: 13, test: "AT" },
-  { pt: "Ester", en: "Esther", caps: 10, test: "AT" },
-  { pt: "Jó", en: "Job", caps: 42, test: "AT" },
-  { pt: "Salmos", en: "Psalms", caps: 150, test: "AT" },
-  { pt: "Provérbios", en: "Proverbs", caps: 31, test: "AT" },
-  { pt: "Eclesiastes", en: "Ecclesiastes", caps: 12, test: "AT" },
-  { pt: "Cantares", en: "Song of Solomon", caps: 8, test: "AT" },
-  { pt: "Isaías", en: "Isaiah", caps: 66, test: "AT" },
-  { pt: "Jeremias", en: "Jeremiah", caps: 52, test: "AT" },
-  { pt: "Lamentações", en: "Lamentations", caps: 5, test: "AT" },
-  { pt: "Ezequiel", en: "Ezekiel", caps: 48, test: "AT" },
-  { pt: "Daniel", en: "Daniel", caps: 12, test: "AT" },
-  { pt: "Oseias", en: "Hosea", caps: 14, test: "AT" },
-  { pt: "Joel", en: "Joel", caps: 3, test: "AT" },
-  { pt: "Amós", en: "Amos", caps: 9, test: "AT" },
-  { pt: "Obadias", en: "Obadiah", caps: 1, test: "AT" },
-  { pt: "Jonas", en: "Jonah", caps: 4, test: "AT" },
-  { pt: "Miqueias", en: "Micah", caps: 7, test: "AT" },
-  { pt: "Naum", en: "Nahum", caps: 3, test: "AT" },
-  { pt: "Habacuque", en: "Habakkuk", caps: 3, test: "AT" },
-  { pt: "Sofonias", en: "Zephaniah", caps: 3, test: "AT" },
-  { pt: "Ageu", en: "Haggai", caps: 2, test: "AT" },
-  { pt: "Zacarias", en: "Zechariah", caps: 14, test: "AT" },
-  { pt: "Malaquias", en: "Malachi", caps: 4, test: "AT" },
-  { pt: "Mateus", en: "Matthew", caps: 28, test: "NT" },
-  { pt: "Marcos", en: "Mark", caps: 16, test: "NT" },
-  { pt: "Lucas", en: "Luke", caps: 24, test: "NT" },
-  { pt: "João", en: "John", caps: 21, test: "NT" },
-  { pt: "Atos", en: "Acts", caps: 28, test: "NT" },
-  { pt: "Romanos", en: "Romans", caps: 16, test: "NT" },
-  { pt: "1 Coríntios", en: "1 Corinthians", caps: 16, test: "NT" },
-  { pt: "2 Coríntios", en: "2 Corinthians", caps: 13, test: "NT" },
-  { pt: "Gálatas", en: "Galatians", caps: 6, test: "NT" },
-  { pt: "Efésios", en: "Ephesians", caps: 6, test: "NT" },
-  { pt: "Filipenses", en: "Philippians", caps: 4, test: "NT" },
-  { pt: "Colossenses", en: "Colossians", caps: 4, test: "NT" },
-  { pt: "1 Tessalonicenses", en: "1 Thessalonians", caps: 5, test: "NT" },
-  { pt: "2 Tessalonicenses", en: "2 Thessalonians", caps: 3, test: "NT" },
-  { pt: "1 Timóteo", en: "1 Timothy", caps: 6, test: "NT" },
-  { pt: "2 Timóteo", en: "2 Timothy", caps: 4, test: "NT" },
-  { pt: "Tito", en: "Titus", caps: 3, test: "NT" },
-  { pt: "Filemom", en: "Philemon", caps: 1, test: "NT" },
-  { pt: "Hebreus", en: "Hebrews", caps: 13, test: "NT" },
-  { pt: "Tiago", en: "James", caps: 5, test: "NT" },
-  { pt: "1 Pedro", en: "1 Peter", caps: 5, test: "NT" },
-  { pt: "2 Pedro", en: "2 Peter", caps: 3, test: "NT" },
-  { pt: "1 João", en: "1 John", caps: 5, test: "NT" },
-  { pt: "2 João", en: "2 John", caps: 1, test: "NT" },
-  { pt: "3 João", en: "3 John", caps: 1, test: "NT" },
-  { pt: "Judas", en: "Jude", caps: 1, test: "NT" },
-  { pt: "Apocalipse", en: "Revelation", caps: 22, test: "NT" }
+  { id: "GEN", pt: "Génesis", en: "Genesis", caps: 50, test: "AT" },
+  { id: "EXO", pt: "Êxodo", en: "Exodus", caps: 40, test: "AT" },
+  { id: "LEV", pt: "Levítico", en: "Leviticus", caps: 27, test: "AT" },
+  { id: "NUM", pt: "Números", en: "Numbers", caps: 36, test: "AT" },
+  { id: "DEU", pt: "Deuteronómio", en: "Deuteronomy", caps: 34, test: "AT" },
+  { id: "JOS", pt: "Josué", en: "Joshua", caps: 24, test: "AT" },
+  { id: "JDG", pt: "Juízes", en: "Judges", caps: 21, test: "AT" },
+  { id: "RUT", pt: "Rute", en: "Ruth", caps: 4, test: "AT" },
+  { id: "1SA", pt: "1 Samuel", en: "1 Samuel", caps: 31, test: "AT" },
+  { id: "2SA", pt: "2 Samuel", en: "2 Samuel", caps: 24, test: "AT" },
+  { id: "1KI", pt: "1 Reis", en: "1 Kings", caps: 22, test: "AT" },
+  { id: "2KI", pt: "2 Reis", en: "2 Kings", caps: 25, test: "AT" },
+  { id: "1CH", pt: "1 Crónicas", en: "1 Chronicles", caps: 29, test: "AT" },
+  { id: "2CH", pt: "2 Crónicas", en: "2 Chronicles", caps: 36, test: "AT" },
+  { id: "EZR", pt: "Esdras", en: "Ezra", caps: 10, test: "AT" },
+  { id: "NEH", pt: "Neemias", en: "Nehemiah", caps: 13, test: "AT" },
+  { id: "EST", pt: "Ester", en: "Esther", caps: 10, test: "AT" },
+  { id: "JOB", pt: "Jó", en: "Job", caps: 42, test: "AT" },
+  { id: "PSA", pt: "Salmos", en: "Psalms", caps: 150, test: "AT" },
+  { id: "PRO", pt: "Provérbios", en: "Proverbs", caps: 31, test: "AT" },
+  { id: "ECC", pt: "Eclesiastes", en: "Ecclesiastes", caps: 12, test: "AT" },
+  { id: "SNG", pt: "Cantares", en: "Song of Solomon", caps: 8, test: "AT" },
+  { id: "ISA", pt: "Isaías", en: "Isaiah", caps: 66, test: "AT" },
+  { id: "JER", pt: "Jeremias", en: "Jeremiah", caps: 52, test: "AT" },
+  { id: "LAM", pt: "Lamentações", en: "Lamentations", caps: 5, test: "AT" },
+  { id: "EZK", pt: "Ezequiel", en: "Ezekiel", caps: 48, test: "AT" },
+  { id: "DAN", pt: "Daniel", en: "Daniel", caps: 12, test: "AT" },
+  { id: "HOS", pt: "Oseias", en: "Hosea", caps: 14, test: "AT" },
+  { id: "JOL", pt: "Joel", en: "Joel", caps: 3, test: "AT" },
+  { id: "AMO", pt: "Amós", en: "Amos", caps: 9, test: "AT" },
+  { id: "OBA", pt: "Obadias", en: "Obadiah", caps: 1, test: "AT" },
+  { id: "JON", pt: "Jonas", en: "Jonah", caps: 4, test: "AT" },
+  { id: "MIC", pt: "Miqueias", en: "Micah", caps: 7, test: "AT" },
+  { id: "NAM", pt: "Naum", en: "Nahum", caps: 3, test: "AT" },
+  { id: "HAB", pt: "Habacuque", en: "Habakkuk", caps: 3, test: "AT" },
+  { id: "ZEP", pt: "Sofonias", en: "Zephaniah", caps: 3, test: "AT" },
+  { id: "HAG", pt: "Ageu", en: "Haggai", caps: 2, test: "AT" },
+  { id: "ZEC", pt: "Zacarias", en: "Zechariah", caps: 14, test: "AT" },
+  { id: "MAL", pt: "Malaquias", en: "Malachi", caps: 4, test: "AT" },
+  { id: "MAT", pt: "Mateus", en: "Matthew", caps: 28, test: "NT" },
+  { id: "MRK", pt: "Marcos", en: "Mark", caps: 16, test: "NT" },
+  { id: "LUK", pt: "Lucas", en: "Luke", caps: 24, test: "NT" },
+  { id: "JHN", pt: "João", en: "John", caps: 21, test: "NT" },
+  { id: "ACT", pt: "Atos", en: "Acts", caps: 28, test: "NT" },
+  { id: "ROM", pt: "Romanos", en: "Romans", caps: 16, test: "NT" },
+  { id: "1CO", pt: "1 Coríntios", en: "1 Corinthians", caps: 16, test: "NT" },
+  { id: "2CO", pt: "2 Coríntios", en: "2 Corinthians", caps: 13, test: "NT" },
+  { id: "GAL", pt: "Gálatas", en: "Galatians", caps: 6, test: "NT" },
+  { id: "EPH", pt: "Efésios", en: "Ephesians", caps: 6, test: "NT" },
+  { id: "PHP", pt: "Filipenses", en: "Philippians", caps: 4, test: "NT" },
+  { id: "COL", pt: "Colossenses", en: "Colossians", caps: 4, test: "NT" },
+  { id: "1TH", pt: "1 Tessalonicenses", en: "1 Thessalonians", caps: 5, test: "NT" },
+  { id: "2TH", pt: "2 Tessalonicenses", en: "2 Thessalonians", caps: 3, test: "NT" },
+  { id: "1TI", pt: "1 Timóteo", en: "1 Timothy", caps: 6, test: "NT" },
+  { id: "2TI", pt: "2 Timóteo", en: "2 Timothy", caps: 4, test: "NT" },
+  { id: "TIT", pt: "Tito", en: "Titus", caps: 3, test: "NT" },
+  { id: "PHM", pt: "Filemom", en: "Philemon", caps: 1, test: "NT" },
+  { id: "HEB", pt: "Hebreus", en: "Hebrews", caps: 13, test: "NT" },
+  { id: "JAS", pt: "Tiago", en: "James", caps: 5, test: "NT" },
+  { id: "1PE", pt: "1 Pedro", en: "1 Peter", caps: 5, test: "NT" },
+  { id: "2PE", pt: "2 Pedro", en: "2 Peter", caps: 3, test: "NT" },
+  { id: "1JN", pt: "1 João", en: "1 John", caps: 5, test: "NT" },
+  { id: "2JN", pt: "2 João", en: "2 John", caps: 1, test: "NT" },
+  { id: "3JN", pt: "3 João", en: "3 John", caps: 1, test: "NT" },
+  { id: "JUD", pt: "Judas", en: "Jude", caps: 1, test: "NT" },
+  { id: "REV", pt: "Apocalipse", en: "Revelation", caps: 22, test: "NT" }
 ];
 
 const cacheCapitulosBiblia = {};
@@ -1576,6 +1576,7 @@ function carregarCapitulosBiblia(autoAbrirCap1 = false) {
     buscarVersiculosBiblia();
   }
 }
+
 async function buscarVersiculosBiblia() {
   const livroNome = document.getElementById('bibliaLivro').value;
   const capitulo = document.getElementById('bibliaCapitulo').value;
@@ -1586,7 +1587,7 @@ async function buscarVersiculosBiblia() {
 
   document.getElementById('bibliaRef').textContent = livroNome + ' ' + capitulo;
   document.getElementById('bibliaProgresso').textContent = 'Cap. ' + capitulo + ' de ' + info.caps;
-  const chaveCache = info.en + '_' + capitulo;
+  const chaveCache = info.id + '_' + capitulo;
 
   if (cacheCapitulosBiblia[chaveCache]) {
     versiculosAtuaisBiblia = cacheCapitulosBiblia[chaveCache];
@@ -1596,19 +1597,28 @@ async function buscarVersiculosBiblia() {
 
   divLeitura.innerHTML = '<p style="text-align:center; padding:30px;">A abrir as Escrituras...</p>';
 
-  try {
-    const queryEn = encodeURIComponent(info.en + ' ' + capitulo);
-    const urlBiblia = 'https:' + '//bible-api.com' + '/' + queryEn + '?translation=arc1911&single_chapter_book_matching=indifferent';
-    const r = await fetch(urlBiblia);
-    const d = await r.json();
-    if (!d.verses || d.error) throw new Error("Capítulo não encontrado.");
+  const host = 'https:' + '//bible-api.com';
+  const urls = [
+    host + '/data/arc1911/' + info.id + '/' + capitulo,
+    host + '/' + encodeURIComponent(info.en + ' ' + capitulo) + '?translation=arc1911',
+    host + '/data/blivre/' + info.id + '/' + capitulo
+  ];
 
-    cacheCapitulosBiblia[chaveCache] = d.verses;
-    versiculosAtuaisBiblia = d.verses;
-    renderizarVersiculosBiblia(d.verses, livroNome, capitulo);
-  } catch (e) {
-    divLeitura.innerHTML = '<p style="text-align:center; color:#dc2626; padding:20px;">Não foi possível carregar o texto. Verifique a ligação à internet.</p>';
+  for (const url of urls) {
+    try {
+      const r = await fetch(url);
+      if (!r.ok) continue;
+      const d = await r.json();
+      if (d && Array.isArray(d.verses) && d.verses.length > 0) {
+        cacheCapitulosBiblia[chaveCache] = d.verses;
+        versiculosAtuaisBiblia = d.verses;
+        renderizarVersiculosBiblia(d.verses, livroNome, capitulo);
+        return;
+      }
+    } catch (e) {}
   }
+
+  divLeitura.innerHTML = '<p style="text-align:center; color:#dc2626; padding:20px;">Não foi possível carregar este capítulo no momento. Tente novamente em alguns segundos.</p>';
 }
 
 function renderizarVersiculosBiblia(lista, livroNome, capitulo) {
